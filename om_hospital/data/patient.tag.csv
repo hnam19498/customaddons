@@ -1,0 +1,4 @@
+id,name,active
+patient_tag_vip4,vip4,True
+patient_tag_vip5,vip5,True
+patient_tag_vip6,vip6,False
