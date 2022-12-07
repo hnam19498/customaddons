@@ -21,7 +21,8 @@ class Bundle(models.Model):
     start_time = fields.Datetime()
     end_time = fields.Datetime()
 
-    product_ids = fields.One2many('product.product', 'product_ids')
+    bundle_to_product_id = fields.One2many('product.product', 'product_to_bundle_ids')
+    bundle_to_qty_id = fields.One2many('product.bundle.qty', 'qty_to_bundle_ids')
 
     def check_indefinite_bundle(self):
         if self.indefinite_bundle:
@@ -34,7 +35,7 @@ class ProductQty(models.Model):
     qty_start = fields.Integer()
     qty_end = fields.Integer()
     discount_value = fields.Integer()
-    bundle_id = fields.Many2one('product.bundle')
+    qty_to_bundle_ids = fields.Many2one('product.bundle')
 
 class BundleSetting(models.Model):
     _name = 'product.bundle.setting'
@@ -47,4 +48,4 @@ class BundleSetting(models.Model):
 class BundleReport(models.Model):
     _name = 'product.bundle.report'
 
-    bundle_id = fields.Many2one('product.bundle')
+    bundle_report_id = fields.Many2one('product.bundle')

@@ -44,17 +44,40 @@
                     <group>
                         <group>
                             <field name="type" string="Bundle type"/>
-                            <field name="discount_rule" string="Discount rule"/>
-                            <field name="discount_type" string="Discount type"/>
-                            <field name="discount_value" string="Discount value"/>
+                            <field name="discount_rule" string="Discount rule"
+                                   attrs="{'invisible':[('type','=','tier')]}"/>
+                            <field name="discount_type" string="Discount type"
+                                   attrs="{'invisible':[('type','=','tier')]}"/>
+                            <field name="discount_value" string="Discount value"
+                                   attrs="{'invisible':[('type','=','tier')]}"/>
                         </group>
                     </group>
-                    <field name="product_ids"
-                           attrs="{'invisible': ['|',('discount_type','!=','total_fix'),('type','!=','bundle')]}">
+                    <field name="bundle_to_product_id"
+                           attrs="{'invisible':['|',('type','!=','bundle'),('discount_rule','!=','discount_on_total_bundle')]}">
                         <tree>
                             <field name="name" string="Product"></field>
                             <field name="product_template_variant_value_ids" string="Product variant"/>
                             <field name="product_vendor" string="Product vendor"/>
+                            <field name="product_bundle_qty" string="Quantity"/>
+                        </tree>
+                    </field>
+                    <field name="bundle_to_product_id"
+                           attrs="{'invisible':['|',('type','!=','bundle'),('discount_rule','!=','discount_on_each_products_variants')]}">
+                        <tree>
+                            <field name="name" string="Product"></field>
+                            <field name="product_template_variant_value_ids" string="Product variant"/>
+                            <field name="product_vendor" string="Product vendor"/>
+                            <field name="product_bundle_qty" string="Quantity"/>
+                            <field name="discount_value" string="Discount"/>
+                        </tree>
+                    </field>
+                    <field name="bundle_to_qty_id" attrs="{'invisible':[('type','!=','tier')]}">
+                        <tree>
+                            <field name="qty_to_bundle_ids" string="Option"></field>
+                            <field name="is_add_range" string=" " widget="boolean_toggle"/>
+                            <field name="qty_start" string="Quantity start"/>
+                            <field name="qty_end" string="Quantity end"/>
+                            <field name="discount_value" string="Discount value"/>
                         </tree>
                     </field>
                 </sheet>
