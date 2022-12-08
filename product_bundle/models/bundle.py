@@ -1,4 +1,5 @@
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 
 
 class Bundle(models.Model):
@@ -9,35 +10,57 @@ class Bundle(models.Model):
     description = fields.Char()
     type = fields.Selection([('bundle', 'Multiple product bundle (Discount by purchasing multiple products)'),
                              ('tier', 'Quantity break bundle (Discount by purchasing a product in a larger quantity)')])
-    discount_rule = fields.Selection([('discount_on_total_bundle', 'Discount on total bundle'),
-                                      ('discount_on_each_products_variants', 'Discount on each products/variants')])
+    discount_rule = fields.Selection(
+        [('total', 'Discount on total bundle'), ('product', 'Discount on each products/variants')])
     discount_type = fields.Selection(
         [('percentage', 'Percentage'), ('hard_fix', 'Hard fix'), ('total_fix', 'Total fix')])
     discount_value = fields.Integer()
     priority = fields.Integer()
     enable = fields.Boolean()
     active = fields.Boolean()
-    indefinite_bundle = fields.Boolean()
+    indefinite_bundle = fields.Boolean(default=False)
     start_time = fields.Datetime()
     end_time = fields.Datetime()
 
-    bundle_to_product_ids = fields.One2many('product.product', 'product_to_bundle_id')
-    bundle_to_qty_ids = fields.One2many('product.bundle.qty', 'qty_to_bundle_id')
+    bundle_to_product_ids = fields.Many2many('product.product', 'bundle_to_product_rel')
+    bundle_to_qty_ids = fields.Many2many('product.bundle.qty')
+    bundle_total_product_ids = fields.Many2many('product.product', 'bundle_total_product_rel')
+    bundle_tier_product_ids = fields.Many2many('product.product', 'bundle_tier_product_rel')
+    bundle_product_ids = fields.Many2many('product.product', 'bundle_product_rel')
 
+    @api.constrains('indefinite_bundle')
     def check_indefinite_bundle(self):
         if self.indefinite_bundle:
             self.start_time = self.end_time = False
+
+    @api.constrains('discount_value')
+    def check_discount_value(self):
+        if float(self.discount_value) <= 0:
+            raise ValidationError(_("Discount value must be an int, greater than or equal to 0!"))
+        if float(self.discount_value):
+            pass
+        else:
+            raise ValidationError(_("Discount value must be an int, greater than or equal to 0!!"))
 
 
 class ProductQty(models.Model):
     _name = 'product.bundle.qty'
 
-    is_add_range = fields.Boolean()
+    qty_bundle_ids = fields.Integer()
+    is_add_range = fields.Boolean(default=False)
     qty_start = fields.Integer()
+    qty = fields.Integer()
     qty_end = fields.Integer()
     discount_value = fields.Integer()
-    qty_to_bundle_id = fields.Many2one('product.bundle')
-    qty_bundle_id = fields.Integer(related='qty_to_bundle_id.id')
+
+    def check_qty(self):
+        for product in self:
+            if product.qty_start and product.qty_end:
+                if product.qty_start >= product.qty_end:
+                    product.qty_start = product.qty_end = 0
+            else:
+                if product.qty < 0 or product.qty.is_integer() == False:
+                    product.qty = 0
 
 
 class BundleSetting(models.Model):
