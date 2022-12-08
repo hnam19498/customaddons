@@ -14,17 +14,16 @@ class ProductBundle(models.Model):
             product.product_vendor = product.company_id.name
 
     def get_variant(self):
-        tempp1 = ''
         for product in self:
-            for variantid in product.product_variant_ids:
-                tempp1 = ''
-                for template_variant in variantid.product_template_variant_value_ids:
-                    tempp1 += template_variant.display_name + " - "
-                    if tempp1[-3:] == ' - ':
-                        temm2 = tempp1[:-3]
-            product.product_bundle_variant = temm2
-            if product.product_bundle_variant:
-                pass
+            temp1 = ''
+            temp2 = ''
+            for lol in product.product_template_variant_value_ids:
+                if lol.display_name:
+                    temp1 += lol.display_name + " - "
+                    if temp1[-3:] == ' - ':
+                        temp2 = temp1[:-3]
+            if len(temp2) >= 1:
+                product.product_bundle_variant = temp2
             else:
                 product.product_bundle_variant = 'No information!'
 

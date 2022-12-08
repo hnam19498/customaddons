@@ -98,8 +98,7 @@
                         <tree editable="top">
                             <field name="name" string="Product"/>
                             <field name="image_128" string="Image" widget="image"/>
-                            <field name="product_bundle_variant" string="Product variant"
-                                   widget="many2many_tags"/>
+                            <field name="product_bundle_variant" string="Product variant"/>
                             <field name="product_vendor" string="Product vendor"/>
                             <field name="product_bundle_qty" string="Quantity"/>
                         </tree>
