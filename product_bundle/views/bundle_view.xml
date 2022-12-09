@@ -104,7 +104,7 @@
                         </tree>
                     </field>
 
-                    <field name="bundle_product_ids"
+                    <field name="bundle_each_product_ids"
                            attrs="{'invisible':['|',('type','!=','bundle'),('discount_rule','!=','product')]}">
                         <tree editable="top">
                             <field name="name" string="Product"/>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <template id="bundle_template" name="Bundle template" inherit_id="website_sale.product">
+        <xpath expr="//div[@id='add_to_cart_wrap']" position="after">
+            <t t-foreach="product_bundle.">
+
+            </t>
+        </xpath>
+    </template>
+</odoo>
