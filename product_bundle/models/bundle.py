@@ -1,5 +1,6 @@
 from odoo import api, models, fields, _
 from odoo.exceptions import ValidationError
+from datetime import datetime
 
 
 class Bundle(models.Model):
@@ -21,12 +22,24 @@ class Bundle(models.Model):
     indefinite_bundle = fields.Boolean(default=False)
     start_time = fields.Datetime()
     end_time = fields.Datetime()
+    enable_bundle = fields.Boolean(compute='check_enable_bundle')
 
     bundle_to_product_ids = fields.Many2many("product.product", "bundle_to_product_rel")
     bundle_to_qty_ids = fields.Many2many("product.bundle.qty")
     bundle_total_product_ids = fields.Many2many("product.product", "bundle_total_product_rel")
     bundle_tier_product_ids = fields.Many2many("product.product", "bundle_tier_product_rel")
     bundle_each_product_ids = fields.Many2many("product.product", "bundle_each_product_rel")
+
+    def check_enable_bundle(self):
+        today = datetime.now()
+        for bundle in self:
+            if bundle.start_time and bundle.end_time:
+                if bundle.start_time <= today <= bundle.end_time:
+                    bundle.enable_bundle = True
+            elif bundle.indefinite_bundle:
+                bundle.enable_bundle = True
+            else:
+                bundle.enable_bundle = False
 
     @api.constrains("indefinite_bundle")
     def check_indefinite_bundle(self):
@@ -46,7 +59,7 @@ class Bundle(models.Model):
 class ProductQty(models.Model):
     _name = "product.bundle.qty"
 
-    qty_bundle_ids = fields.Many2one("product.bundle")
+    qty_bundle_id = fields.Many2one("product.bundle")
     is_add_range = fields.Boolean(default=False)
     qty_start = fields.Integer()
     qty = fields.Integer()
@@ -70,7 +83,7 @@ class BundleSetting(models.Model):
     bundle_number = fields.Integer()
     bundle_title_color = fields.Char()
     button_label = fields.Char()
-    user_id = fields.Many2one('res.users')
+    user_setting_id = fields.Many2one('res.users')
 
 
 class BundleReport(models.Model):

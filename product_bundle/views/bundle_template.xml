@@ -2,9 +2,18 @@
 <odoo>
     <template id="bundle_template" name="Bundle template" inherit_id="website_sale.product">
         <xpath expr="//div[@id='add_to_cart_wrap']" position="after">
-            <t t-foreach="product_bundle.">
-
-            </t>
+            <div style="display: flex;">
+                <t t-foreach="product.get_bundle_list()" t-as="bundle">
+                    <t t-if="bundle.enable_bundle">
+                        <div style="border:1px solid; margin-left:5px;">
+                            <p><t t-out="bundle.title"></t></p>
+                            <p><t t-out="bundle.discount_rule"></t></p>
+                            <p><t t-out="bundle.discount_type"></t></p>
+                            <p><t t-out="bundle.discount_value"></t></p>
+                        </div>
+                    </t>
+                </t>
+            </div>
         </xpath>
     </template>
 </odoo>
