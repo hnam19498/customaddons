@@ -73,7 +73,7 @@
 
                     <field name="bundle_to_qty_ids" attrs="{'invisible':[('type','!=','tier')]}">
                         <tree>
-                            <field name="qty_bundle_id" string="Option"/>
+                            <field name="id" string="Option"/>
                             <field name="is_add_range" string=" " widget="boolean_toggle"/>
                             <field name="qty_start" string="Quantity start"
                                    attrs="{'invisible':[('is_add_range','=',False)]}"/>

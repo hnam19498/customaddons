@@ -51,7 +51,7 @@ class ProductVariant(models.Model):
 
 
 class ProductTemplate(models.Model):
-    _inherit = 'product.template'
+    _inherit = "product.template"
 
     def get_bundle_list(self):
         bundles = []
@@ -76,6 +76,11 @@ class ProductTemplate(models.Model):
                 if id not in bundle_ids:
                     bundle_ids.append(id)
 
-        bundles = self.env['product.bundle'].browse(bundle_ids)
+        bundles = self.env["product.bundle"].browse(bundle_ids)
 
         return bundles
+
+    def check_bundle_each_product_template_id(self):
+        for product in self:
+            for variant_id in product.product_variant_ids:
+                return variant_id.id

@@ -1,16 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
+
 <odoo>
     <template id="bundle_template" name="Bundle template" inherit_id="website_sale.product">
         <xpath expr="//div[@id='add_to_cart_wrap']" position="after">
-            <div style="display: flex;">
+            <div>
                 <t t-foreach="product.get_bundle_list()" t-as="bundle">
                     <t t-if="bundle.enable_bundle">
-                        <div style="border:1px solid; margin-left:5px;">
-                            <p><t t-out="bundle.title"></t></p>
-                            <p><t t-out="bundle.discount_rule"></t></p>
-                            <p><t t-out="bundle.discount_type"></t></p>
-                            <p><t t-out="bundle.discount_value"></t></p>
-                        </div>
+                        <t t-if="bundle.type == 'bundle'">
+                            <t t-if="bundle.discount_rule == 'total'">
+                                <div id="bundle_discount_rule_total" style="border: 1px solid black">
+                                    <t t-foreach="bundle.bundle_total_product_ids" t-as="bundle_total_product_id">
+                                        <t t-if="bundle_total_product_id.product_bundle_variant != 'No information!'">
+                                            <p><t t-out="bundle.title"/> - Mua <t t-out="bundle_total_product_id.product_bundle_qty"/> sản phẩm, mã <t t-out="bundle_total_product_id.product_bundle_variant"/>, giảm <t t-out="bundle.discount_value"/></p>
+                                        </t>
+                                        <t t-else="">
+                                            <p><t t-out="bundle.title"/> - Mua <t t-out="bundle_total_product_id.product_bundle_qty"/> sản phẩm, giảm <t t-out="bundle.discount_value"/></p>
+                                        </t>
+                                    </t>
+                                </div>
+                            </t>
+                            <t t-if="bundle.discount_rule == 'product'">
+                                <t t-foreach="bundle.bundle_each_product_ids" t-as="bundle_each_product_id">
+                                    <t t-if="bundle_each_product_id.id == product.check_bundle_each_product_template_id()">
+                                        <div style="border: 1px solid black">
+                                            <t t-if="bundle_each_product_id.product_bundle_variant != 'No information!'">
+                                                <p><t t-out="bundle.title"/> - Mua <t t-out="bundle_each_product_id.product_bundle_qty"/> sản phẩm, mã <t t-out="bundle_each_product_id.product_bundle_variant"/>, giảm <t t-out="bundle_each_product_id.discount_value"/></p>
+                                            </t>
+                                            <t t-else="">
+                                                <p><t t-out="bundle.title"/> - Mua <t t-out="bundle_each_product_id.product_bundle_qty"/> sản phẩm, giảm <t t-out="bundle_each_product_id.discount_value"/></p>
+                                            </t>
+                                        </div>
+                                    </t>
+                                </t>
+                            </t>
+                        </t>
                     </t>
                 </t>
             </div>

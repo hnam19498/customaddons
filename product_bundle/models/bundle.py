@@ -30,6 +30,8 @@ class Bundle(models.Model):
     bundle_tier_product_ids = fields.Many2many("product.product", "bundle_tier_product_rel")
     bundle_each_product_ids = fields.Many2many("product.product", "bundle_each_product_rel")
 
+
+
     def check_enable_bundle(self):
         today = datetime.now()
         for bundle in self:
@@ -46,14 +48,16 @@ class Bundle(models.Model):
         if self.indefinite_bundle:
             self.start_time = self.end_time = False
 
-    @api.constrains("discount_value")
+    @api.constrains("discount_value", 'type')
     def check_discount_value(self):
         if float(self.discount_value) <= 0:
-            raise ValidationError(_("Discount value must be an int, greater than or equal to 0!"))
-        if float(self.discount_value):
-            pass
+            if self.type == 'bundle':
+                raise ValidationError(_("Discount value must be an int, greater than or equal to 0!"))
         else:
-            raise ValidationError(_("Discount value must be an int, greater than or equal to 0!!"))
+            if float(self.discount_value):
+                pass
+            else:
+                raise ValidationError(_("Discount value must be an int, greater than or equal to 0!!"))
 
 
 class ProductQty(models.Model):
