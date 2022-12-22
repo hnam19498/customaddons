@@ -17,6 +17,20 @@
         </field>
     </record>
 
+    <record id="view_product_bundle_setting_tree" model="ir.ui.view">
+        <field name="name">bundle.setting.tree</field>
+        <field name="model">product.bundle.setting</field>
+        <field name="arch" type="xml">
+            <tree>
+                <field name="bundle_position" string="Bundle position"/>
+                <field name="bundle_number" string="Bundle number"/>
+                <field name="bundle_title_color" string="Bundle title color" widget="color"/>
+                <field name="button_label" string="Button label"/>
+                <field name="user_setting_id" string="User setting id"/>
+            </tree>
+        </field>
+    </record>
+
     <record id="view_product_bundle_qty_form" model="ir.ui.view">
         <field name="name">product.bundle.qty.form</field>
         <field name="model">product.bundle.qty</field>
@@ -67,14 +81,14 @@
                             <field name="discount_type" string="Discount type"
                                    attrs="{'invisible':[('type','=','tier')]}"/>
                             <field name="discount_value" string="Discount value"
-                                   attrs="{'invisible':[('type','=','tier')]}"/>
+                                   attrs="{'invisible':['|',('type','=','tier'),('discount_rule','=','product')]}"/>
                         </group>
                     </group>
 
                     <field name="bundle_to_qty_ids" attrs="{'invisible':[('type','!=','tier')]}">
                         <tree>
                             <field name="id" string="Option"/>
-                            <field name="is_add_range" string=" " widget="boolean_toggle"/>
+                            <field name="is_add_range" string="Is add range" widget="boolean_toggle"/>
                             <field name="qty_start" string="Quantity start"
                                    attrs="{'invisible':[('is_add_range','=',False)]}"/>
                             <field name="qty" string="Quantity" attrs="{'invisible': [('is_add_range', '=', True)]}"/>
@@ -130,9 +144,41 @@
         </field>
     </record>
 
+    <record id="action_bundle_setting" model="ir.actions.act_window">
+        <field name="name">Product bundle setting</field>
+        <field name="type">ir.actions.act_window</field>
+        <field name="res_model">product.bundle.setting</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create your first bundle setting!</p>
+        </field>
+    </record>
+
+    <record id="view_product_bundle_setting_form" model="ir.ui.view">
+        <field name="name">product.bundle.setting.form</field>
+        <field name="model">product.bundle.setting</field>
+        <field name="arch" type="xml">
+            <form>
+                <group>
+                    <field name="bundle_position" string="Bundle position"/>
+                    <field name="bundle_number" string="Bundle number"/>
+                    <field name="bundle_title_color" string="Bundle title color" widget="color"/>
+                    <field name="button_label" string="Button label"/>
+                    <field name="user_setting_id" string="User setting id"/>
+                </group>
+            </form>
+        </field>
+    </record>
+
     <menuitem id="menu_product_bundle_root"
               name="Product bundle"
               action="action_bundle"
+              sequence="0"/>
+
+    <menuitem id="menu_product_bundle_setting"
+              name="Product bundle setting"
+              action="action_bundle_setting"
+              parent="menu_product_bundle_root"
               sequence="0"/>
 
 </odoo>
