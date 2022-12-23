@@ -51,24 +51,35 @@ class BundleMain(http.Controller):
                     "discount_value": discount_value_tier,
                 })
 
-            if item.type == 'bundle' and item.discount_rule == 'discount_total':
-                for temp in item.bundle_total_product_ids:
-                    qty_total.append({
-                        "id": temp.id,
-                        'qty': temp.qty
-                    })
-                    product_total.append({
-                        'display_name': temp.display_name,
-                        'id': temp.id
-                    })
+            if item.type == 'bundle':
+                if item.discount_rule == 'discount_total':
+                    for temp in item.bundle_total_product_ids:
+                        qty_total.append({
+                            "id": temp.id,
+                            'qty': temp.qty
+                        })
+                        product_total.append({
+                            'display_name': temp.display_name,
+                            'id': temp.id
+                        })
 
-                bundles.append({
-                    'title': item.title,
-                    'type': item.type,
-                    "discount_rule": item.discount_rule,
-                    'qty_total': qty_total,
-                    'product_total': product_total,
-                    "discount_value": item.discount_value,
-                })
+                    bundles.append({
+                        'title': item.title,
+                        'type': item.type,
+                        "discount_rule": item.discount_rule,
+                        'qty_total': qty_total,
+                        'product_total': product_total,
+                        "discount_value": item.discount_value,
+                    })
+                if item.discount_rule == 'discount_product':
+                    for temp in item.bundle_each_product_ids:
+                        if temp.id == template_id:
+                            bundles.append({
+                                'title': item.title,
+                                'type': item.type,
+                                "discount_rule": item.discount_rule,
+                                'qty_each': temp.qty,
+                                "discount_value_each": temp.discount_value,
+                            })
 
         return {'bundles': bundles}

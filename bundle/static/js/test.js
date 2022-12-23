@@ -29,15 +29,18 @@ function render_bundle(data) {
             if (item.discount_rule == 'discount_total') {
                 var html_string_b = ''
                 var html_string_a = `<div> ${item.title}:`
-                var html_string_c = `, giảm ${item.discount_value}</div>`
+                var html_string_c = `, giảm ${item.discount_value}</div><hr>`
                 for (let qty of item.qty_total) {
                     for (let product of item.product_total) {
                         if (qty.id == product.id) {
-                            html_string_b += `<span> Mua ${qty.qty} ${product.display_name}</span>`
+                            html_string_b += `<span> mua ${qty.qty} ${product.display_name}</span>`
                         }
                     }
                 }
-                html_string += (html_string_a + html_string_b + html_string_c)
+                html_string += html_string_a + html_string_b + html_string_c
+            }
+            if (item.discount_rule == 'discount_product') {
+                html_string += `<div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}</div><hr>`
             }
         }
     }
@@ -47,6 +50,7 @@ function render_bundle(data) {
 $.ajax({
     url: '/bundle/get_bundle',
     method: 'POST',
+    contentType: 'application/json',
     dataType: 'json',
     data: JSON.stringify({
         jsonrpc: "2.0",
@@ -54,9 +58,8 @@ $.ajax({
             message: 'Hi',
             template_id: template_id
         },
-    }),
-    contentType: 'application/json'
-}).then((response) => {
+    })
+}).then(response => {
         console.log(response.result);
         var data = response.result.bundles
         render_bundle(data)
