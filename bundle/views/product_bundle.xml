@@ -1,0 +1,244 @@
+<odoo>
+    <data>
+        <record id="product_bundle_view_form" model="ir.ui.view">
+            <field name="name">Bundle Form</field>
+            <field name="model">product.bundle</field>
+            <field name="arch" type="xml">
+                <form string="Products Bundles">
+                    <sheet>
+                        <div>
+                            <h1>Bundle Setup</h1>
+                        </div>
+                        <group style="margin-top: 30px;">
+                            <field name="enable" string="Enable Bundle" widget="boolean_toggle"/>
+                        </group>
+                        <hr/>
+                        <group>
+                            <field name="active" invisible="1"/>
+                        </group>
+                        <h1>General settings</h1>
+                        <group>
+                            <div class="row mt-2">
+                                <div class="col-xl-6 col-lg-9 col-md-9">
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="title" string="Title" style="font-weight:bold"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="title" required="1" class="s_o_field_char"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="description" string="Description" style="font-weight:bold"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="description" class="s_o_field_char"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="start_time" string="Date Range" style="font-weight:bold"
+                                                   attrs="{'invisible': [('indefinite_bundle', '=', True)]}"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <div class="o_row"
+                                                 attrs="{'invisible': [('indefinite_bundle', '=', True)]}">
+                                                <label for="start_time" string="From"/>
+                                                <field name="start_time" widget="daterange" nolabel="1"
+                                                       class="oe_inline s_o_field_char"
+                                                       options="{'related_end_date': 'end_time'}"
+                                                       attrs="{'required': [('indefinite_bundle', '=', False)]}"/>
+                                                <label for="end_time" string="To"/>
+                                                <field name="end_time" widget="daterange" nolabel="1"
+                                                       class="oe_inline s_o_field_char"
+                                                       options="{'related_start_date': 'start_time'}"
+                                                       attrs="{'required': [('indefinite_bundle', '=', False)]}"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="indefinite_bundle" style="font-weight:bold"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="indefinite_bundle" widget="boolean_toggle"/>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-xl-6 col-lg-3 col-md-3">
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-6 col-md-6">
+                                            <label for="priority" style="font-weight:bold"
+                                                   help="(For bundles that have the same products), A value of ‘0’ indicates the highest priority to display in the product detail page"/>
+                                        </div>
+                                        <div class="col-xl-3 col-lg-6 col-md-6">
+                                            <field name="priority" string="Priority"
+                                                   options='{"type": "number", "step": 1}' class="s_o_field_char"/>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </group>
+                        <hr/>
+                        <h1>Discount settings</h1>
+                        <group>
+                            <div class="row mt-2">
+                                <div class="col-xl-7 col-lg-9 col-md-9">
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3" style="display:flex">
+                                            <label for="type" string="Bundle Type" style="font-weight:bold"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="type" string="Bundle Type" required="1" class="s_o_field_char"
+                                                   nolabel="1"/>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="discount_rule" attrs="{'invisible': [('type', '=', 'tier')]}"
+                                                   style="font-weight:bold" class="pt-2 pb-2"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="discount_rule" string="Discount Rule" required="1"
+                                                   class="s_o_field_char" attrs="{'invisible': [('type', '=', 'tier')]}"
+                                                   nolabel="1"/>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-12" style="margin: 0 0 5px 5px">
+                                            <span attrs="{'invisible': ['|',('type', '=', 'tier'),('discount_rule', '!=', 'discount_product')]}">
+                                                <strong>Note:</strong>
+                                                if you want to offer a discount on each product/variant, please set a
+                                                discount rate in the product table below.
+                                            </span>
+                                        </div>
+                                    </div>
+
+                                    <div class="row">
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="discount_type" string="Discount Type" style="font-weight:bold"
+                                                   class="pt-2 pb-2"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <field name="discount_type" string="Discount Type" required="1"
+                                                   class="s_o_field_char" nolabel="1"/>
+                                        </div>
+                                        <div class="col-xl-3 col-lg-3 col-md-3">
+                                            <label for="discount_value" string="Discount Value"
+                                                   style="font-weight: bold;"
+                                                   attrs="{'invisible': ['|',('type', '=', 'tier'),('discount_rule', '=', 'discount_product')]}"
+                                                   class="pt-2 pb-2"/>
+                                        </div>
+                                        <div class="col-xl-9 col-lg-9 col-md-9">
+                                            <div style="display: flex"
+                                                 attrs="{'invisible': ['|',('type', '=', 'tier'),('discount_rule', '=', 'discount_product')]}">
+                                                <field name="discount_value" class="s_o_field_char"/>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </group>
+
+                        <group>
+                            <label for="bundle_to_qty_ids"
+                                   style="font-weight: bold;margin-bottom: 10px;"
+                                   attrs="{'invisible': ['|',('type','=','tier'),('type', '=', 'bundle')]}"/>
+                            <br/>
+                            <field name="bundle_to_qty_ids"
+                                   attrs="{'invisible': [('type', '=', 'bundle')]}" nolabel="1">
+                                <tree context="{'default_bundle_id': active_id}"
+                                      editable="bottom" edit="1" create="1">
+                                    <field name="is_add_range" widget="boolean_toggle"/>
+                                    <field name="qty_start"/>
+                                    <field name="qty_end" attrs="{'invisible': [('is_add_range', '=', False)]}"/>
+                                    <field name="discount_value"/>
+                                </tree>
+                            </field>
+                        </group>
+                        <hr/>
+                        <div>
+                            <span>Choose products which are applied in this bundle</span>
+                            <br></br>
+                            <span>
+                                <strong>Note:</strong>
+                                Choose the variant if you want to set your bundle at variant level. With product without
+                                variants, the product variant column will be blank
+                            </span>
+                            <br></br>
+                        </div>
+
+                        <group attrs="{'invisible': ['|',('type', '!=', 'bundle'),('discount_rule', '!=', 'discount_total')]}">
+                            <field name="bundle_total_product_ids" nolabel="1"
+                                   context="{'default_discount_value': discount_value}">
+                                <tree string="Bundle Products"
+                                      editable="bottom" edit="1" import="0">
+                                    <field name="image_128" widget="image" readonly="1"/>
+                                    <field name="name" string="Product" readonly="1"/>
+                                    <field name="product_variant_id" string="Product Variant"
+                                           domain="[('product_tmpl_id', '=', id)]"
+                                           options="{'no_open': True,'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="qty" string="Quantity" required="1"/>
+                                    <field name="product_variant_ids" string="Product Variant" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+
+                        <group attrs="{'invisible': ['|',('type', '!=', 'bundle'),('discount_rule', '!=', 'discount_product')]}">
+                            <field name="bundle_each_product_ids" nolabel="1">
+                                <tree string="Bundle Products"
+                                      editable="bottom">
+                                    <field name="image_128" string=" " widget="image" readonly="1"/>
+                                    <field name="name" string="Product" readonly="1"/>
+                                    <field name="product_variant_id" string="Product Variant"
+                                           domain="[('product_tmpl_id', '=', id)]"
+                                           options="{'no_open': True,'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="discount_value" string="Discount Value"/>
+                                    <field name="qty" string="Quantity" required="1"/>
+                                    <field name="product_variant_ids" string="Product Variant" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+
+                        <group attrs="{'invisible': [('type', '!=', 'tier')]}">
+                            <field name="bundle_tier_product_ids" nolabel="1">
+                                <tree string="Bundle Products" editable="bottom">
+                                    <field name="image_128" string=" " widget="image" readonly="1"/>
+                                    <field name="name" string="Product" readonly="1"/>
+                                    <field name="product_variant_id" string="Product Variant"
+                                           domain="[('product_tmpl_id', '=', id)]"
+                                           options="{'no_open': True,'no_create': True, 'no_create_edit': True}"/>
+                                    <field name="product_variant_ids" string="Product Variant" invisible="1"/>
+                                </tree>
+                            </field>
+                        </group>
+                    </sheet>
+                </form>
+            </field>
+        </record>
+
+        <record id="product_bundle_view_tree" model="ir.ui.view">
+            <field name="name">Bundle Tree</field>
+            <field name="model">product.bundle</field>
+            <field name="arch" type="xml">
+                <tree string="Products Bundles">
+                    <field name="priority" widget="s_badge"/>
+                    <field name="title" string="Title"/>
+                    <field name="start_time" string="Start Date"/>
+                    <field name="end_time" string="End Date"/>
+                    <field name="active" invisible="1"/>
+                    <field name="enable" widget="boolean_toggle"/>
+                </tree>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="product_bundle_action">
+            <field name="name">Bundles</field>
+            <field name="res_model">product.bundle</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+    </data>
+</odoo>
