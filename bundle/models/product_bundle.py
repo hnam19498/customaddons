@@ -5,6 +5,8 @@ class ProductBundle(models.Model):
     _name = "product.bundle"
 
     title = fields.Char()
+    price_after_reduce = fields.Float()
+    check_total = fields.Boolean(default=False)
     description = fields.Char()
     type = fields.Selection([("bundle", "Multiple Product Bundle (Discount by Purchasing Multiple Products"),
                              ("tier", "Quantity Break Bundle (Discount by Purchasing a Product in a Larger Quantity")
@@ -22,6 +24,8 @@ class ProductBundle(models.Model):
     start_time = fields.Datetime()
     end_time = fields.Datetime()
     indefinite_bundle = fields.Boolean()
+    sale_off = fields.Float(default=0)
+    price_after_reduce = fields.Float(default=0)
 
     bundle_to_product_ids = fields.Many2many("product.template", "bundle_to_product_rel")
     bundle_to_qty_ids = fields.One2many("product.bundle.qty", "bundle_id")

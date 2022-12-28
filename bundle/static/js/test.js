@@ -1,18 +1,19 @@
-var child = document.createElement('div');
-var el = document.querySelector('form[action="/shop/cart/update"]')
+var child1 = document.createElement('div');
+var child2 = document.createElement('div');
+var el1 = document.querySelector('form[action="/shop/cart/update"]')
+var el2 = document.querySelector('div#cart_total')
 
-if (el) {
-    el.appendChild(child);
+if (el1) {
+    el1.appendChild(child1);
     var template_id = parseInt($($("input.product_template_id")[0]).val())
     $.ajax({
-        url: '/bundle/get_bundle',
+        url: '/bundle/get_bundle_detail',
         method: 'POST',
         contentType: 'application/json',
         dataType: 'json',
         data: JSON.stringify({
             jsonrpc: "2.0",
             params: {
-                message: 'Hi',
                 template_id: template_id
             },
         })
@@ -64,11 +65,19 @@ function render_bundle(data) {
         if (item.type == 'bundle') {
             if (item.discount_rule == 'discount_total') {
                 var html_string_b = ''
-                var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}`
+                if (item.discount_type == 'percentage') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}%`
+                }
+                if (item.discount_type == 'hard_fixed') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/sản phẩm`
+                }
+                if (item.discount_type == 'total_fixed') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn`
+                }
                 for (let qty of item.qty_total) {
                     for (let product of item.product_total) {
                         for (let line of item.qty_order) {
-                            if (product.template_id == qty.template_id) {
+                            if (product.template_id == qty.template_id && line.template_id == qty.template_id) {
                                 if (line.qty_order >= qty.qty) {
                                     selected_style = 'border: 1px solid red'
                                 } else {
@@ -93,9 +102,47 @@ function render_bundle(data) {
                         selected_style = ''
                     }
                 }
-                html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}</div><hr>`
+                if (item.discount_type == 'percentage') {
+                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}%</div><hr>`
+                }
+                if (item.discount_type == 'hard_fixed') {
+                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}/sản phẩm</div><hr>`
+                }
+                if (item.discount_type == 'total_fixed') {
+                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}</div><hr>`
+                }
             }
         }
     }
-    child.innerHTML = html_string
+    child1.innerHTML = html_string
+}
+
+if (el2) {
+    el2.appendChild(child2);
+    var order_id = parseInt($($("sup.my_cart_quantity.badge-primary")[0]).attr('data-order-id'))
+    $.ajax({
+        url: '/bundle/get_bundle_cart',
+        method: 'POST',
+        contentType: 'application/json',
+        dataType: 'json',
+        data: JSON.stringify({
+            jsonrpc: "2.0",
+            params: {order_id: order_id},
+        })
+    }).then(response => {
+            console.log(response.result);
+            var data = response.result.bundle_infors
+            render_bundle_cart(data)
+        }
+    ).catch((error) => {
+        console.log(error);
+    });
+}
+
+function render_bundle_cart(data) {
+    var html_string = ''
+    for (let item of data) {
+        html_string += `<div>${item.title}: sale_off ${item.sale_off}, price_after_reduce ${item.price_after_reduce}</div>`
+    }
+    child2.innerHTML = html_string
 }
