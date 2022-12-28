@@ -141,8 +141,25 @@ if (el2) {
 
 function render_bundle_cart(data) {
     var html_string = ''
+    var total_price = parseFloat($($("td span.monetary_field span.oe_currency_value")[0]).text())
+    var list_reduce = []
+    var max = 0.0
     for (let item of data) {
-        html_string += `<div>${item.title}: sale_off ${item.sale_off}, price_after_reduce ${item.price_after_reduce}</div>`
+        list_reduce.push(item.sale_off)
     }
-    child2.innerHTML = html_string
+    for (let i of list_reduce) {
+        if (max < i) {
+            max = i
+        }
+    }
+    for (let item of data) {
+        if (item) {
+            $(function () {
+                $($("td span.monetary_field span.oe_currency_value")[0]).css("text-decoration", "line-through")
+                $($("td strong span.oe_currency_value")[0]).text(total_price - max)
+                $($("tr#order_total_taxes td.text-right")).text("Sale off")
+                $($("tr#order_total_taxes span.oe_currency_value")).text(max)
+            })
+        }
+    }
 }

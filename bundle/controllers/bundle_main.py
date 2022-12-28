@@ -125,7 +125,7 @@ class BundleMain(http.Controller):
     def get_bundle_cart(self, **kw):
 
         today = datetime.now()
-        price_total = 0
+        price_total = 0.0
         price_reduce = 0.0
         line_infor = []
         order_id = kw["order_id"]
@@ -162,37 +162,30 @@ class BundleMain(http.Controller):
                                     if bundle.discount_type == 'total_fixed':
                                         for temp in bundle.bundle_to_qty_ids:
                                             if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
-                                                bundle.price_after_reduce = line.price_unit * line.product_uom_qty - temp.discount_value
                                                 bundle.sale_off = temp.discount_value
 
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
-                                                    bundle.price_after_reduce = line.price_unit * line.product_uom_qty - temp.discount_value
                                                     bundle.sale_off = temp.discount_value
 
                                     if bundle.discount_type == 'hard_fixed':
                                         for temp in bundle.bundle_to_qty_ids:
                                             if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
-                                                bundle.price_after_reduce = line.price_unit * line.product_uom_qty - temp.discount_value * line.product_uom_qty
                                                 bundle.sale_off = temp.discount_value * line.product_uom_qty
 
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
-                                                    bundle.price_after_reduce = line.price_unit * line.product_uom_qty - temp.discount_value * line.product_uom_qty
                                                     bundle.sale_off = temp.discount_value * line.product_uom_qty
 
                                     if bundle.discount_type == 'percentage':
                                         for temp in bundle.bundle_to_qty_ids:
                                             if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
-                                                bundle.price_after_reduce = line.price_unit * line.product_uom_qty * (
-                                                        1 - temp.discount_value / 100)
                                                 bundle.sale_off = temp.discount_value / 100 * line.price_unit * line.product_uom_qty
 
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
-                                                    bundle.sale_off = temp.discount_value / 100 * line.price_unit * line.product_uom_qty
                                                     bundle.price_after_reduce = line.price_unit * line.product_uom_qty * (
-                                                            1 - temp.discount_value / 100)
+                                                                1 - temp.discount_value / 100)
 
                         if bundle.type == 'bundle':
                             if bundle.discount_rule == 'discount_product':
@@ -202,14 +195,11 @@ class BundleMain(http.Controller):
                                         remainder = line.product_uom_qty % bundle.bundle_each_product_ids.qty
                                         if bundle.discount_type == 'total_fixed':
                                             bundle.price_after_reduce = line.price_unit * line.product_uom_qty - time * bundle.bundle_each_product_ids.discount_value
-                                            bundle.sale_off = line.price_unit * line.product_uom_qty - bundle.price_after_reduce
+                                            bundle.sale_off = time * bundle.bundle_each_product_ids.discount_value
                                         if bundle.discount_type == 'hard_fixed':
-                                            bundle.price_after_reduce = line.price_unit * line.product_uom_qty - time * bundle.bundle_each_product_ids.discount_value * line.product_uom_qty
-                                            bundle.sale_off = line.price_unit * line.product_uom_qty - bundle.price_after_reduce
+                                            bundle.sale_off = time * bundle.bundle_each_product_ids.discount_value * line.product_uom_qty
                                         if bundle.discount_type == 'percentage':
-                                            bundle.price_after_reduce = line.price_unit * line.product_uom_qty - time * (
-                                                    1 - bundle.bundle_each_product_ids.discount_value / 100)
-                                            bundle.sale_off = line.price_unit * line.product_uom_qty - bundle.price_after_reduce
+                                            bundle.sale_off = time * (1 - bundle.bundle_each_product_ids.discount_value / 100)
 
                             if bundle.discount_rule == 'discount_total':
                                 for item in bundle.bundle_total_product_ids:
@@ -223,21 +213,21 @@ class BundleMain(http.Controller):
 
                                 if bundle.check_total:
                                     for item in bundle.bundle_total_product_ids:
-                                        if line.product_template_id.id == item.id:
-                                            price_total += line.product_uom_qty * item.list_price
+                                        for linee in order.order_line:
+                                            if linee.product_template_id.id == item.id:
+                                                price_total += linee.product_uom_qty * item.list_price
+                                    if bundle.discount_type == 'total_fixed':
+                                        bundle.sale_off = bundle.discount_value
                                     if bundle.discount_type == 'percentage':
                                         bundle.price_after_reduce = price_total * (1 - bundle.discount_value / 100)
                                         bundle.sale_off = price_total * bundle.discount_value / 100
-                                    if bundle.discount_type == 'total_fixed':
-                                        bundle.price_after_reduce = price_total - bundle.discount_value
-                                        bundle.sale_off = bundle.discount_value
                                     if bundle.discount_type == 'hard_fixed':
                                         for item in bundle.bundle_total_product_ids:
-                                            if line.product_template_id.id == item.id:
-                                                price_reduce -= line.product_uom_qty * bundle.discount_value
+                                            for linee in order.order_line:
+                                                if linee.product_template_id.id == item.id:
+                                                    price_reduce -= linee.product_uom_qty * bundle.discount_value
                                         bundle.price_after_reduce = price_total + price_reduce
                                         bundle.sale_off = -price_reduce
-
 
         bundle_infors = []
         for bundle in bundles:
@@ -246,7 +236,6 @@ class BundleMain(http.Controller):
                     'id': bundle.id,
                     'title': bundle.title,
                     'sale_off': bundle.sale_off,
-                    'price_after_reduce': bundle.price_after_reduce,
                 })
 
         return {'bundle_infors': bundle_infors}
