@@ -140,7 +140,6 @@ if (el2) {
 }
 
 function render_bundle_cart(data) {
-    var html_string = ''
     var total_price = parseFloat($($("td span.monetary_field span.oe_currency_value")[0]).text())
     var list_reduce = []
     var max = 0.0

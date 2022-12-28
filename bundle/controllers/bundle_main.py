@@ -153,6 +153,7 @@ class BundleMain(http.Controller):
 
         if bundles:
             for bundle in bundles:
+                count_product = 0
                 bundle.sale_off = 0
                 for line in order.order_line:
                     if bundle.indefinite_bundle or bundle.start_time <= today <= bundle.end_time:
@@ -185,7 +186,7 @@ class BundleMain(http.Controller):
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
                                                     bundle.price_after_reduce = line.price_unit * line.product_uom_qty * (
-                                                                1 - temp.discount_value / 100)
+                                                            1 - temp.discount_value / 100)
 
                         if bundle.type == 'bundle':
                             if bundle.discount_rule == 'discount_product':
@@ -199,19 +200,16 @@ class BundleMain(http.Controller):
                                         if bundle.discount_type == 'hard_fixed':
                                             bundle.sale_off = time * bundle.bundle_each_product_ids.discount_value * line.product_uom_qty
                                         if bundle.discount_type == 'percentage':
-                                            bundle.sale_off = time * (1 - bundle.bundle_each_product_ids.discount_value / 100)
+                                            bundle.sale_off = time * (
+                                                    1 - bundle.bundle_each_product_ids.discount_value / 100)
 
                             if bundle.discount_rule == 'discount_total':
                                 for item in bundle.bundle_total_product_ids:
-                                    if line.product_template_id.id == item.id:
+                                    if item.id == line.product_template_id.id:
                                         if line.product_uom_qty >= item.qty:
-                                            bundle.check_total = True
-                                        else:
-                                            bundle.check_total = False
-                                    else:
-                                        bundle.check_total = False
+                                            count_product += 1
 
-                                if bundle.check_total:
+                                if count_product == len(bundle.bundle_total_product_ids):
                                     for item in bundle.bundle_total_product_ids:
                                         for linee in order.order_line:
                                             if linee.product_template_id.id == item.id:
