@@ -2,7 +2,7 @@
     "name": "Bundle",
     "application": True,
     "auto_install": False,
-    "author": "Juan",
+    "author": "Hnam",
     "sequence": -1000,
     "version": "1.0",
     "depends": ["base", "product", "sale", "web"],
@@ -14,7 +14,7 @@
     "demo": [],
     'assets': {
         'web.assets_frontend': [
-            'bundle/static/js/test.js',
+            'bundle/static/js/main.js',
         ],
     },
     "license": "LGPL-3",

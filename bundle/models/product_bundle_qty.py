@@ -9,6 +9,3 @@ class ProductBundle(models.Model):
     qty_end = fields.Float()
     discount_value = fields.Float()
     bundle_id = fields.Many2one('product.bundle')
-
-
-

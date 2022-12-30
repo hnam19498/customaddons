@@ -9,11 +9,10 @@ class ProductBundle(models.Model):
     check_total = fields.Boolean(default=False)
     description = fields.Char()
     type = fields.Selection([("bundle", "Multiple Product Bundle (Discount by Purchasing Multiple Products"),
-                             ("tier", "Quantity Break Bundle (Discount by Purchasing a Product in a Larger Quantity")
-                             ], default="bundle", required=True)
-    discount_rule = fields.Selection(
-        [("discount_total", "Discount on Total Bundle"), ("discount_product", "Discount on each Product/Variant")
-         ], default="discount_total")
+                             ("tier", "Quantity Break Bundle (Discount by Purchasing a Product in a Larger Quantity")],
+                            default="bundle", required=True)
+    discount_rule = fields.Selection([("discount_total", "Discount on Total Bundle"), (
+        "discount_product", "Discount on each Product/Variant")], default="discount_total")
     discount_type = fields.Selection([("percentage", "Percentage OFF"), ("hard_fixed", "Fixed Discount Amount OFF"),
                                       ("total_fixed", "Fixed Total Price")], default="percentage", required=True)
     discount_value = fields.Float(default=1.0)
@@ -40,8 +39,9 @@ class ProductBundleSetting(models.Model):
     user = fields.Many2one('res.users')
     bundle_position = fields.Selection([('below', "Below add to cart form"), ('above', 'Above add to cart form')])
     bundle_number = fields.Integer()
-    bundle_tier_color=fields.Char()
-    bundle_label=fields.Char()
+    bundle_tier_color = fields.Char()
+    bundle_label = fields.Char()
+
 
 class ProductsBundleReports(models.Model):
-    _name='products.bundle.reports'
+    _name = 'products.bundle.reports'
