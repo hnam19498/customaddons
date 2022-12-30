@@ -1,16 +1,16 @@
-var child1 = document.createElement('div');
-var child2 = document.createElement('div');
-var el1 = document.querySelector('form[action="/shop/cart/update"]')
-var el2 = document.querySelector('div#cart_total')
+var child1 = document.createElement("div");
+var child2 = document.createElement("div");
+var el1 = document.querySelector("form[action='/shop/cart/update']")
+var el2 = document.querySelector("div#cart_total")
 
 if (el1) {
     el1.appendChild(child1);
     var template_id = parseInt($($("input.product_template_id")[0]).val())
     $.ajax({
-        url: '/bundle/get_bundle_detail',
-        method: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
+        url: "/bundle/get_bundle_detail",
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
         data: JSON.stringify({
             jsonrpc: "2.0",
             params: {
@@ -28,25 +28,25 @@ if (el1) {
 }
 
 function render_bundle(data) {
-    var selected_style = ''
+    var selected_style = ""
     var html_string = ""
     for (let item of data) {
-        if (item.type == 'tier') {
+        if (item.type == "tier") {
             for (let quantity of item.qty) {
                 for (let line of item.qty_order) {
                     if (line.template_id == quantity.template_id) {
                         if (quantity.qty_start <= quantity.qty_end) {
                             if (quantity.qty_start <= line.qty_order && line.qty_order <= quantity.qty_end) {
-                                selected_style = 'border: 1px solid red'
+                                selected_style = "border: 1px solid red"
                             } else {
-                                selected_style = ''
+                                selected_style = ""
                             }
                         }
                         if (quantity.qty_start >= quantity.qty_end) {
                             if (quantity.qty_start <= line.qty_order) {
-                                selected_style = 'border: 1px solid red'
+                                selected_style = "border: 1px solid red"
                             } else {
-                                selected_style = ''
+                                selected_style = ""
                             }
                         }
                     }
@@ -62,10 +62,10 @@ function render_bundle(data) {
             }
         }
 
-        if (item.type == 'bundle') {
-            if (item.discount_rule == 'discount_total') {
+        if (item.type == "bundle") {
+            if (item.discount_rule == "discount_total") {
                 var count = 0
-                var html_string_b = ''
+                var html_string_b = ""
                 for (let qty of item.qty_total) {
                     for (let product of item.product_total) {
                         for (let line of item.qty_order) {
@@ -77,38 +77,38 @@ function render_bundle(data) {
                         }
                         if (qty.template_id == product.template_id) {
                             if (count == (item.product_total).length) {
-                                selected_style = 'border: 1px solid red'
-                            } else selected_style = ''
+                                selected_style = "border: 1px solid red"
+                            } else selected_style = ""
                             html_string_b += `<p> mua ${qty.qty_for_total} ${product.display_name} <img src="${product.img}"></p>`
                         }
                     }
                 }
-                if (item.discount_type == 'percentage') {
+                if (item.discount_type == "percentage") {
                     var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}%`
                 }
-                if (item.discount_type == 'hard_fixed') {
+                if (item.discount_type == "hard_fixed") {
                     var html_string_a = `<div style="${selected_style}"> ${item.title}: chỉ $${item.discount_value} mua combo trọn bộ`
                 }
-                if (item.discount_type == 'total_fixed') {
+                if (item.discount_type == "total_fixed") {
                     var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn`
                 }
                 html_string += html_string_a + html_string_b + `</div><hr>`
             }
-            if (item.discount_rule == 'discount_product') {
+            if (item.discount_rule == "discount_product") {
                 for (let line of item.qty_order) {
                     if (line.qty_order >= item.qty_each) {
-                        selected_style = 'border: 1px solid red'
+                        selected_style = "border: 1px solid red"
                     } else {
-                        selected_style = ''
+                        selected_style = ""
                     }
                 }
-                if (item.discount_type == 'percentage') {
+                if (item.discount_type == "percentage") {
                     html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}%</div><hr>`
                 }
-                if (item.discount_type == 'hard_fixed') {
+                if (item.discount_type == "hard_fixed") {
                     html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}/sản phẩm</div><hr>`
                 }
-                if (item.discount_type == 'total_fixed') {
+                if (item.discount_type == "total_fixed") {
                     html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}</div><hr>`
                 }
             }
@@ -119,12 +119,12 @@ function render_bundle(data) {
 
 if (el2) {
     el2.appendChild(child2);
-    var order_id = parseInt($($("sup.my_cart_quantity.badge-primary")[0]).attr('data-order-id'))
+    var order_id = parseInt($($("sup.my_cart_quantity.badge-primary")[0]).attr("data-order-id"))
     $.ajax({
-        url: '/bundle/get_bundle_cart',
-        method: 'POST',
-        contentType: 'application/json',
-        dataType: 'json',
+        url: "/bundle/get_bundle_cart",
+        method: "POST",
+        contentType: "application/json",
+        dataType: "json",
         data: JSON.stringify({
             jsonrpc: "2.0",
             params: {order_id: order_id},
@@ -140,7 +140,7 @@ if (el2) {
 }
 
 function render_bundle_cart(data) {
-    var total_price = parseFloat($($("div#cart_total table tbody tr td span.monetary_field span.oe_currency_value")[0]).text().replace(',', ''))
+    var total_price = parseFloat($($("div#cart_total table tbody tr td span.monetary_field span.oe_currency_value")[0]).text().replace(",", ""))
     var list_reduce = []
     var max = 0.0
     for (let item of data) {
@@ -161,5 +161,4 @@ function render_bundle_cart(data) {
             })
         }
     }
-
 }

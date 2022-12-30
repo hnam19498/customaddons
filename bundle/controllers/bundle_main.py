@@ -173,14 +173,14 @@ class BundleMain(http.Controller):
                                                 if line.product_uom_qty >= temp.qty_start:
                                                     bundle.sale_off = temp.discount_value
 
-                                    if bundle.discount_type == 'hard_fixed':
-                                        for temp in bundle.bundle_to_qty_ids:
-                                            if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
-                                                bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
-
-                                            if temp.qty_start > temp.qty_end:
-                                                if line.product_uom_qty >= temp.qty_start:
-                                                    bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
+                                    # if bundle.discount_type == 'hard_fixed':
+                                    #     for temp in bundle.bundle_to_qty_ids:
+                                    #         if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
+                                    #             bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
+                                    #
+                                    #         if temp.qty_start > temp.qty_end:
+                                    #             if line.product_uom_qty >= temp.qty_start:
+                                    #                 bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
 
                                     if bundle.discount_type == 'percentage':
                                         for temp in bundle.bundle_to_qty_ids:
@@ -189,8 +189,7 @@ class BundleMain(http.Controller):
 
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
-                                                    bundle.price_after_reduce = line.price_unit * line.product_uom_qty * (
-                                                            1 - temp.discount_value / 100)
+                                                    bundle.sale_off = temp.discount_value / 100 * line.price_unit * line.product_uom_qty
 
                         if bundle.type == 'bundle':
                             if bundle.discount_rule == 'discount_product':

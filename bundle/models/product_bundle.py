@@ -1,4 +1,5 @@
 from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 
 
 class ProductBundle(models.Model):
@@ -31,6 +32,23 @@ class ProductBundle(models.Model):
     bundle_total_product_ids = fields.Many2many("product.template", "bundle_total_product_rel")
     bundle_tier_product_ids = fields.Many2many("product.template", "bundle_tier_product_rel")
     bundle_each_product_ids = fields.Many2many("product.template", "bundle_each_product_rel")
+
+    @api.constrains("discount_value", "type", 'discount_rule')
+    def check_discount_value(self):
+        if float(self.discount_value) <= 0:
+            if self.type == "bundle":
+                if self.discount_rule == 'total':
+                    raise ValidationError(_("Discount value must be an int, greater than or equal to 0!"))
+        else:
+            if float(self.discount_value):
+                pass
+            else:
+                raise ValidationError(_("Discount value must be an int, greater than or equal to 0!!"))
+
+    @api.constrains('type', 'discount_type')
+    def check_discount_type(self):
+        if self.type == 'tier' and self.discount_type == 'hard_fixed':
+            raise ValidationError(_('Cannot set Bundle type = "Quantity Break Bundle (Discount by Purchasing a Product in a Larger Quantity" and Discount type = "Fixed Discount Amount OFF"'))
 
 
 class ProductBundleSetting(models.Model):
