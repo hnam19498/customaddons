@@ -32,3 +32,16 @@ class ProductBundle(models.Model):
     bundle_total_product_ids = fields.Many2many("product.template", "bundle_total_product_rel")
     bundle_tier_product_ids = fields.Many2many("product.template", "bundle_tier_product_rel")
     bundle_each_product_ids = fields.Many2many("product.template", "bundle_each_product_rel")
+
+
+class ProductBundleSetting(models.Model):
+    _name = 'product.bundle.setting'
+
+    user = fields.Many2one('res.users')
+    bundle_position = fields.Selection([('below', "Below add to cart form"), ('above', 'Above add to cart form')])
+    bundle_number = fields.Integer()
+    bundle_tier_color=fields.Char()
+    bundle_label=fields.Char()
+
+class ProductsBundleReports(models.Model):
+    _name='products.bundle.reports'

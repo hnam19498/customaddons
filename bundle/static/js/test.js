@@ -64,33 +64,33 @@ function render_bundle(data) {
 
         if (item.type == 'bundle') {
             if (item.discount_rule == 'discount_total') {
+                var count = 0
                 var html_string_b = ''
-                if (item.discount_type == 'percentage') {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}%`
-                }
-                if (item.discount_type == 'hard_fixed') {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/sản phẩm`
-                }
-                if (item.discount_type == 'total_fixed') {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn`
-                }
                 for (let qty of item.qty_total) {
                     for (let product of item.product_total) {
                         for (let line of item.qty_order) {
                             if (product.template_id == qty.template_id && line.template_id == qty.template_id) {
-                                if (line.qty_order >= qty.qty) {
-                                    selected_style = 'border: 1px solid red'
-                                } else {
-                                    selected_style = ''
+                                if (line.qty_order >= qty.qty_for_total) {
+                                    count += 1
                                 }
-                            } else {
-                                selected_style = ''
                             }
                         }
                         if (qty.template_id == product.template_id) {
-                            html_string_b += `<p> mua ${qty.qty} ${product.display_name} <img src="${product.img}"></p>`
+                            if (count == (item.product_total).length) {
+                                selected_style = 'border: 1px solid red'
+                            } else selected_style = ''
+                            html_string_b += `<p> mua ${qty.qty_for_total} ${product.display_name} <img src="${product.img}"></p>`
                         }
                     }
+                }
+                if (item.discount_type == 'percentage') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}%`
+                }
+                if (item.discount_type == 'hard_fixed') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: chỉ $${item.discount_value} mua combo trọn bộ`
+                }
+                if (item.discount_type == 'total_fixed') {
+                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn`
                 }
                 html_string += html_string_a + html_string_b + `</div><hr>`
             }
@@ -140,7 +140,7 @@ if (el2) {
 }
 
 function render_bundle_cart(data) {
-    var total_price = parseFloat($($("td span.monetary_field span.oe_currency_value")[0]).text())
+    var total_price = parseFloat($($("div#cart_total table tbody tr td span.monetary_field span.oe_currency_value")[0]).text().replace(',', ''))
     var list_reduce = []
     var max = 0.0
     for (let item of data) {
@@ -154,11 +154,12 @@ function render_bundle_cart(data) {
     for (let item of data) {
         if (item) {
             $(function () {
-                $($("td span.monetary_field span.oe_currency_value")[0]).css("text-decoration", "line-through")
-                $($("td strong span.oe_currency_value")[0]).text(total_price - max)
+                $($("tr#order_total_untaxed td.text-xl-right span.monetary_field span.oe_currency_value")[0]).css("text-decoration", "line-through")
+                $($("tr#order_total td.text-xl-right strong.monetary_field span.oe_currency_value")[0]).text((total_price - max).toFixed(2))
                 $($("tr#order_total_taxes td.text-right")).text("Sale off")
                 $($("tr#order_total_taxes span.oe_currency_value")).text(max)
             })
         }
     }
+
 }
