@@ -14,8 +14,8 @@ class ShopifyMain(http.Controller):
         shopify.Session.setup(api_key=api_key, secret=secret_key)
         shop_url = "shop-odoo-hnam.myshopify.com"
         state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
-        redirect_uri = "http://localhost:8069/auth/shopify/callback"
-        scopes = ["read_products", "read_orders"]
+        redirect_uri = "https://odoo.website/auth/shopify/callback"
+        scopes = ["read_products", "read_orders", 'read_script_tags', 'write_script_tags']
         newSession = shopify.Session(shop_url, api_version)
         auth_url = newSession.create_permission_url(scopes, redirect_uri, state)
 
@@ -43,31 +43,40 @@ class ShopifyMain(http.Controller):
 
         webhook_order_create = shopify.Webhook()
         webhook_order_create.topic = "orders/create"
-        webhook_order_create.address = "https://2395-116-97-240-10.ap.ngrok.io/webhook/order_create"
+        webhook_order_create.address = "https://0fa6-116-97-240-10.ap.ngrok.io/webhook/order_create"
         webhook_order_create.format = "json"
         webhook_order_create.save()
         print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
 
         webhook_order_updated = shopify.Webhook()
         webhook_order_updated.topic = "orders/updated"
-        webhook_order_updated.address = "https://2395-116-97-240-10.ap.ngrok.io/webhook/order_updated"
+        webhook_order_updated.address = "https://0fa6-116-97-240-10.ap.ngrok.io/webhook/order_updated"
         webhook_order_updated.format = "json"
         webhook_order_updated.save()
         print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
 
         webhook_products_create = shopify.Webhook()
         webhook_products_create.topic = "products/create"
-        webhook_products_create.address = "https://2395-116-97-240-10.ap.ngrok.io/webhook/products_create"
+        webhook_products_create.address = "https://0fa6-116-97-240-10.ap.ngrok.io/webhook/products_create"
         webhook_products_create.format = "json"
         webhook_products_create.save()
         print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
 
         webhook_products_update = shopify.Webhook()
         webhook_products_update.topic = "products/update"
-        webhook_products_update.address = "https://2395-116-97-240-10.ap.ngrok.io/webhook/products_update"
+        webhook_products_update.address = "https://0fa6-116-97-240-10.ap.ngrok.io/webhook/products_update"
         webhook_products_update.format = "json"
         webhook_products_update.save()
         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+
+        existing_script_tags = shopify.ScriptTag.find()
+        for script_tag in existing_script_tags:
+            print(f"old_script_tag.id: {script_tag.id}")
+            shopify.ScriptTag.find(script_tag.id).destroy()
+
+        new_script_tag = shopify.ScriptTag.create({"event": "onload", "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tagg_1.js', "display_scope": "all"})
+        print(f"new_script_tag.id: {new_script_tag.id}")
+        print(f"new_script_tag.src: {new_script_tag.src}")
 
         shop = shopify.Shop.current()
         client = shopify.GraphQL()

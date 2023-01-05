@@ -10,5 +10,11 @@
     "data": [
         "views/setting_view.xml",
     ],
+    'assets': {
+        'web.assets_frontend': [
+            'shopify_odoo/static/src/js/main.js',
+        ],
+    },
+
     "license": "LGPL-3",
 }
