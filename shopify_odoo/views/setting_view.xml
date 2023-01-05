@@ -13,7 +13,6 @@
                         <div class="o_setting_left_pane"/>
                         <div class="o_setting_right_pane">
                             <group>
-                                <field name="name_module"/>
                                 <field name="app_api_version"/>
                                 <field name="app_api_key"/>
                                 <field name="app_secret_key"/>
