@@ -19,3 +19,4 @@ class ShopKey(models.TransientModel):
     app_api_version = fields.Char(config_parameter="shopify_odoo.app_api_version")
     app_api_key = fields.Char(config_parameter="shopify_odoo.app_api_key")
     app_secret_key = fields.Char(config_parameter="shopify_odoo.app_secret_key")
+    name_module = fields.Char(config_parameter="shopify_odoo.name_module")

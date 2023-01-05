@@ -1,5 +1,5 @@
 {
-    "name": "shopify",
+    "name": "Shopify",
     "application": True,
     "auto_install": False,
     "author": "Hnam",
