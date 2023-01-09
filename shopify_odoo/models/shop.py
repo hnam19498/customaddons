@@ -11,6 +11,8 @@ class Shop(models.Model):
     currencyCode = fields.Char()
     url = fields.Char()
     country = fields.Char()
+    status = fields.Boolean()
+    shop_owner = fields.Char()
 
 
 class ShopKey(models.TransientModel):

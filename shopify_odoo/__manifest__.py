@@ -8,7 +8,9 @@
     "depends": ["base", "product", "sale", "web"],
     "demo": [],
     "data": [
+        'security/ir.model.access.csv',
         "views/setting_view.xml",
+        "views/shopify_view.xml",
     ],
     'assets': {
         'web.assets_frontend': [

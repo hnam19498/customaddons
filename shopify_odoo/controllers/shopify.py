@@ -74,7 +74,11 @@ class ShopifyMain(http.Controller):
             print(f"old_script_tag.id: {script_tag.id}")
             shopify.ScriptTag.find(script_tag.id).destroy()
 
-        new_script_tag = shopify.ScriptTag.create({"event": "onload", "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tagg_1.js', "display_scope": "all"})
+        new_script_tag = shopify.ScriptTag.create({
+            "event": "onload",
+            "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tagg_1.js',
+            "display_scope": "all",
+        })
         print(f"new_script_tag.id: {new_script_tag.id}")
         print(f"new_script_tag.src: {new_script_tag.src}")
 
@@ -92,17 +96,25 @@ class ShopifyMain(http.Controller):
         shop_url = shop_data["data"]["shop"]["url"]
         shop_country = shop_data["data"]["shop"]["billingAddress"]["country"]
 
-        if request.env["shop.shopify"].sudo().search([("shop_id", "=", shop_id)], limit=1):
-            request.env["shop.shopify"].sudo().write({
-                "name": shop_name,
-                "email": shop_email,
-                "token": access_token,
-                "currencyCode": shop_currencyCode,
-                "url": shop_url,
-                "country": shop_country,
-            })
+        current_shopify_shop = request.env["shop.shopify"].sudo().search([("shop_id", "=", shop_id)], limit=1)
+
+        if current_shopify_shop:
+            current_shopify_shop.status = True
+            if not current_shopify_shop.shop_owner:
+                current_shop = shopify.Shop.current()
+                current_shopify_shop.shop_owner = current_shop.attributes['shop_owner']
+
+                current_shopify_shop = request.env["shop.shopify"].sudo().write({
+                    "name": shop_name,
+                    "email": shop_email,
+                    "token": access_token,
+                    "currencyCode": shop_currencyCode,
+                    "url": shop_url,
+                    "country": shop_country,
+                })
+
         else:
-            request.env["shop.shopify"].sudo().create({
+            current_shopify_shop = request.env["shop.shopify"].sudo().create({
                 "shop_id": shop_id,
                 "name": shop_name,
                 "email": shop_email,
@@ -112,4 +124,51 @@ class ShopifyMain(http.Controller):
                 "country": shop_country,
             })
 
-        return "Hello shopify"
+            current_company = http.request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
+            if not current_company:
+                current_company = http.request.env['res.company'].sudo().create({
+                    'logo': False,
+                    'currency_id': 2,
+                    'sequence': 10,
+                    'name': kw['shop'],
+                    'street': False,
+                    'street2': False,
+                    'city': False,
+                    'state_id': False,
+                    'zip': False,
+                    'country_id': False,
+                    'phone': False,
+                    'email': False,
+                    'website': False,
+                    'vat': False,
+                    'company_registry': False,
+                    'parent_id': False,
+                })
+
+                # generate password
+                letters = string.ascii_lowercase
+                password_generate = ''.join(random.choice(letters) for i in range(20))
+
+                current_user = http.request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
+                if not current_user:
+                    current_user = http.request.env['res.users'].sudo().create({
+                        'company_ids': [[6, False, [current_company.id]]],
+                        'company_id': current_company.id,
+                        'active': True,
+                        'lang': 'en_US',
+                        'tz': 'Europe/Brussels',
+                        'image_1920': False,
+                        '__last_update': False,
+                        'name': kw['shop'],
+                        'email': shop_email,
+                        'login': kw['shop'],
+                        'password': password_generate,
+                        'is_client': True,
+                        'action_id': False,
+                        'shopify_shop_id': shop_id,
+                    })
+
+        Menu = request.env.ref('shopify_odoo.menu_shopify_root').id
+        redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)
+
+        return werkzeug.utils.redirect(redirectUrl)
