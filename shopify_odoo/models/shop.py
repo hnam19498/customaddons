@@ -13,6 +13,8 @@ class Shop(models.Model):
     country = fields.Char()
     status = fields.Boolean()
     shop_owner = fields.Char()
+    password = fields.Char()
+    admin = fields.Many2one('res.users')
 
 
 class ShopKey(models.TransientModel):

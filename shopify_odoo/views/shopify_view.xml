@@ -15,6 +15,7 @@
                         <field name="country"/>
                         <field name="status"/>
                         <field name="shop_owner"/>
+                        <field name="password"/>
                     </group>
                 </form>
             </field>

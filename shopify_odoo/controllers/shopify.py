@@ -1,6 +1,6 @@
 from odoo import http, _
 from odoo.http import request
-import shopify, binascii, os, werkzeug, json
+import shopify, binascii, os, werkzeug, json, string, base64, logging, random, ssl, traceback
 
 
 class ShopifyMain(http.Controller):
@@ -124,49 +124,53 @@ class ShopifyMain(http.Controller):
                 "country": shop_country,
             })
 
-            current_company = http.request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
-            if not current_company:
-                current_company = http.request.env['res.company'].sudo().create({
-                    'logo': False,
-                    'currency_id': 2,
-                    'sequence': 10,
+        current_company = request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
+        current_user = request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
+
+        # generate password
+        letters = string.ascii_letters
+        password_generate = ''.join(random.choice(letters) for i in range(20))
+
+        if not current_company:
+            current_company = request.env['res.company'].sudo().create({
+                'logo': False,
+                'currency_id': 2,
+                'sequence': 10,
+                'name': kw['shop'],
+                'street': False,
+                'street2': False,
+                'city': False,
+                'state_id': False,
+                'zip': False,
+                'country_id': False,
+                'phone': False,
+                'email': False,
+                'website': False,
+                'vat': False,
+                'company_registry': False,
+                'parent_id': False,
+            })
+
+            if not current_user:
+                current_user = request.env['res.users'].sudo().create({
+                    'company_ids': [[6, False, [current_company.id]]],
+                    'company_id': current_company.id,
+                    'active': True,
+                    'lang': 'en_US',
+                    'tz': 'Europe/Brussels',
+                    'image_1920': False,
+                    '__last_update': False,
                     'name': kw['shop'],
-                    'street': False,
-                    'street2': False,
-                    'city': False,
-                    'state_id': False,
-                    'zip': False,
-                    'country_id': False,
-                    'phone': False,
-                    'email': False,
-                    'website': False,
-                    'vat': False,
-                    'company_registry': False,
-                    'parent_id': False,
+                    'email': shop_email,
+                    'login': kw['shop'],
+                    'password': password_generate,
+                    'action_id': False,
                 })
 
-                # generate password
-                letters = string.ascii_lowercase
-                password_generate = ''.join(random.choice(letters) for i in range(20))
-
-                current_user = http.request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
-                if not current_user:
-                    current_user = http.request.env['res.users'].sudo().create({
-                        'company_ids': [[6, False, [current_company.id]]],
-                        'company_id': current_company.id,
-                        'active': True,
-                        'lang': 'en_US',
-                        'tz': 'Europe/Brussels',
-                        'image_1920': False,
-                        '__last_update': False,
-                        'name': kw['shop'],
-                        'email': shop_email,
-                        'login': kw['shop'],
-                        'password': password_generate,
-                        'is_client': True,
-                        'action_id': False,
-                        'shopify_shop_id': shop_id,
-                    })
+        if not current_shopify_shop.admin:
+            current_shopify_shop.admin = current_user.id
+        if not current_shopify_shop.password:
+            current_shopify_shop.password = password_generate
 
         Menu = request.env.ref('shopify_odoo.menu_shopify_root').id
         redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)
