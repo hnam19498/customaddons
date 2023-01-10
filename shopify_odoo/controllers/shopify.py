@@ -12,11 +12,11 @@ class ShopifyMain(http.Controller):
         api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
 
         shopify.Session.setup(api_key=api_key, secret=secret_key)
-        shop_url = "shop-odoo-hnam.myshopify.com"
+        shopify_url = "shop-odoo-hnam.myshopify.com"
         state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
         redirect_uri = "https://odoo.website/auth/shopify/callback"
         scopes = ["read_products", "read_orders", 'read_script_tags', 'write_script_tags']
-        newSession = shopify.Session(shop_url, api_version)
+        newSession = shopify.Session(shopify_url, api_version)
         auth_url = newSession.create_permission_url(scopes, redirect_uri, state)
 
         return werkzeug.utils.redirect(auth_url)
@@ -27,10 +27,11 @@ class ShopifyMain(http.Controller):
         api_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
         secret_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
+        fetch_order = request.env['fetch.order'].sudo().search([])
 
         shopify.Session.setup(api_key=api_key, secret=secret_key)
-        shop_url = kw["shop"]
-        session = shopify.Session(shop_url, api_version)
+        shopify_url = kw["shop"]
+        session = shopify.Session(shopify_url, api_version)
         access_token = session.request_token(kw)
         shopify.ShopifyResource.activate_session(session)
 
@@ -82,46 +83,47 @@ class ShopifyMain(http.Controller):
         print(f"new_script_tag.id: {new_script_tag.id}")
         print(f"new_script_tag.src: {new_script_tag.src}")
 
-        shop = shopify.Shop.current()
+        shop_shopify = shopify.Shop.current()
         client = shopify.GraphQL()
-        shop_infor = client.execute("{shop{id name email currencyCode url billingAddress{country}}}")
-        shop_data = json.loads(shop_infor)
+        shopify_infor = client.execute("{shop{id name email currencyCode url billingAddress{country}}}")
+        shopify_data = json.loads(shopify_infor)
 
         print(f"kw = {kw}")
 
-        shop_id = shop_data["data"]["shop"]["id"].split("/")[-1]
-        shop_name = shop_data["data"]["shop"]["name"]
-        shop_email = shop_data["data"]["shop"]["email"]
-        shop_currencyCode = shop_data["data"]["shop"]["currencyCode"]
-        shop_url = shop_data["data"]["shop"]["url"]
-        shop_country = shop_data["data"]["shop"]["billingAddress"]["country"]
+        shopify_id = shopify_data["data"]["shop"]["id"].split("/")[-1]
+        shopify_name = shopify_data["data"]["shop"]["name"]
+        shopify_email = shopify_data["data"]["shop"]["email"]
+        shopify_currencyCode = shopify_data["data"]["shop"]["currencyCode"]
+        shopify_url = shopify_data["data"]["shop"]["url"]
+        shopify_country = shopify_data["data"]["shop"]["billingAddress"]["country"]
 
-        current_shopify_shop = request.env["shop.shopify"].sudo().search([("shop_id", "=", shop_id)], limit=1)
+        current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
+        print(current_shopify_shop)
 
         if current_shopify_shop:
             current_shopify_shop.status = True
-            if not current_shopify_shop.shop_owner:
+            if not current_shopify_shop.shopify_owner:
                 current_shop = shopify.Shop.current()
-                current_shopify_shop.shop_owner = current_shop.attributes['shop_owner']
+                current_shopify_shop.shopify_owner = current_shop.attributes['shop_owner']
 
-                current_shopify_shop = request.env["shop.shopify"].sudo().write({
-                    "name": shop_name,
-                    "email": shop_email,
+                current_shopify_shop.sudo().write({
+                    "name": shopify_name,
+                    "email": shopify_email,
                     "token": access_token,
-                    "currencyCode": shop_currencyCode,
-                    "url": shop_url,
-                    "country": shop_country,
+                    "currencyCode": shopify_currencyCode,
+                    "url": shopify_url,
+                    "country": shopify_country,
                 })
 
         else:
             current_shopify_shop = request.env["shop.shopify"].sudo().create({
-                "shop_id": shop_id,
-                "name": shop_name,
-                "email": shop_email,
-                "currencyCode": shop_currencyCode,
+                "shopify_id": shopify_id,
+                "name": shopify_name,
+                "email": shopify_email,
+                "currencyCode": shopify_currencyCode,
                 "token": access_token,
-                "url": shop_url,
-                "country": shop_country,
+                "url": shopify_url,
+                "country": shopify_country,
             })
 
         current_company = request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
@@ -151,28 +153,31 @@ class ShopifyMain(http.Controller):
                 'parent_id': False,
             })
 
-            if not current_user:
-                current_user = request.env['res.users'].sudo().create({
-                    'company_ids': [[6, False, [current_company.id]]],
-                    'company_id': current_company.id,
-                    'active': True,
-                    'lang': 'en_US',
-                    'tz': 'Europe/Brussels',
-                    'image_1920': False,
-                    '__last_update': False,
-                    'name': kw['shop'],
-                    'email': shop_email,
-                    'login': kw['shop'],
-                    'password': password_generate,
-                    'action_id': False,
-                })
-
+        if not current_user:
+            current_user = request.env['res.users'].sudo().create({
+                'company_ids': [[6, False, [current_company.id]]],
+                'company_id': current_company.id,
+                'active': True,
+                'lang': 'en_US',
+                'tz': 'Europe/Brussels',
+                'image_1920': False,
+                '__last_update': False,
+                'name': kw['shop'],
+                'email': shopify_email,
+                'login': kw['shop'],
+                'password': password_generate,
+                'action_id': False,
+            })
+        print(current_shopify_shop)
         if not current_shopify_shop.admin:
             current_shopify_shop.admin = current_user.id
         if not current_shopify_shop.password:
             current_shopify_shop.password = password_generate
+        if not fetch_order:
+            fetch_order = request.env['fetch.order'].sudo().create({
+                'shop_shopify_id': current_shopify_shop.id,
+            })
 
         Menu = request.env.ref('shopify_odoo.menu_shopify_root').id
         redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)
-
         return werkzeug.utils.redirect(redirectUrl)

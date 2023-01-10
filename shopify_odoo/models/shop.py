@@ -4,7 +4,7 @@ from odoo import api, models, fields, _
 class Shop(models.Model):
     _name = "shop.shopify"
 
-    shop_id = fields.Char()
+    shopify_id = fields.Char()
     token = fields.Char()
     name = fields.Char()
     email = fields.Char()
@@ -12,9 +12,10 @@ class Shop(models.Model):
     url = fields.Char()
     country = fields.Char()
     status = fields.Boolean()
-    shop_owner = fields.Char()
+    shopify_owner = fields.Char()
     password = fields.Char()
     admin = fields.Many2one('res.users')
+    fetch_order_id = fields.Many2one('fetch.order')
 
 
 class ShopKey(models.TransientModel):

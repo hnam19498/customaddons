@@ -8,11 +8,13 @@ class BundleMain(http.Controller):
     def get_bundle_detail(self, **kw):
 
         order_id = request.session.sale_order_id
-        order = request.env["sale.order"].sudo().search([("id", "=", order_id)], limit=1)
+        order = request.env["sale.order"].sudo().search(
+            [("id", "=", order_id)], limit=1)
         bundle_ids = []
         bundles = []
         template_id = kw["template_id"]
-        template = request.env["product.template"].sudo().search([("id", "=", template_id)], limit=1)
+        template = request.env["product.template"].sudo().search(
+            [("id", "=", template_id)], limit=1)
 
         bundle_tier_ids = template.get_list_bundle_tier()
         for id in bundle_tier_ids:
@@ -114,6 +116,7 @@ class BundleMain(http.Controller):
                                 'discount_type': item.discount_type,
                                 "discount_rule": item.discount_rule,
                                 "qty_each": temp.qty,
+                                "template_id": template_id,
                                 'qty_order': qty_order,
                                 'product_price': temp.list_price,
                                 "discount_value_each": temp.discount_value,
@@ -131,7 +134,8 @@ class BundleMain(http.Controller):
         price_reduce = 0.0
         line_infor = []
         order_id = kw["order_id"]
-        order = request.env["sale.order"].sudo().search([("id", "=", order_id)])
+        order = request.env["sale.order"].sudo().search(
+            [("id", "=", order_id)])
         bundle_ids = []
         product_total = []
         count_time = 0
@@ -201,10 +205,9 @@ class BundleMain(http.Controller):
                                             bundle.price_after_reduce = line.price_unit * line.product_uom_qty - time * bundle.bundle_each_product_ids.discount_value
                                             bundle.sale_off = time * bundle.bundle_each_product_ids.discount_value
                                         if bundle.discount_type == 'hard_fixed':
-                                            bundle.sale_off = line.product_uom_qty * line.price_unit - time * bundle.bundle_each_product_ids.discount_value
+                                            bundle.sale_off = bundle.bundle_each_product_ids.qty * line.price_unit * time - time * bundle.bundle_each_product_ids.discount_value
                                         if bundle.discount_type == 'percentage':
-                                            bundle.sale_off = time * (
-                                                    1 - bundle.bundle_each_product_ids.discount_value / 100)
+                                            bundle.sale_off = time * (1 - bundle.bundle_each_product_ids.discount_value / 100)
 
                             if bundle.discount_rule == 'discount_total':
                                 for item in bundle.bundle_total_product_ids:
@@ -212,8 +215,7 @@ class BundleMain(http.Controller):
                                         if item.id == linee.product_template_id.id:
                                             if linee.product_uom_qty >= item.qty:
                                                 count_product += 1
-                                                b = {'bundle_id': bundle.id, "template_id": item.id,
-                                                     'time': linee.product_uom_qty // item.qty}
+                                                b = {'bundle_id': bundle.id, "template_id": item.id, 'time': linee.product_uom_qty // item.qty}
                                                 if b not in list_time:
                                                     list_time.append(b)
 
@@ -236,11 +238,9 @@ class BundleMain(http.Controller):
                                         bundle.price_after_reduce = price_total * (1 - bundle.discount_value / 100)
                                         bundle.sale_off = price_total * bundle.discount_value / 100
                                     if bundle.discount_type == 'hard_fixed':
-
                                         for item in bundle.bundle_total_product_ids:
                                             for linee in order.order_line:
-                                                if linee.product_template_id.id == item.id and count < len(
-                                                        bundle.bundle_total_product_ids):
+                                                if linee.product_template_id.id == item.id and count < len(bundle.bundle_total_product_ids):
                                                     price_total2 += min_time * item.qty * linee.price_unit
                                                     count += 1
                                         bundle.sale_off = price_total2 - min_time * bundle.discount_value
@@ -250,8 +250,44 @@ class BundleMain(http.Controller):
             if bundle.sale_off != 0:
                 bundle_infors.append({
                     'id': bundle.id,
-                    'title': bundle.title,
                     'sale_off': bundle.sale_off,
+                    'title': bundle.title,
                 })
 
         return {'bundle_infors': bundle_infors}
+
+    @http.route("/bundle/add_to_cart", auth="public", type="json", csrf=False, cors="*", save_session=False)
+    def add_to_cart(self, **kw):
+        order_id = int(kw['order_id'])
+        product = request.env["product.template"].sudo().search([("id", "=", kw['template_id'])]).product_variant_id
+        order = request.env["sale.order"].sudo().search([("id", "=", order_id)])
+        template = request.env["product.template"].sudo().search([("id", "=", int(kw['template_id']))])
+        template_in_order = order.order_line.product_template_id
+        if order.order_line:
+            for line in order.order_line:
+                if template in template_in_order:
+                    if int(kw['template_id']) == line.product_template_id.id:
+                        line.sudo().write({
+                            'product_uom_qty': line.product_uom_qty + int(kw['quantity']),
+                        })
+                else:
+                    request.env["sale.order.line"].sudo().create({
+                        'product_template_id': int(kw['template_id']),
+                        'product_uom_qty': int(kw['quantity']),
+                        'order_id': order_id,
+                        'name': template.name,
+                        'product_id': product.id,
+                        'customer_lead': 0,
+                        "price_unit": product.lst_price,
+                    })
+
+        else:
+            request.env["sale.order.line"].sudo().create({
+                'product_template_id': int(kw['template_id']),
+                'product_uom_qty': int(kw['quantity']),
+                'order_id': order_id,
+                'name': template.name,
+                'product_id': product.id,
+                'customer_lead': 0,
+                "price_unit": product.lst_price,
+            })

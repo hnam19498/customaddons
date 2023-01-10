@@ -10,7 +10,8 @@
     "data": [
         'security/ir.model.access.csv',
         "views/setting_view.xml",
-        "views/shopify_view.xml",
+        "views/shop_infor_view.xml",
+        "views/fetch_order_view.xml",
     ],
     'assets': {
         'web.assets_frontend': [

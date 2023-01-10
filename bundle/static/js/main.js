@@ -18,45 +18,26 @@ if (el1) {
             },
         })
     }).then(response => {
-            console.log(response.result);
-            var data = response.result.bundles
-            render_bundle(data)
-        }
+        console.log(response.result);
+        var data = response.result.bundles
+        render_bundle(data)
+    }
     ).catch((error) => {
         console.log(error);
     });
 }
 
 function render_bundle(data) {
-    var selected_style = ""
     var html_string = ""
     for (let item of data) {
         if (item.type == "tier") {
             for (let quantity of item.qty) {
-                for (let line of item.qty_order) {
-                    if (line.template_id == quantity.template_id) {
-                        if (quantity.qty_start <= quantity.qty_end) {
-                            if (quantity.qty_start <= line.qty_order && line.qty_order <= quantity.qty_end) {
-                                selected_style = "border: 1px solid red"
-                            } else {
-                                selected_style = ""
-                            }
-                        }
-                        if (quantity.qty_start >= quantity.qty_end) {
-                            if (quantity.qty_start <= line.qty_order) {
-                                selected_style = "border: 1px solid red"
-                            } else {
-                                selected_style = ""
-                            }
-                        }
-                    }
-                }
                 for (let value of item.discount_value) {
                     if (quantity.qty_end < quantity.qty_start && quantity.id == value.id) {
-                        html_string += `<div style="${selected_style}">${item.title}: mua ${quantity.qty_start} trở lên, giảm giá ${value.discount_value}</div><hr>`
+                        html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua ${quantity.qty_start} trở lên, giảm giá ${value.discount_value}</div><div style="border: 1px solid red;" class="bundle-add-to-cart" data-quantity="${quantity.qty_start}" data-template-id="${value.template_id}">Add to cart</div></div><hr>`
                     }
                     if (quantity.qty_end > quantity.qty_start && quantity.id == value.id) {
-                        html_string += `<div style="${selected_style}">${item.title}: mua từ ${quantity.qty_start} đến ${quantity.qty_end}, giảm giá ${value.discount_value}</div><hr>`
+                        html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua từ ${quantity.qty_start} đến ${quantity.qty_end}, giảm giá ${value.discount_value}</div><div style="border: 1px solid red;" class="bundle-add-to-cart" data-template-id="${value.template_id}" data-quantity="${quantity.qty_start}">Add to cart</div></div><hr>`
                     }
                 }
             }
@@ -76,40 +57,30 @@ function render_bundle(data) {
                             }
                         }
                         if (qty.template_id == product.template_id) {
-                            if (count == (item.product_total).length) {
-                                selected_style = "border: 1px solid red"
-                            } else selected_style = ""
-                            html_string_b += `<p> mua ${qty.qty_for_total} ${product.display_name} <img src="${product.img}"></p>`
+                            html_string_b += `<div style="display: flex; align-items: center; gap: 12px;"><div> mua ${qty.qty_for_total} ${product.display_name} <img src="${product.img}"></div><div style="border: 1px solid red;" class="bundle-add-to-cart" data-quantity="${qty.qty_for_total}" data-template-id="${product.template_id}">Add to cart</div></div>`
                         }
                     }
                 }
                 if (item.discount_type == "percentage") {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}%`
+                    var html_string_a = `<div> ${item.title}: mua combo trọn bộ, giảm ${item.discount_value}% `
                 }
                 if (item.discount_type == "hard_fixed") {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: chỉ $${item.discount_value} mua combo trọn bộ`
+                    var html_string_a = `<div> ${item.title}: chỉ $${item.discount_value} mua combo trọn bộ `
                 }
                 if (item.discount_type == "total_fixed") {
-                    var html_string_a = `<div style="${selected_style}"> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn`
+                    var html_string_a = `<div> ${item.title}: mua combo trọn bộ, giảm $${item.discount_value}/tổng hóa đơn `
                 }
                 html_string += html_string_a + html_string_b + `</div><hr>`
             }
             if (item.discount_rule == "discount_product") {
-                for (let line of item.qty_order) {
-                    if (line.qty_order >= item.qty_each) {
-                        selected_style = "border: 1px solid red"
-                    } else {
-                        selected_style = ""
-                    }
-                }
                 if (item.discount_type == "percentage") {
-                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}%</div><hr>`
+                    html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}%</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
                 }
                 if (item.discount_type == "hard_fixed") {
-                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}/sản phẩm</div><hr>`
+                    html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm còn $${item.discount_value_each}/combo</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
                 }
                 if (item.discount_type == "total_fixed") {
-                    html_string += `<div style="${selected_style}">${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}</div><hr>`
+                    html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
                 }
             }
         }
@@ -119,7 +90,7 @@ function render_bundle(data) {
 
 if (el2) {
     el2.appendChild(child2);
-    var order_id = parseInt($($("sup.my_cart_quantity.badge-primary")[0]).attr("data-order-id"))
+    var order_id = parseInt($($("sup.my_cart_quantity")[0]).attr("data-order-id"))
     $.ajax({
         url: "/bundle/get_bundle_cart",
         method: "POST",
@@ -127,13 +98,13 @@ if (el2) {
         dataType: "json",
         data: JSON.stringify({
             jsonrpc: "2.0",
-            params: {order_id: order_id},
+            params: { order_id: order_id },
         })
     }).then(response => {
-            console.log(response.result);
-            var data = response.result.bundle_infors
-            render_bundle_cart(data)
-        }
+        console.log(response.result);
+        var data = response.result.bundle_infors
+        render_bundle_cart(data)
+    }
     ).catch((error) => {
         console.log(error);
     });
@@ -158,7 +129,46 @@ function render_bundle_cart(data) {
                 $($("tr#order_total td.text-xl-right strong.monetary_field span.oe_currency_value")[0]).text((total_price - max).toFixed(2))
                 $($("tr#order_total_taxes td.text-right")).text("Sale off")
                 $($("tr#order_total_taxes span.oe_currency_value")).text(max)
+                $($("tr td.text-xl-right span a.show_coupon")).text('Đã áp dụng mã giảm giá ' + item.title)
             })
         }
     }
 }
+
+var check_add_to_cart = setInterval(function () {
+    if (document.getElementsByClassName('bundle-add-to-cart').length > 0) {
+        clearInterval(check_add_to_cart)
+        var divs = document.getElementsByClassName('bundle-add-to-cart')
+        if (divs) {
+            for (let div of divs) {
+                div.addEventListener('click', function () {
+    
+                    let add_template_id = div.getAttribute('data-template-id')
+                    let add_quantity = div.getAttribute('data-quantity')
+                    let add_order_id = parseInt($($("sup.my_cart_quantity")[0]).attr("data-order-id"))
+    
+                    $.ajax({
+                        url: "/bundle/add_to_cart",
+                        method: "POST",
+                        contentType: "application/json",
+                        dataType: "json",
+                        data: JSON.stringify({
+                            jsonrpc: "2.0",
+                            params: {
+                                order_id: add_order_id,
+                                quantity: add_quantity,
+                                template_id: add_template_id
+                            },
+                        })
+                    }).then(response => {
+                        console.log(response.result);
+                        window.location.reload()
+                    }
+                    ).catch((error) => {
+                        console.log(error);
+                    });
+                })
+            }
+        }
+    }
+}, 100)
