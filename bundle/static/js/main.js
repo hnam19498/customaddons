@@ -77,7 +77,7 @@ function render_bundle(data) {
                     html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm ${item.discount_value_each}%</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
                 }
                 if (item.discount_type == "hard_fixed") {
-                    html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm còn $${item.discount_value_each}/combo</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
+                    html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: chỉ $${item.discount_value_each}/mỗi ${item.qty_each} sản phẩm</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
                 }
                 if (item.discount_type == "total_fixed") {
                     html_string += `<div style="display: flex; align-items: center; gap: 12px;"><div>${item.title}: mua mỗi ${item.qty_each} sản phẩm, giảm $${item.discount_value_each}</div><div style="border: 1px solid red;" data-quantity="${item.qty_each}" class="bundle-add-to-cart" data-template-id="${item.template_id}">Add to cart</div></div><hr>`
