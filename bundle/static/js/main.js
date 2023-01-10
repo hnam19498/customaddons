@@ -18,10 +18,10 @@ if (el1) {
             },
         })
     }).then(response => {
-        console.log(response.result);
-        var data = response.result.bundles
-        render_bundle(data)
-    }
+            console.log(response.result);
+            var data = response.result.bundles
+            render_bundle(data)
+        }
     ).catch((error) => {
         console.log(error);
     });
@@ -98,13 +98,13 @@ if (el2) {
         dataType: "json",
         data: JSON.stringify({
             jsonrpc: "2.0",
-            params: { order_id: order_id },
+            params: {order_id: order_id},
         })
     }).then(response => {
-        console.log(response.result);
-        var data = response.result.bundle_infors
-        render_bundle_cart(data)
-    }
+            console.log(response.result);
+            var data = response.result.bundle_infors
+            render_bundle_cart(data)
+        }
     ).catch((error) => {
         console.log(error);
     });
@@ -142,11 +142,11 @@ var check_add_to_cart = setInterval(function () {
         if (divs) {
             for (let div of divs) {
                 div.addEventListener('click', function () {
-    
+
                     let add_template_id = div.getAttribute('data-template-id')
                     let add_quantity = div.getAttribute('data-quantity')
                     let add_order_id = parseInt($($("sup.my_cart_quantity")[0]).attr("data-order-id"))
-    
+
                     $.ajax({
                         url: "/bundle/add_to_cart",
                         method: "POST",
@@ -161,9 +161,9 @@ var check_add_to_cart = setInterval(function () {
                             },
                         })
                     }).then(response => {
-                        console.log(response.result);
-                        window.location.reload()
-                    }
+                            console.log(response.result);
+                            window.location.reload()
+                        }
                     ).catch((error) => {
                         console.log(error);
                     });
