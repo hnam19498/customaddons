@@ -8,13 +8,11 @@ class BundleMain(http.Controller):
     def get_bundle_detail(self, **kw):
 
         order_id = request.session.sale_order_id
-        order = request.env["sale.order"].sudo().search(
-            [("id", "=", order_id)], limit=1)
+        order = request.env["sale.order"].sudo().search([("id", "=", order_id)], limit=1)
         bundle_ids = []
         bundles = []
         template_id = kw["template_id"]
-        template = request.env["product.template"].sudo().search(
-            [("id", "=", template_id)], limit=1)
+        template = request.env["product.template"].sudo().search([("id", "=", template_id)], limit=1)
 
         bundle_tier_ids = template.get_list_bundle_tier()
         for id in bundle_tier_ids:
@@ -134,8 +132,7 @@ class BundleMain(http.Controller):
         price_reduce = 0.0
         line_infor = []
         order_id = kw["order_id"]
-        order = request.env["sale.order"].sudo().search(
-            [("id", "=", order_id)])
+        order = request.env["sale.order"].sudo().search([("id", "=", order_id)])
         bundle_ids = []
         product_total = []
         count_time = 0
