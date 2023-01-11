@@ -4,6 +4,19 @@ import shopify, binascii, os, werkzeug, json, string, base64, logging, random, s
 
 
 class ShopifyMain(http.Controller):
+
+    def initSession(self):
+
+        api_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
+        secret_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
+        api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
+
+        shopify.Session.setup(api_key=api_key, secret=secret_key)
+        shopify_url = "shop-odoo-hnam.myshopify.com"
+        newSession = shopify.Session(shopify_url, api_version)
+
+        return newSession
+
     @http.route("/shopify/shopify_test", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopifytest(self, **kw):
 
@@ -27,7 +40,6 @@ class ShopifyMain(http.Controller):
         api_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
         secret_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
-        fetch_order = request.env['fetch.order'].sudo().search([])
 
         shopify.Session.setup(api_key=api_key, secret=secret_key)
         shopify_url = kw["shop"]
@@ -98,7 +110,6 @@ class ShopifyMain(http.Controller):
         shopify_country = shopify_data["data"]["shop"]["billingAddress"]["country"]
 
         current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
-        print(current_shopify_shop)
 
         if current_shopify_shop:
             current_shopify_shop.status = True
@@ -168,15 +179,16 @@ class ShopifyMain(http.Controller):
                 'password': password_generate,
                 'action_id': False,
             })
+
         print(current_shopify_shop)
         if not current_shopify_shop.admin:
             current_shopify_shop.admin = current_user.id
         if not current_shopify_shop.password:
             current_shopify_shop.password = password_generate
-        if not fetch_order:
-            fetch_order = request.env['fetch.order'].sudo().create({
-                'shop_shopify_id': current_shopify_shop.id,
-            })
+        # if not fetch_order:
+        #     fetch_order = request.env['fetch.order'].sudo().create({
+        #         'shop_shopify_id': current_shopify_shop.id,
+        #     })
 
         Menu = request.env.ref('shopify_odoo.menu_shopify_root').id
         redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)

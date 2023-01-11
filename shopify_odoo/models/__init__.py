@@ -1,1 +1,1 @@
-from . import shop, shopify_order, fetch_order
+from . import shop, shopify_infor, fetch_shopify

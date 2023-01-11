@@ -21,8 +21,7 @@
         <field name="model">hospital.patient</field>
         <field name="arch" type="xml">
             <search>
-                <field name="name" string="Patient name"
-                       filter_domain="['|', '|', ('name', 'ilike', self), ('ref', 'ilike', self), ('age', 'ilike', self)]"></field>
+                <field name="name" string="Patient name" filter_domain="['|', '|', ('name', 'ilike', self), ('ref', 'ilike', self), ('age', 'ilike', self)]"></field>
                 <field name="age" string="Age"></field>
                 <field name="gender" string="Gender"></field>
                 <filter name="filter_male" string="Male" domain="[('gender', '=', 'male')]"></filter>
@@ -80,4 +79,19 @@
             <p class="o_view_nocontent_smiling_face">Create your first patient!</p>
         </field>
     </record>
+    <menuitem id="menu_hospital_root" name="Hospital" sequence="0"/>
+
+    <menuitem id="menu_patient_master" name="Patient details" parent="menu_hospital_root" sequence="10"/>
+
+    <menuitem id="menu_patient" name="Patient" parent="menu_patient_master" action="action_hospital_patient" sequence="0"/>
+
+    <menuitem id="menu_configuration" name="Configurations" parent="menu_hospital_root" sequence="100"/>
+
+    <menuitem id="menu_appointment_master" name="Appointment details" parent="menu_hospital_root" sequence="15">
+
+        <menuitem id="menu_cancel_appointment" name="Cancellation" action="action_cancel_appointment" sequence="25"/>
+
+    </menuitem>
+
+    <menuitem id="menu_appointment" name="Appointments" parent="menu_appointment_master" action="action_hospital_appointment" sequence="20"/>
 </odoo>

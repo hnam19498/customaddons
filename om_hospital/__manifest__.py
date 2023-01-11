@@ -13,7 +13,6 @@
         'data/sequence_data.xml',
         'data/patient.tag.csv',
         'wizard/cancel_appointment_view.xml',
-        'views/menu.xml',
         'views/patient_view.xml',
         'views/odoo_playground_view.xml',
         'views/patient_tag_view.xml',
