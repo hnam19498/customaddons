@@ -129,13 +129,9 @@ class BundleMain(http.Controller):
         list_time = []
         price_total = 0.0
         price_total2 = 0.0
-        price_reduce = 0.0
-        line_infor = []
         order_id = kw["order_id"]
         order = request.env["sale.order"].sudo().search([("id", "=", order_id)])
         bundle_ids = []
-        product_total = []
-        count_time = 0
 
         for line in order.order_line:
             for template in line.product_template_id:
@@ -173,15 +169,6 @@ class BundleMain(http.Controller):
                                             if temp.qty_start > temp.qty_end:
                                                 if line.product_uom_qty >= temp.qty_start:
                                                     bundle.sale_off = temp.discount_value
-
-                                    # if bundle.discount_type == 'hard_fixed':
-                                    #     for temp in bundle.bundle_to_qty_ids:
-                                    #         if temp.qty_start <= line.product_uom_qty <= temp.qty_end:
-                                    #             bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
-                                    #
-                                    #         if temp.qty_start > temp.qty_end:
-                                    #             if line.product_uom_qty >= temp.qty_start:
-                                    #                 bundle.sale_off = line.product_uom_qty * line.price_unit - temp.discount_value
 
                                     if bundle.discount_type == 'percentage':
                                         for temp in bundle.bundle_to_qty_ids:

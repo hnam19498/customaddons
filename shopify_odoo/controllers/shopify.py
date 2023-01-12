@@ -185,10 +185,6 @@ class ShopifyMain(http.Controller):
             current_shopify_shop.admin = current_user.id
         if not current_shopify_shop.password:
             current_shopify_shop.password = password_generate
-        # if not fetch_order:
-        #     fetch_order = request.env['fetch.order'].sudo().create({
-        #         'shop_shopify_id': current_shopify_shop.id,
-        #     })
 
         Menu = request.env.ref('shopify_odoo.menu_shopify_root').id
         redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)

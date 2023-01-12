@@ -1,5 +1,7 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access.shop.shopify,access_shop_shopify,model_shop_shopify,base.group_user,1,1,1,1
 access.fetch.shopify,access_fetch_shopify,model_fetch_shopify,base.group_user,1,1,1,1
+access.fetch.history,access_fetch_history,model_fetch_history,base.group_user,1,1,1,1
 access.shopify.order,access_shopify_order,model_shopify_order,base.group_user,1,1,1,1
 access.shopify.product,access_shopify_product,model_shopify_product,base.group_user,1,1,1,1
+access.shopify.shop.xero,access_shopify_shop_xero,model_shopify_shop_xero,base.group_user,1,1,1,1

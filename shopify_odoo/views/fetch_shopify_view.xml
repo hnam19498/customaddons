@@ -87,7 +87,7 @@
 
         <menuitem id="menu_fetch_history"
                   name="Fetch history"
-                  parent="menu_fetch_shopify"
+                  parent="menu_shopify_root"
                   action="action_fetch_history"
                   sequence="0"/>
 
