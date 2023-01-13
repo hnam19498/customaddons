@@ -4,8 +4,8 @@ from odoo import api, models, fields, _
 class ShopifyShopXero(models.Model):
     _name = 'shopify.shop.xero'
 
-    xero_token = fields.Char()
-    shop = fields.Char()
+    store_xero_name = fields.Char()
+    status_connect = fields.Char(default='Disconnected')
     shop_shopify_id = fields.Many2one('shop.shopify')
 
 

@@ -1,14 +1,13 @@
 from odoo import http, _
 from odoo.http import request
-import shopify, binascii, os, werkzeug, json, string, base64, logging, random, ssl, traceback, requests
-import datetime
+import shopify, binascii, os, werkzeug, json, string, base64, logging, random, ssl, traceback, requests, datetime
 
 
 class XeroController(http.Controller):
     @http.route('/xero/authenticate/', auth='public')
     def xero_authenticate(self, **kw):
-        time_now = datetime.datetime.now()
         print(f'kw_xero: {kw}')
+        time_now = datetime.datetime.now()
         xero_code = kw['code']
         shop_shopify_url = 'https://' + kw['state']
 
@@ -17,9 +16,7 @@ class XeroController(http.Controller):
         callback_url = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/xero/authenticate'
 
         shop_shopify = request.env['shop.shopify'].sudo().search([('url', '=', shop_shopify_url)])
-
-        client_data = client_id + ":" + client_secret
-        xero_authorization = base64.urlsafe_b64encode(client_data.encode()).decode()
+        xero_authorization = base64.urlsafe_b64encode((client_id + ":" + client_secret).encode()).decode()
 
         auth_headers = {
             'Authorization': "Basic " + xero_authorization,
@@ -33,7 +30,7 @@ class XeroController(http.Controller):
         }
 
         auth_xero = requests.post('https://identity.xero.com/connect/token', headers=auth_headers, data=auth_body).json()
-        print(auth_xero)
+        print(f"auth_xero: {auth_xero}")
 
         xero_tokens = request.env['xero.token'].sudo().search([('shop_id', '=', shop_shopify.id)])
 
@@ -65,4 +62,39 @@ class XeroController(http.Controller):
                 'shop_id': shop_shopify.id,
             })
 
-        return werkzeug.utils.redirect('https://www.google.com/')
+        if shop_shopify_url:
+
+            access_token = request.env['xero.token'].sudo().search([('shop_id', '=', shop_shopify.id)]).access_token
+
+            check_headers = {
+                'Authorization': "Bearer " + access_token,
+                'Content-Type': 'application/json',
+            }
+
+            store_infor = requests.get('https://api.xero.com/connections', headers=check_headers).json()[0]
+
+            if store_infor['id']:
+                print(f"store_infors: {store_infor}")
+                shop_xero = request.env['shopify.shop.xero'].sudo().search([('store_xero_name', '=', store_infor['tenantName'])])
+
+                if not shop_xero:
+                    shop_xero.create({
+                        'store_xero_name': store_infor['tenantName'],
+                        'shop_shopify_id': shop_shopify.id,
+                        'status_connect': "Connected",
+                    })
+
+                else:
+                    shop_xero.write({
+                        'status_connect': "Connected",
+                    })
+
+            else:
+                shop_xero.write({
+                    'status_connect': "Disconnected",
+                })
+
+        Menu = request.env.ref('shopify_odoo.menu_xero').id
+        redirectUrl = request.env["ir.config_parameter"].sudo().get_param("web.base.url") + '/web?#menu_id=' + str(Menu)
+
+        return werkzeug.utils.redirect(redirectUrl)

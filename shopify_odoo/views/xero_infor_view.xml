@@ -1,38 +1,48 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
-        <record id="view_shopify_odoo_form" model="ir.ui.view">
-            <field name="name">shopify.odoo.form</field>
-            <field name="model">shop.shopify</field>
+
+        <record id="view_xero_form" model="ir.ui.view">
+            <field name="name">xero.form</field>
+            <field name="model">shopify.shop.xero</field>
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="name"/>
-                        <field name="email"/>
-                        <field name="currencyCode"/>
-                        <field name="url"/>
-                        <field name="country"/>
-                        <field name="status"/>
-                        <field name="shopify_owner"/>
-                        <field name="password"/>
+                        <field name="store_xero_name"/>
+                        <field name="shop_shopify_id"/>
+                        <field name="status_connect"/>
                     </group>
                 </form>
             </field>
         </record>
 
-        <record id="action_shopify_odoo" model="ir.actions.act_window">
-            <field name="name">Shopify odoo</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">shop.shopify</field>
-            <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">Create your first shopify shop!</p>
+        <record id="view_xero_tree" model="ir.ui.view">
+            <field name="name">xero.tree</field>
+            <field name="model">shopify.shop.xero</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="store_xero_name"/>
+                    <field name="shop_shopify_id"/>
+                    <field name="status_connect"/>
+                </tree>
             </field>
         </record>
 
-        <menuitem id="menu_shopify_root"
-                  name="Shopify"
-                  action="action_shopify_odoo"
+        <record id="action_xero_odoo" model="ir.actions.act_window">
+            <field name="name">Xero</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">shopify.shop.xero</field>
+            <field name="view_mode">tree,form</field>
+            <field name="help" type="html">
+                <a href="https://odoo.website/xero/check-connect">Connect</a>
+            </field>
+        </record>
+
+        <menuitem id="menu_xero"
+                  name="Xero"
+                  parent="menu_shopify_root"
+                  action="action_xero_odoo"
                   sequence="0"/>
+
     </data>
 </odoo>
