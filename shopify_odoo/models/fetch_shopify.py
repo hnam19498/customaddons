@@ -14,6 +14,7 @@ class FetchShopify(models.Model):
     def fetch_order(self):
         list_order_ids = []
         count_fetch_order = 0
+
         api_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
         secret_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
@@ -32,17 +33,34 @@ class FetchShopify(models.Model):
                 if order.shopify_order_id not in list_order_ids:
                     list_order_ids.append(order.shopify_order_id)
 
+        list_quantity =[]
         orders = shopify.Order.find(published_at_min=start_date, published_at_max=end_date, status='any')
 
         if orders:
             for order in orders:
+                products = []
+                for line in order.line_items:
+                    test_product = self.env['shopify.product'].sudo().search(
+                        [('shopify_product_id', '=', line.product_id)])
+                    if test_product:
+                        products.append(test_product.id)
+                    else:
+                        print("Chưa có sản phẩm trong database!")
+
+                    temp = {"product_id": test_product.id,
+                            'order_id': self.env['shopify.order'].sudo().search([('shopify_order_id', '=', order.id)]).id,
+                            "quantity": line.attributes['quantity']}
+                    if temp not in list_quantity:
+                        list_quantity.append(temp)
+
                 if str(order.id) not in list_order_ids:
                     self.env['shopify.order'].sudo().create({
                         'shopify_order_id': order.id,
                         'name': order.name,
                         'total_price': order.total_price,
                         'shop_id': self.shop_id.id,
-                        'fetch_order_id': self.id
+                        'fetch_order_id': self.id,
+                        'products': products,
                     })
                     count_fetch_order += 1
                 else:
@@ -56,10 +74,9 @@ class FetchShopify(models.Model):
                 'count': count_fetch_order,
                 'shopify_name': self.shop_id.name,
             })
+        print('a')
 
     def fetch_product(self):
-        list_product_ids = []
-        count_fetch_product = 0
         api_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
         secret_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
@@ -75,19 +92,22 @@ class FetchShopify(models.Model):
         products = shopify.Product.find(published_at_min=start_date, published_at_max=end_date)
 
         exist_products = self.env['shopify.product'].sudo().search([])
+        list_product_ids = []
+
         if exist_products:
             for product in exist_products:
                 if str(product.shopify_product_id) not in list_product_ids:
                     list_product_ids.append(product.shopify_product_id)
 
         if products:
+            count_fetch_product = 0
             for product in products:
                 if str(product.id) not in list_product_ids:
                     self.env['shopify.product'].sudo().create({
                         'shopify_product_id': product.id,
                         'name': product.title,
                         'shop_id': self.shop_id.id,
-                        'fetch_product_id': self.id
+                        'fetch_product_id': self.id,
                     })
                     count_fetch_product += 1
                 else:
@@ -101,13 +121,3 @@ class FetchShopify(models.Model):
                 'count': count_fetch_product,
                 'shopify_name': self.shop_id.name,
             })
-
-
-class FetchHistory(models.Model):
-    _name = 'fetch.history'
-
-    type = fields.Char()
-    start_date = fields.Date()
-    end_date = fields.Date()
-    count = fields.Integer()
-    shopify_name = fields.Char()

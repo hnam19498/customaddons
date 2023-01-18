@@ -3,8 +3,8 @@
     <data>
 
         <record id="view_xero_form" model="ir.ui.view">
-            <field name="name">xero.form</field>
-            <field name="model">shopify.shop.xero</field>
+            <field name="name">xero.view.form</field>
+            <field name="model">xero.store</field>
             <field name="arch" type="xml">
                 <form>
                     <group>
@@ -18,7 +18,7 @@
 
         <record id="view_xero_tree" model="ir.ui.view">
             <field name="name">xero.tree</field>
-            <field name="model">shopify.shop.xero</field>
+            <field name="model">xero.store</field>
             <field name="arch" type="xml">
                 <tree>
                     <field name="store_xero_name"/>
@@ -31,7 +31,7 @@
         <record id="action_xero_odoo" model="ir.actions.act_window">
             <field name="name">Xero</field>
             <field name="type">ir.actions.act_window</field>
-            <field name="res_model">shopify.shop.xero</field>
+            <field name="res_model">xero.store</field>
             <field name="view_mode">tree,form</field>
             <field name="help" type="html">
                 <a href="https://odoo.website/xero/check-connect">Connect</a>

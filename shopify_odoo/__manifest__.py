@@ -13,6 +13,7 @@
         "views/shop_infor_view.xml",
         "views/fetch_shopify_view.xml",
         'views/xero_infor_view.xml',
+        "views/sync_invoice_view.xml",
     ],
     'assets': {
         'web.assets_frontend': [

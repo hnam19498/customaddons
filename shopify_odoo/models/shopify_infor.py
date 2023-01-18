@@ -1,5 +1,4 @@
 from odoo import api, models, fields, _
-import shopify
 
 
 class ShopifyOrder(models.Model):
@@ -10,6 +9,7 @@ class ShopifyOrder(models.Model):
     total_price = fields.Char()
     shop_id = fields.Many2one('shop.shopify')
     fetch_order_id = fields.Many2one('fetch.shopify')
+    products = fields.Many2many('shopify.product', 'orders_to_products_shopify')
 
 
 class ShopifyProduct(models.Model):

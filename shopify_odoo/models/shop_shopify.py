@@ -16,11 +16,3 @@ class Shop(models.Model):
     password = fields.Char()
     admin = fields.Many2one('res.users')
     fetch_order_id = fields.Many2one('fetch.order')
-
-
-class ShopKey(models.TransientModel):
-    _inherit = "res.config.settings"
-
-    app_api_version = fields.Char(config_parameter="shopify_odoo.app_api_version")
-    app_api_key = fields.Char(config_parameter="shopify_odoo.app_api_key")
-    app_secret_key = fields.Char(config_parameter="shopify_odoo.app_secret_key")

@@ -141,8 +141,7 @@ class ShopifyMain(http.Controller):
         current_user = request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
 
         # generate password
-        letters = string.ascii_letters
-        password_generate = ''.join(random.choice(letters) for i in range(20))
+        password_generate = ''.join(random.choice(string.ascii_letters) for i in range(20))
 
         if not current_company:
             current_company = request.env['res.company'].sudo().create({
