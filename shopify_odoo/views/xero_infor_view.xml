@@ -8,7 +8,7 @@
             <field name="arch" type="xml">
                 <form>
                     <group>
-                        <field name="store_xero_name"/>
+                        <field name="name"/>
                         <field name="shop_shopify_id"/>
                         <field name="status_connect"/>
                     </group>
@@ -21,7 +21,7 @@
             <field name="model">xero.store</field>
             <field name="arch" type="xml">
                 <tree>
-                    <field name="store_xero_name"/>
+                    <field name="name"/>
                     <field name="shop_shopify_id"/>
                     <field name="status_connect"/>
                 </tree>

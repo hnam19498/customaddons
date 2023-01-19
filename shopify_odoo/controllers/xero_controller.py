@@ -70,11 +70,11 @@ class XeroController(http.Controller):
 
             if store_infor['id']:
                 print(f"store_infors: {store_infor}")
-                shop_xero = request.env['xero.store'].sudo().search([('store_xero_name', '=', store_infor['tenantName'])])
+                shop_xero = request.env['xero.store'].sudo().search([('name', '=', store_infor['tenantName'])])
 
                 if not shop_xero:
                     shop_xero.create({
-                        'store_xero_name': store_infor['tenantName'],
+                        'name': store_infor['tenantName'],
                         'tenantId': store_infor['tenantId'],
                         'shop_shopify_id': shop_shopify.id,
                         'status_connect': "Connected",

@@ -8,4 +8,4 @@ class SyncHistory(models.Model):
     start_date = fields.Date()
     end_date = fields.Date()
     count = fields.Integer()
-    shopify_name = fields.Char()
+    store_name = fields.Char()

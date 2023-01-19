@@ -7,6 +7,7 @@ class ShopifyOrder(models.Model):
     shopify_order_id = fields.Char()
     name = fields.Char()
     total_price = fields.Char()
+    created_date = fields.Char()
     financial_status = fields.Char()
     shop_id = fields.Many2one('shop.shopify')
     fetch_order_id = fields.Many2one('fetch.shopify')
@@ -20,3 +21,4 @@ class ShopifyProduct(models.Model):
     name = fields.Char()
     fetch_product_id = fields.Many2one('fetch.shopify')
     shop_id = fields.Many2one('shop.shopify')
+    price = fields.Float()

@@ -21,6 +21,7 @@
                                 <tree>
                                     <field name="shopify_product_id" string="ID"/>
                                     <field name="name"/>
+                                    <field name="price"/>
                                 </tree>
                             </field>
                         </group>

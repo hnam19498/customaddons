@@ -1,5 +1,5 @@
 from odoo import api, models, fields, _
-import shopify
+import shopify,datetime
 
 
 class FetchShopify(models.Model):
@@ -62,6 +62,7 @@ class FetchShopify(models.Model):
                         'shop_id': self.shop_id.id,
                         'fetch_order_id': self.id,
                         'products': odoo_products,
+                        'created_date': datetime.datetime.strptime(order.attributes['created_at'], "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d")
                     })
                     count_fetch_order += 1
                 else:
@@ -125,6 +126,7 @@ class FetchShopify(models.Model):
                         'name': product.title,
                         'shop_id': self.shop_id.id,
                         'fetch_product_id': self.id,
+                        'price': float(product.variants[0].price),
                     })
                     count_fetch_product += 1
                 else:
