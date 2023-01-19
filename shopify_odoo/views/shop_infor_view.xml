@@ -22,7 +22,7 @@
         </record>
 
         <record id="action_shopify_odoo" model="ir.actions.act_window">
-            <field name="name">Shopify odoo</field>
+            <field name="name">Shopify infor</field>
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">shop.shopify</field>
             <field name="view_mode">tree,form</field>

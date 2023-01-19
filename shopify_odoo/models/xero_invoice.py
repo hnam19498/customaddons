@@ -10,6 +10,7 @@ class XeroInvoice(models.Model):
     invoice_number = fields.Char()
     reference = fields.Char()
     amount_due = fields.Float()
+    financial_status = fields.Char()
     amount_paid = fields.Float()
     contact_id = fields.Char()
     currency_code = fields.Char()

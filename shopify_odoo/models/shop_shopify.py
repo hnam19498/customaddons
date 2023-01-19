@@ -15,4 +15,4 @@ class Shop(models.Model):
     shopify_owner = fields.Char()
     password = fields.Char()
     admin = fields.Many2one('res.users')
-    fetch_order_id = fields.Many2one('fetch.order')
+    fetch_ids = fields.One2many('fetch.shopify', 'shop_id')

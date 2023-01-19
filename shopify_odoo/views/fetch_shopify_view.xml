@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record id="fetch_shopify_view_form" model="ir.ui.view">
             <field name="name">fetch.shopify.view.form</field>
             <field name="model">fetch.shopify</field>

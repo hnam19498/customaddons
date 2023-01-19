@@ -8,34 +8,33 @@ class XeroController(http.Controller):
     def xero_authenticate(self, **kw):
         print(f'kw_xero: {kw}')
 
+        time_now = datetime.datetime.now()
         shop_shopify_url = 'https://' + kw['state']
         shop_shopify = request.env['shop.shopify'].sudo().search([('url', '=', shop_shopify_url)])
         xero_token = request.env["xero.token"].sudo().search([('shop_id', '=', shop_shopify.id)], limit=1)
 
+        client_id = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.client_id")
+        client_secret = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.client_secret")
+        xero_authorization = base64.urlsafe_b64encode((client_id + ":" + client_secret).encode()).decode()
+
+        auth_headers = {
+            'Authorization': "Basic " + xero_authorization,
+            'Content-Type': 'application/x-www-form-urlencoded',
+        }
+
+        auth_body = {
+            'grant_type': "authorization_code",
+            'code': kw['code'],
+            'redirect_uri': 'https://odoo.website/xero/authenticate/',
+        }
+
+        auth_xero = requests.post('https://identity.xero.com/connect/token', headers=auth_headers, data=auth_body).json()
+
         if xero_token:
-            time_now = datetime.datetime.now()
             if xero_token.refresh_token_time_out >= time_now:
                 if xero_token.access_token_time_out >= time_now:
                     access_token = xero_token.access_token
                 else:
-                    client_id = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.client_id")
-                    client_secret = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.client_secret")
-                    xero_authorization = base64.urlsafe_b64encode((client_id + ":" + client_secret).encode()).decode()
-
-                    auth_headers = {
-                        'Authorization': "Basic " + xero_authorization,
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    }
-
-                    auth_body = {
-                        'grant_type': "authorization_code",
-                        'code': kw['code'],
-                        'redirect_uri': 'https://odoo.website/xero/authenticate/',
-                    }
-
-                    auth_xero = requests.post('https://identity.xero.com/connect/token', headers=auth_headers,
-                                              data=auth_body).json()
-
                     xero_token.write({
                         "id_token": auth_xero['id_token'],
                         "access_token": auth_xero['access_token'],

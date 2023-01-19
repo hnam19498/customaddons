@@ -33,23 +33,23 @@ class FetchShopify(models.Model):
                 if order.shopify_order_id not in list_order_ids:
                     list_order_ids.append(order.shopify_order_id)
 
-        list_quantity =[]
+        list_quantity = []
         orders = shopify.Order.find(published_at_min=start_date, published_at_max=end_date, status='any')
 
         if orders:
             for order in orders:
-                products = []
+                odoo_products = []
                 for line in order.line_items:
-                    test_product = self.env['shopify.product'].sudo().search(
-                        [('shopify_product_id', '=', line.product_id)])
+                    test_product = self.env['shopify.product'].sudo().search([('shopify_product_id', '=', line.product_id)])
                     if test_product:
-                        products.append(test_product.id)
+                        odoo_products.append(test_product.id)
                     else:
                         print("Chưa có sản phẩm trong database!")
 
                     temp = {"product_id": test_product.id,
                             'order_id': self.env['shopify.order'].sudo().search([('shopify_order_id', '=', order.id)]).id,
                             "quantity": line.attributes['quantity']}
+
                     if temp not in list_quantity:
                         list_quantity.append(temp)
 
@@ -57,10 +57,11 @@ class FetchShopify(models.Model):
                     self.env['shopify.order'].sudo().create({
                         'shopify_order_id': order.id,
                         'name': order.name,
+                        'financial_status': order.financial_status,
                         'total_price': order.total_price,
                         'shop_id': self.shop_id.id,
                         'fetch_order_id': self.id,
-                        'products': products,
+                        'products': odoo_products,
                     })
                     count_fetch_order += 1
                 else:
@@ -74,7 +75,23 @@ class FetchShopify(models.Model):
                 'count': count_fetch_order,
                 'shopify_name': self.shop_id.name,
             })
-        print('a')
+
+        if list_quantity:
+            for quantity in list_quantity:
+                x = self.env["quantity.order.line"].sudo().search([('product_id', "=", quantity['product_id']), ("order_id", '=', quantity["order_id"])])
+                if x:
+                    if x.quantity != quantity['quantity']:
+                        x.write({
+                            'quantity': quantity['quantity']
+                        })
+                    else:
+                        print('quantity_order_line đã tồn tại!')
+                else:
+                    self.env["quantity.order.line"].sudo().create({
+                        'quantity': quantity['quantity'],
+                        'product_id': quantity['product_id'],
+                        'order_id': quantity['order_id'],
+                    })
 
     def fetch_product(self):
         api_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
