@@ -54,16 +54,30 @@ class FetchShopify(models.Model):
                         list_quantity.append(temp)
 
                 if str(order.id) not in list_order_ids:
-                    self.env['shopify.order'].sudo().create({
-                        'shopify_order_id': order.id,
-                        'name': order.name,
-                        'financial_status': order.financial_status,
-                        'total_price': order.total_price,
-                        'shop_id': self.shop_id.id,
-                        'fetch_order_id': self.id,
-                        'products': odoo_products,
-                        'created_date': datetime.datetime.strptime(order.attributes['created_at'], "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d")
-                    })
+                    if order.attributes["shipping_lines"]:
+                        self.env['shopify.order'].sudo().create({
+                            'shopify_order_id': order.id,
+                            'ship_cost': float(order.attributes["shipping_lines"][0].attributes['price']),
+                            'name': order.name,
+                            'financial_status': order.financial_status,
+                            'total_price': order.total_price,
+                            'shop_id': self.shop_id.id,
+                            'fetch_order_id': self.id,
+                            'products': odoo_products,
+                            'created_date': datetime.datetime.strptime(order.attributes['created_at'], "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d")
+                        })
+                    else:
+                        self.env['shopify.order'].sudo().create({
+                            'shopify_order_id': order.id,
+                            'ship_cost': 0,
+                            'name': order.name,
+                            'financial_status': order.financial_status,
+                            'total_price': order.total_price,
+                            'shop_id': self.shop_id.id,
+                            'fetch_order_id': self.id,
+                            'products': odoo_products,
+                            'created_date': datetime.datetime.strptime(order.attributes['created_at'], "%Y-%m-%dT%H:%M:%S%z").strftime("%Y-%m-%d")
+                        })
                     count_fetch_order += 1
                 else:
                     print("Đã trong database!")

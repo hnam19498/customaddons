@@ -63,48 +63,97 @@ class SyncInvoice(models.Model):
             })
 
     def put_invoice(self):
+        count_put_invoice = 0
+        count_paid_invoice = 0
         orders = self.env['shopify.order'].sudo().search([])
         for order in orders:
-            if order.financial_status == 'paid':
-                status_invoice = "PAID"
-            else:
-                status_invoice='AUTHORISED'
-            lineitems = []
-            lines = self.env['quantity.order.line'].sudo().search([('order_id', '=', order.id)])
-            for line in lines:
-                lineitems.append({
-                    "Description": "Test",
-                    "Quantity": line.quantity,
-                    "UnitAmount": self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price,
-                    "AccountCode": "200",
-                    "TaxType": "OUTPUT",
-                    "TaxAmount": self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price * 0.1,
-                    "LineAmount": line.quantity * self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price
-                })
+            if not order.xero_invoice_id:
+                total_tax_xero = 0
+                total_price_xero = 0
+                lineitems = []
+                lines = self.env['quantity.order.line'].sudo().search([('order_id', '=', order.id)])
 
-            hearder_post_invoice = {
-                'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
-                'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
-                'Content-Type': 'application/json',
-                "Accept": "application/json",
-            }
+                for line in lines:
+                    lineitems.append({
+                        "Description": "Test",
+                        "Quantity": line.quantity,
+                        "UnitAmount": self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price,
+                        "AccountCode": "200",
+                        "TaxType": "OUTPUT",
+                        "TaxAmount": self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price * 0.1,
+                        "LineAmount": line.quantity * self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price
+                    })
+                    total_price_xero += self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price * line.quantity
+                    total_tax_xero += 0.1 * self.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)]).price
 
-            body_post_invoice = {
-                "Invoices": [
-                    {
-                        "Type": "ACCREC",
-                        "Contact": {
-                            "ContactID": "61ef5b44-a7a2-4775-a81d-de61c95bf5e9"
-                        },
-                        "LineItems": lineitems,
-                        "Date": "2019-03-11",
-                        "DueDate": "2018-12-10",
-                        "Reference": "Website Design",
-                        "Status": status_invoice
+                body_post_invoice = {
+                    "Invoices": [
+                        {
+                            "Type": "ACCREC",
+                            "Contact": {"ContactID": "61ef5b44-a7a2-4775-a81d-de61c95bf5e9"},
+                            "LineItems": lineitems,
+                            "Date": order.created_date,
+                            "DueDate": order.created_date,
+                            "Reference": order.name,
+                            "Status": 'AUTHORISED'
+                        }
+                    ]
+                }
+
+                hearder_post_invoice = {
+                    'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
+                    'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
+                    'Content-Type': 'application/json',
+                    "Accept": "application/json",
+                }
+
+                result_post_invoice = requests.post('https://api.xero.com/api.xro/2.0/Invoices', headers=hearder_post_invoice, json=body_post_invoice).json()
+                print(f'invoice: {result_post_invoice}')
+                count_put_invoice += 1
+
+                selected_order = self.env['shopify.order'].sudo().search([('id','=',order.id)],limit=1)
+                selected_order.sudo().write({"xero_invoice_id": result_post_invoice['Invoices'][0]['InvoiceID']})
+
+                if order.financial_status == 'paid':
+
+                    hearder_post_payments = {
+                        'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
+                        'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
+                        'Content-Type': 'application/json',
+                        "Accept": "application/json",
                     }
-                ]
-            }
 
-            respond = requests.post('https://api.xero.com/api.xro/2.0/Invoices', headers=hearder_post_invoice, json=body_post_invoice).json()
+                    body_post_payments = {
+                        "Payments": [
+                            {
+                                "Invoice": {
+                                    "LineItems": [],
+                                    "InvoiceID": result_post_invoice['Invoices'][0]['InvoiceID']
+                                },
+                                "Account": {"Code": "970"},
+                                "Amount": total_tax_xero + total_price_xero
+                            }
+                        ]
+                    }
 
-            print(respond)
+                    result_post_payment = requests.post('https://api.xero.com/api.xro/2.0/Payments', headers=hearder_post_payments, json=body_post_payments).json()
+                    print(f'payment: {result_post_payment}')
+                    count_paid_invoice += 1
+
+        if count_put_invoice != 0:
+            self.env['sync.history'].sudo().create({
+                'type': "Put invoice",
+                'start_date': self.start_date.strftime("%Y-%m-%d"),
+                'end_date': self.end_date.strftime("%Y-%m-%d"),
+                'count': count_put_invoice,
+                'store_name': self.store_id.name,
+            })
+
+        if count_post_invoice != 0:
+            self.env['sync.history'].sudo().create({
+                'type': "Put paid invoice",
+                'start_date': self.start_date.strftime("%Y-%m-%d"),
+                'end_date': self.end_date.strftime("%Y-%m-%d"),
+                'count': count_paid_invoice,
+                'store_name': self.store_id.name,
+            })
