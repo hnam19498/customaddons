@@ -19,8 +19,7 @@ class ProductBundle(models.Model):
     discount_value = fields.Float(default=1.0)
     enable = fields.Boolean(default=True)
     active = fields.Boolean(default=True)
-    priority = fields.Integer(
-        help="(For bundles that have the same products), A value of ‘0’ indicates the highest priority to display in the product detail page.")
+    priority = fields.Integer(help="(For bundles that have the same products), A value of ‘0’ indicates the highest priority to display in the product detail page.")
     start_time = fields.Datetime()
     end_time = fields.Datetime()
     indefinite_bundle = fields.Boolean()

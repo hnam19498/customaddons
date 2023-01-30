@@ -13,11 +13,12 @@
         "views/shop_infor_view.xml",
         "views/fetch_shopify_view.xml",
         'views/xero_infor_view.xml',
+        "views/bundle_view.xml",
         "views/sync_invoice_view.xml",
     ],
     'assets': {
         'web.assets_frontend': [
-            'shopify_odoo/static/src/js/script_tagg_1.js',
+            'shopify_odoo/static/src/js/product_details.js',
         ],
     },
 

@@ -149,7 +149,7 @@ class SyncInvoice(models.Model):
                 'store_name': self.store_id.name,
             })
 
-        if count_post_invoice != 0:
+        if count_paid_invoice != 0:
             self.env['sync.history'].sudo().create({
                 'type': "Put paid invoice",
                 'start_date': self.start_date.strftime("%Y-%m-%d"),

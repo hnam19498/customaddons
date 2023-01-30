@@ -1,6 +1,6 @@
 from odoo import http, _
 from odoo.http import request
-from datetime import datetime, time
+from datetime import datetime
 
 
 class BundleMain(http.Controller):

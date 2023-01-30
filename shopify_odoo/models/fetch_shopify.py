@@ -139,6 +139,7 @@ class FetchShopify(models.Model):
                         'shopify_product_id': product.id,
                         'name': product.title,
                         'shop_id': self.shop_id.id,
+                        'url_img': product.attributes['images'][0].attributes['src'],
                         'fetch_product_id': self.id,
                         'price': float(product.variants[0].price),
                     })

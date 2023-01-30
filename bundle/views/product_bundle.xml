@@ -36,7 +36,7 @@
                                             <field name="description" class="s_o_field_char"/>
                                         </div>
                                     </div>
-                                    <div class="row">
+                                    <div class="row" attrs="{'invisible': [('indefinite_bundle', '=', True)]}">
                                         <div class="col-xl-3 col-lg-3 col-md-3">
                                             <label for="start_time" string="Date Range" style="font-weight:bold"
                                                    attrs="{'invisible': [('indefinite_bundle', '=', True)]}"/>

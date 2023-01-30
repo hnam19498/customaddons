@@ -73,9 +73,9 @@
                 <tree>
                     <field name="shopify_name"/>
                     <field name="type"/>
+                    <field name="count"/>
                     <field name="start_date"/>
                     <field name="end_date"/>
-                    <field name="count"/>
                 </tree>
             </field>
         </record>

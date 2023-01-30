@@ -89,13 +89,12 @@ class ShopifyMain(http.Controller):
 
         new_script_tag = shopify.ScriptTag.create({
             "event": "onload",
-            "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tagg_1.js',
+            "src": 'https://odoo.website/shopify_odoo/static/src/js/product_details.js',
             "display_scope": "all",
         })
         print(f"new_script_tag.id: {new_script_tag.id}")
         print(f"new_script_tag.src: {new_script_tag.src}")
 
-        shop_shopify = shopify.Shop.current()
         client = shopify.GraphQL()
         shopify_infor = client.execute("{shop{id name email currencyCode url billingAddress{country}}}")
         shopify_data = json.loads(shopify_infor)
