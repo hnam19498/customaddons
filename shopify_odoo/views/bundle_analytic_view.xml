@@ -1,0 +1,39 @@
+<odoo>
+    <data>
+        <record id="view_bundle_analytic_form" model="ir.ui.view">
+            <field name="name">bundle.analytic.view.form</field>
+            <field name="model">bundle.analytic</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="bundle_id"/>
+                        <field name="start_time"/>
+                        <field name="end_time"/>
+                        <field name="count_time"/>
+                    </group>
+                    <iframe id="bundle_analytic_iframe"
+                            src="/iframe/shopify_iframe"
+                            style="border:none; width: 100%; height: 500px">
+                    </iframe>
+                </form>
+            </field>
+        </record>
+
+        <record id="bundle_analytic_action" model="ir.actions.act_window">
+            <field name="name">Bundle analytic</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">bundle.analytic</field>
+            <field name="view_mode">form</field>
+            <field name="help" type="html">
+                <p class="o_view_nocontent_smiling_face">Create your first shopify shop!</p>
+            </field>
+        </record>
+
+        <menuitem name="Bundle analytic"
+                  id="menu_bundle_analytic"
+                  sequence="10"
+                  parent="menu_shopify_root"
+                  action="bundle_analytic_action"/>
+
+    </data>
+</odoo>

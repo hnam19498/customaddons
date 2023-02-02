@@ -140,6 +140,7 @@
             <field name="res_model">shopify.bundle.setting</field>
             <field name="view_mode">tree,form</field>
         </record>
+
         <record id="shopify_bundle_setting_view_tree" model="ir.ui.view">
             <field name="name">Bundle setting tree</field>
             <field name="model">shopify.bundle.setting</field>

@@ -2,10 +2,6 @@ if (window.location.href.indexOf("products") > -1) {
     document.getElementsByClassName("shopify-payment-button__button--unbranded")[0].remove()
 }
 
-if (window.location.href.indexOf("cart") > -1) {
-    document.getElementById('checkout').remove()
-}
-
 if (typeof (axios) === 'undefined') {
     script1 = document.createElement("script")
     script1.src = 'https://cdn.jsdelivr.net/npm/axios@1.1.2/dist/axios.min.js'
@@ -78,10 +74,18 @@ var reduce_price = setInterval(function () {
         }).then(function () {
             axios.post("https://odoo.website/shopify_bundle/cart", {
                 jsonrpc: "2.0",
-                params: {cart_infors: cart_infors}
+                params: {
+                    cart_infors: cart_infors,
+                    shop_url: window.location.origin
+                }
             }).then(response => {
                 var draft_order_url = response.data.result.draft_order_url
-                redirect_to_check_out(draft_order_url)
+                if (draft_order_url) {
+                    if (window.location.href.indexOf("cart") > -1) {
+                        document.getElementById('checkout').remove()
+                    }
+                    redirect_to_check_out(draft_order_url)
+                }
             }).catch(error => {
                 console.log(error)
             })

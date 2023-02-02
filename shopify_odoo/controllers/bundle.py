@@ -14,7 +14,8 @@ class ShopifyBundle(http.Controller):
         list_bundle_ids = product.get_list_bundle()
         today = datetime.now()
 
-        setting_data = request.env['shopify.bundle.setting'].sudo().search([("shop_id",'=',request.env["shopify.product"].sudo().search([("shopify_product_id",'=',kw["product_id"])]).shop_id.id)])
+        setting_data = request.env['shopify.bundle.setting'].sudo().search([("shop_id", '=', request.env["shopify.product"].sudo().search([("shopify_product_id", '=', kw["product_id"])]).shop_id.id)])
+
         bundle_setting = {
             "color": setting_data.color,
             'bundle_position': setting_data.bundle_position,
@@ -36,6 +37,7 @@ class ShopifyBundle(http.Controller):
                     "discount_value": bundle.discount_value,
                     "title": bundle.title
                 })
+
                 if bundle.indefinite_bundle or bundle.start_time <= today <= bundle.end_time:
                     product_lines = request.env['bundle.product.quantity'].sudo().search([("bundle_id", '=', bundle.id)])
                     for line in product_lines:
@@ -47,7 +49,9 @@ class ShopifyBundle(http.Controller):
                             'img': request.env['shopify.product'].sudo().search([("id", '=', line.product_id.id)], limit=1).url_img,
                         })
 
-            return {'bundle_infors': bundle_infors, "bundle_setting": bundle_setting, "quantity_infors": quantity_infors}
+            return {'bundle_infors': bundle_infors,
+                    "bundle_setting": bundle_setting,
+                    "quantity_infors": quantity_infors}
         else:
             return {'bundle_infors': []}
 
@@ -55,10 +59,10 @@ class ShopifyBundle(http.Controller):
     def cart(self, **kw):
 
         api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
-        print(f"kw: {kw}")
         list_time = []
         list_bundle = []
         today = datetime.now()
+        draft_order_url=0
         price = []
 
         for line in kw['cart_infors']:
@@ -67,16 +71,23 @@ class ShopifyBundle(http.Controller):
             if bundles:
                 for bundle in bundles:
                     if product_id == bundle.product_id.id and line['quantity'] >= bundle.qty:
-                        b = {"bundle_id": bundle.bundle_id.id,
+                        b = {
+                            "bundle_id": bundle.bundle_id.id,
                              "product_id": product_id,
-                             "time": line['quantity'] // bundle.qty}
+                             'quantity': request.env['bundle.product.quantity'].sudo().search([("product_id", '=', product_id), ('bundle_id','=',bundle["bundle_id"].id)]).qty,
+                             "time": line['quantity'] // bundle.qty
+                        }
                         if b not in list_time:
                             list_time.append(b)
 
         for item in list_time:
             count = 0
             line = request.env['bundle.product.quantity'].sudo().search([("bundle_id", "=", item["bundle_id"])])
-            line_bundle = {"bundle_id": item["bundle_id"], "line": len(line)}
+            line_bundle = {
+                "bundle_id": item["bundle_id"],
+                "line": len(line)
+            }
+
             for x in list_time:
                 if x["bundle_id"] == line_bundle['bundle_id']:
                     count += 1
@@ -107,7 +118,7 @@ class ShopifyBundle(http.Controller):
             price_reduce = 0
             for time in list_time:
                 if bundle["bundle_id"] == time["bundle_id"]:
-                    price_reduce += bundle['time'] * request.env['shopify.product'].sudo().search([("id", '=', time['product_id'])]).price * bundle["discount_value"] / 100
+                    price_reduce += bundle['time'] * request.env['shopify.product'].sudo().search([("id", '=', time['product_id'])]).price * time['quantity'] * bundle["discount_value"] / 100
 
             price_test = {
                 "bundle_id": bundle["bundle_id"],
@@ -125,15 +136,13 @@ class ShopifyBundle(http.Controller):
                     maxx = line['price_reduce']
                     max_bundle = line
 
-            print(f"max_bundle: {max_bundle}")
             for line in kw['cart_infors']:
-                print(line)
                 list_items.append({
                     "quantity": line['quantity'],
                     "variant_id": line["variant_id"]
                 })
 
-            session = shopify.Session("https://shop-odoo-hnam.myshopify.com", api_version, 'shpua_0026596b7af6cc4f70b6de9a24fa4809')
+            session = shopify.Session(kw['shop_url'], api_version, request.env['shop.shopify'].sudo().search([("url", '=', kw['shop_url'])]).token)
             shopify.ShopifyResource.activate_session(session)
 
             # price_rule = shopify.PriceRule.create({
@@ -153,12 +162,15 @@ class ShopifyBundle(http.Controller):
             # })
             # print(discount_code)
 
-            draft_order = shopify.DraftOrder.create({"line_items": list_items,
-                                                     "applied_discount": {
-                                                         "value": max_bundle["price_reduce"],
-                                                         "value_type": "fixed_amount"
-                                                     }})
+            draft_order = shopify.DraftOrder.create({
+                "line_items": list_items,
+                "applied_discount": {
+                    "value": max_bundle["price_reduce"],
+                    "value_type": "fixed_amount"
+                }
+            })
 
             draft_order_url = draft_order.invoice_url
 
-        return {'draft_order_url': draft_order_url}
+        if draft_order_url != 0:
+            return {'draft_order_url': draft_order_url}

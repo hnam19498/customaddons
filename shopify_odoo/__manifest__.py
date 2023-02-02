@@ -15,6 +15,7 @@
         'views/xero_infor_view.xml',
         "views/bundle_view.xml",
         "views/sync_invoice_view.xml",
+        "views/bundle_analytic_view.xml",
     ],
     'assets': {
         'web.assets_frontend': [
