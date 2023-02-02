@@ -28,9 +28,11 @@ class ShopifyMain(http.Controller):
         shopify_url = "shop-odoo-hnam.myshopify.com"
         state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
         redirect_uri = "https://odoo.website/auth/shopify/callback"
-        scopes = ["read_products", "read_orders", 'read_script_tags', 'write_script_tags']
+        scopes = ["write_price_rules", "read_price_rules", "read_products", "read_orders", 'read_script_tags', 'write_script_tags', "read_draft_orders", 'write_draft_orders']
         newSession = shopify.Session(shopify_url, api_version)
         auth_url = newSession.create_permission_url(scopes, redirect_uri, state)
+
+        print(f"auth_url: {auth_url}")
 
         return werkzeug.utils.redirect(auth_url)
 
@@ -89,7 +91,7 @@ class ShopifyMain(http.Controller):
 
         new_script_tag = shopify.ScriptTag.create({
             "event": "onload",
-            "src": 'https://odoo.website/shopify_odoo/static/src/js/product_details.js',
+            "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tag_1.js',
             "display_scope": "all",
         })
         print(f"new_script_tag.id: {new_script_tag.id}")

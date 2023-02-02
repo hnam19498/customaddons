@@ -11,3 +11,4 @@ access.xero.store,access_xero_store,model_xero_store,base.group_user,1,1,1,1
 access.shopify.bundle,access_shopify_bundle,model_shopify_bundle,base.group_user,1,1,1,1
 access.quantity.order.line,access_quantity_order_line,model_quantity_order_line,base.group_user,1,1,1,1
 access.bundle.product.quantity,access_bundle_product_quantity,model_bundle_product_quantity,base.group_user,1,1,1,1
+access.shopify.bundle.setting,access_shopify_bundle_setting,model_shopify_bundle_setting,base.group_user,1,1,1,1

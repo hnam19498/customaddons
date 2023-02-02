@@ -118,5 +118,45 @@
                   sequence="10"
                   parent="menu_shopify_root"
                   action="shopify_bundle_action"/>
+
+
+        <record id="view_bundle_setting_form" model="ir.ui.view">
+            <field name="name">bundle.setting.view.form</field>
+            <field name="model">shopify.bundle.setting</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="color" widget="color"/>
+                        <field name="bundle_position"/>
+                        <field name="bundle_label"/>
+                        <field name="shop_id"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record model="ir.actions.act_window" id="shopify_bundle_setting_action">
+            <field name="name">Bundle setting</field>
+            <field name="res_model">shopify.bundle.setting</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+        <record id="shopify_bundle_setting_view_tree" model="ir.ui.view">
+            <field name="name">Bundle setting tree</field>
+            <field name="model">shopify.bundle.setting</field>
+            <field name="arch" type="xml">
+                <tree string="Bundle setting">
+                    <field name="color" widget="color"/>
+                    <field name="bundle_position"/>
+                    <field name="bundle_label"/>
+                    <field name="shop_id"/>
+                </tree>
+            </field>
+        </record>
+
+        <menuitem name="Bundle setting"
+                  id="shopify_odoo.menu_bundle_setting"
+                  sequence="10"
+                  parent="menu_shopify_root"
+                  action="shopify_bundle_setting_action"/>
     </data>
 </odoo>

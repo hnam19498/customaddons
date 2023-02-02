@@ -25,3 +25,12 @@ class ShopifyBundle(models.Model):
                 pass
             else:
                 raise ValidationError(_("Discount value must be an int, greater than or equal to 0!!"))
+
+
+class ShopifyBundleSetting(models.Model):
+    _name = "shopify.bundle.setting"
+
+    color = fields.Char()
+    bundle_position = fields.Selection([('below', "Below add to cart form"), ('above', 'Above add to cart form')])
+    bundle_label = fields.Char()
+    shop_id = fields.Many2one('shop.shopify')

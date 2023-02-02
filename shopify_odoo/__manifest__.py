@@ -18,7 +18,7 @@
     ],
     'assets': {
         'web.assets_frontend': [
-            'shopify_odoo/static/src/js/product_details.js',
+            'shopify_odoo/static/src/js/script_tag_1.js',
         ],
     },
 
