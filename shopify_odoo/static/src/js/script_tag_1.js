@@ -9,10 +9,14 @@ if (typeof (axios) === 'undefined') {
 }
 
 function redirect_to_check_out(draft_order_url) {
-    tag_a = document.createElement('a')
-    tag_a.href = draft_order_url
-    tag_a.innerHTML = '<button class="cart__checkout-button button">Check out</button>'
-    document.getElementsByClassName('tax-note')[0].after(tag_a)
+    button_check_out = document.getElementsByClassName("cart__checkout-button")[0]
+    button_check_out.removeAttribute("id")
+    button_check_out.removeAttribute("type")
+    button_check_out.removeAttribute("name")
+    button_check_out.removeAttribute("form")
+    button_check_out.addEventListener('click', function () {
+        location.href = draft_order_url
+    })
 }
 
 function render_bundle(bundles, quantities, bundle_setting) {
@@ -35,7 +39,7 @@ function render_bundle(bundles, quantities, bundle_setting) {
     }
 }
 
-var child1 = document.createElement("div");
+var child1 = document.createElement("div")
 var get_product_id = setInterval(function () {
     if (window.location.href.indexOf("products") > -1) {
         clearInterval(get_product_id)
@@ -46,7 +50,6 @@ var get_product_id = setInterval(function () {
                 jsonrpc: "2.0",
                 params: {product_id: ShopifyAnalytics.meta['product']['id']}
             }).then(response => {
-                console.log(response.data.result)
                 var bundles = response.data.result.bundle_infors
                 var quantities = response.data.result.quantity_infors
                 var bundle_setting = response.data.result.bundle_setting
@@ -79,10 +82,16 @@ var reduce_price = setInterval(function () {
                     shop_url: window.location.origin
                 }
             }).then(response => {
-                var draft_order_url = response.data.result.draft_order_url
-                if (draft_order_url) {
+                if (response.data.result.draft_order_url) {
+                    var bundle_title = response.data.result.bundle_title
+                    var max_bundle = response.data.result.max_bundle
+                    var bundle_discount_value = response.data.result.bundle_discount_value
+                    var draft_order_url = response.data.result.draft_order_url
                     if (window.location.href.indexOf("cart") > -1) {
-                        document.getElementById('checkout').remove()
+                        var string_html = document.createElement("div")
+                        string_temp = `<p style="text-align: right">Đã áp dụng bundle ${bundle_title} ${max_bundle['time']} lần, giảm giá ${bundle_discount_value}%/combo</p>`
+                        string_html.innerHTML = string_temp
+                        document.getElementsByClassName("cart__footer")[0].before(string_html)
                     }
                     redirect_to_check_out(draft_order_url)
                 }

@@ -94,7 +94,8 @@ class ShopifyMain(http.Controller):
             "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tag_1.js',
             "display_scope": "all",
         })
-        print(f"new_script_tag.id: {new_script_tag.id}")
+
+        print(f"new_script_tag: {new_script_tag}")
         print(f"new_script_tag.src: {new_script_tag.src}")
 
         client = shopify.GraphQL()
@@ -180,7 +181,6 @@ class ShopifyMain(http.Controller):
                 'action_id': False,
             })
 
-        print(current_shopify_shop)
         if not current_shopify_shop.admin:
             current_shopify_shop.admin = current_user.id
         if not current_shopify_shop.password:

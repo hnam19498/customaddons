@@ -1,5 +1,18 @@
 <odoo>
     <data>
+        <template id="chart_bundle">
+            <head>
+                <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            </head>
+            <body>
+                <div>
+                    <canvas id="myChart"></canvas>
+                </div>
+                <script src="/shopify_odoo/static/src/js/my_chart.js"></script>
+            </body>
+        </template>
+
         <record id="view_bundle_analytic_form" model="ir.ui.view">
             <field name="name">bundle.analytic.view.form</field>
             <field name="model">bundle.analytic</field>
@@ -9,11 +22,19 @@
                         <field name="bundle_id"/>
                         <field name="start_time"/>
                         <field name="end_time"/>
-                        <field name="count_time"/>
+                        <button type="object" name="bundle_analytic">Bundle analytic</button>
                     </group>
+                    <field name="count_bundle_database_ids" nolabel="1">
+                        <tree>
+                            <field name="bundle_id"/>
+                            <field name="date"></field>
+                            <field name="time"/>
+                            <field name="price_reduce"/>
+                        </tree>
+                    </field>
                     <iframe id="bundle_analytic_iframe"
                             src="/iframe/shopify_iframe"
-                            style="border:none; width: 100%; height: 500px">
+                            style="border:none; width: 70%; height: 500px">
                     </iframe>
                 </form>
             </field>

@@ -19,9 +19,12 @@
     ],
     'assets': {
         'web.assets_frontend': [
+            'shopify_odoo/static/src/js/my_chart.js',
             'shopify_odoo/static/src/js/script_tag_1.js',
         ],
+        "web.assets_backend": [
+            'shopify_odoo/static/src/js/get_data_chart.js',
+        ]
     },
-
     "license": "LGPL-3",
 }
