@@ -9,6 +9,15 @@ class BundleAnalytic(models.Model):
     start_time = fields.Datetime()
     bundle_id = fields.Many2one('shopify.bundle')
     count_bundle_database_ids = fields.One2many("count.bundle.database", "bundle_analytic_id")
+    check_analytic = fields.Boolean(default=False)
+    html_iframe = fields.Html(compute='gen_html_iframe', sanitize=False)
+
+    @api.constrains("bundle_id", 'end_time', 'start_time')
+    def gen_html_iframe(self):
+        if self.check_analytic:
+            self.html_iframe = f'<iframe src="/iframe/shopify_iframe?bundle_id={self.bundle_id.id}" width="1000px" height="500px"></iframe>'
+        else:
+            self.html_iframe = f'<iframe src="/iframe/shopify_iframe"></iframe>'
 
     def bundle_analytic(self):
         try:
@@ -22,7 +31,7 @@ class BundleAnalytic(models.Model):
                 for count_bundle in count_bundles:
                     count = 0
                     price_reduce = 0
-                    
+
                     if start_time <= count_bundle.create_date <= end_time:
                         count += count_bundle.time
                         price_reduce += count_bundle.price_reduce
@@ -61,15 +70,16 @@ class BundleAnalytic(models.Model):
                                 count_hhh += list_count[i]['count']
 
                     if count_hhh > 0:
-                        # print(f"single_date: {single_date}, count_hhh: {count_hhh}, price_reduce: {price_reduce}")
-                        exist_analytic = self.env['count.bundle.database'].sudo().search([('bundle_id', '=', bundle.id), ("date", "=", single_date)], limit=1)
-                        if not exist_analytic: self.env['count.bundle.database'].sudo().create({
-                            'bundle_id': bundle.id,
-                            'time': count_hhh,
-                            "bundle_analytic_id": self.id,
-                            "price_reduce": price_reduce,
-                            "date": single_date,
-                        })
+                        exist_analytic = self.env['count.bundle.database'].sudo().search(
+                            [('bundle_id', '=', bundle.id), ("date", "=", single_date)], limit=1)
+                        if not exist_analytic:
+                            self.env['count.bundle.database'].sudo().create({
+                                'bundle_id': bundle.id,
+                                'time': count_hhh,
+                                "bundle_analytic_id": self.id,
+                                "price_reduce": price_reduce,
+                                "date": single_date,
+                            })
                         else:
                             if exist_analytic.time != count_hhh:
                                 exist_analytic.sudo().write({
@@ -82,6 +92,8 @@ class BundleAnalytic(models.Model):
                                 exist_analytic.sudo().write({
                                     "bundle_analytic_id": self.id
                                 })
+
+                        self.check_analytic = True
 
         except Exception as e:
             print(e)
