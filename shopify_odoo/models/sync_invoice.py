@@ -108,21 +108,18 @@ class SyncInvoice(models.Model):
                 }
 
                 result_post_invoice = requests.post('https://api.xero.com/api.xro/2.0/Invoices', headers=hearder_post_invoice, json=body_post_invoice).json()
-                print(f'invoice: {result_post_invoice}')
                 count_put_invoice += 1
 
-                selected_order = self.env['shopify.order'].sudo().search([('id','=',order.id)],limit=1)
+                selected_order = self.env['shopify.order'].sudo().search([('id', '=', order.id)],limit=1)
                 selected_order.sudo().write({"xero_invoice_id": result_post_invoice['Invoices'][0]['InvoiceID']})
 
                 if order.financial_status == 'paid':
-
                     hearder_post_payments = {
                         'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
                         'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
                         'Content-Type': 'application/json',
                         "Accept": "application/json",
                     }
-
                     body_post_payments = {
                         "Payments": [
                             {
@@ -135,9 +132,7 @@ class SyncInvoice(models.Model):
                             }
                         ]
                     }
-
-                    result_post_payment = requests.post('https://api.xero.com/api.xro/2.0/Payments', headers=hearder_post_payments, json=body_post_payments).json()
-                    print(f'payment: {result_post_payment}')
+                    requests.post('https://api.xero.com/api.xro/2.0/Payments', headers=hearder_post_payments, json=body_post_payments).json()
                     count_paid_invoice += 1
 
         if count_put_invoice != 0:

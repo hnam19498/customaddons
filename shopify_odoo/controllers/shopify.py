@@ -32,8 +32,6 @@ class ShopifyMain(http.Controller):
         newSession = shopify.Session(shopify_url, api_version)
         auth_url = newSession.create_permission_url(scopes, redirect_uri, state)
 
-        print(f"auth_url: {auth_url}")
-
         return werkzeug.utils.redirect(auth_url)
 
     @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*", save_session=False)
@@ -89,20 +87,15 @@ class ShopifyMain(http.Controller):
             print(f"old_script_tag.id: {script_tag.id}")
             shopify.ScriptTag.find(script_tag.id).destroy()
 
-        new_script_tag = shopify.ScriptTag.create({
+        shopify.ScriptTag.create({
             "event": "onload",
             "src": 'https://odoo.website/shopify_odoo/static/src/js/script_tag_1.js',
             "display_scope": "all",
         })
 
-        print(f"new_script_tag: {new_script_tag}")
-        print(f"new_script_tag.src: {new_script_tag.src}")
-
         client = shopify.GraphQL()
         shopify_infor = client.execute("{shop{id name email currencyCode url billingAddress{country}}}")
         shopify_data = json.loads(shopify_infor)
-
-        print(f"kw = {kw}")
 
         shopify_id = shopify_data["data"]["shop"]["id"].split("/")[-1]
         shopify_name = shopify_data["data"]["shop"]["name"]
@@ -118,7 +111,6 @@ class ShopifyMain(http.Controller):
             if not current_shopify_shop.shopify_owner:
                 current_shop = shopify.Shop.current()
                 current_shopify_shop.shopify_owner = current_shop.attributes['shop_owner']
-
                 current_shopify_shop.sudo().write({
                     "name": shopify_name,
                     "email": shopify_email,
