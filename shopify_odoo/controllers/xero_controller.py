@@ -60,7 +60,6 @@ class XeroController(http.Controller):
             access_token = auth_xero['access_token']
 
         if shop_shopify_url:
-
             check_headers = {
                 'Authorization': "Bearer " + access_token,
                 'Content-Type': 'application/json',
@@ -79,7 +78,6 @@ class XeroController(http.Controller):
                         'shop_shopify_id': shop_shopify.id,
                         'status_connect': "Connected",
                     })
-
                 else:
                     shop_xero.write({
                         'status_connect': "Connected",

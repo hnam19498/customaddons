@@ -73,7 +73,7 @@ class ShopifyBundle(http.Controller):
                         b = {
                             "bundle_id": bundle.bundle_id.id,
                             "product_id": product_id,
-                            "quantity": request.env["bundle.product.quantity"].sudo().search([("product_id", "=", product_id), ("bundle_id","=",bundle["bundle_id"].id)]).qty,
+                            "quantity": request.env["bundle.product.quantity"].sudo().search([("product_id", "=", product_id), ("bundle_id", "=", bundle["bundle_id"].id)]).qty,
                             "time": line["quantity"] // bundle.qty
                         }
                         if b not in list_time:

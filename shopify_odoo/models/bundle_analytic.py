@@ -17,7 +17,7 @@ class BundleAnalytic(models.Model):
         if self.check_analytic:
             self.html_iframe = f'<iframe src="/iframe/shopify_iframe?bundle_id={self.bundle_id.id}" width="1000px" height="500px"></iframe>'
         else:
-            self.html_iframe = f'<iframe src="/iframe/shopify_iframe"></iframe>'
+            self.html_iframe = '<iframe src="/iframe/shopify_iframe"></iframe>'
 
     def bundle_analytic(self):
         try:
@@ -46,9 +46,6 @@ class BundleAnalytic(models.Model):
                     if b not in list_count:
                         list_count.append(b)
 
-                    count_hhh = 0
-                    sodem = 0
-
                 list_date = []
                 for i in range(len(list_count)):
                     date_temp = list_count[i]['date']
@@ -70,8 +67,7 @@ class BundleAnalytic(models.Model):
                                 count_hhh += list_count[i]['count']
 
                     if count_hhh > 0:
-                        exist_analytic = self.env['count.bundle.database'].sudo().search(
-                            [('bundle_id', '=', bundle.id), ("date", "=", single_date)], limit=1)
+                        exist_analytic = self.env['count.bundle.database'].sudo().search([('bundle_id', '=', bundle.id), ("date", "=", single_date)], limit=1)
                         if not exist_analytic:
                             self.env['count.bundle.database'].sudo().create({
                                 'bundle_id': bundle.id,
@@ -87,7 +83,6 @@ class BundleAnalytic(models.Model):
                                     'price_reduce': price_reduce,
                                     "bundle_analytic_id": self.id
                                 })
-
                             if exist_analytic.bundle_analytic_id != self.id:
                                 exist_analytic.sudo().write({
                                     "bundle_analytic_id": self.id
