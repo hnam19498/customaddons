@@ -15,6 +15,8 @@ class FetchShopify(models.Model):
         list_order_ids = []
         count_fetch_order = 0
 
+        api_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
+        secret_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
 
         shopify_access_token = self.shop_id.token
@@ -107,6 +109,8 @@ class FetchShopify(models.Model):
                     })
 
     def fetch_product(self):
+        api_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
+        secret_key = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
         api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
 
         shopify_access_token = self.shop_id.token

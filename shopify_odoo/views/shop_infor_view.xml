@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record id="view_shopify_odoo_form" model="ir.ui.view">
             <field name="name">shopify.odoo.form</field>
             <field name="model">shop.shopify</field>
@@ -34,5 +35,6 @@
                   name="Shopify"
                   action="action_shopify_odoo"
                   sequence="0"/>
+
     </data>
 </odoo>

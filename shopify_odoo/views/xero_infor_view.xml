@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
     <data>
+
         <record id="view_xero_form" model="ir.ui.view">
             <field name="name">xero.view.form</field>
             <field name="model">xero.store</field>
@@ -42,5 +43,6 @@
                   parent="menu_shopify_root"
                   action="action_xero_odoo"
                   sequence="0"/>
+
     </data>
 </odoo>
