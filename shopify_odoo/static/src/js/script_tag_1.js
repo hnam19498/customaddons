@@ -25,7 +25,7 @@ function render_bundle(bundles, quantities, bundle_setting) {
             string_html = `<div style="border: 1px solid black; color: ${bundle_setting.color}">${bundle_setting.bundle_label} - Mua combo giảm ${bundle.discount_value}%: `
             for (let quantity of quantities) {
                 if (quantity.bundle_id == bundle.bundle_id) {
-                    string_html += `<p> - mua ${quantity.quantity} sản phẩm ${quantity.product_name} <img src="${quantity.img}" style="width: 50px; height: auto"></p>`
+                    string_html += `<p>- mua ${quantity.quantity} sản phẩm ${quantity.product_name} <img src="${quantity.img}" style="width: 50px; height: auto"></p>`
                 }
             }
             child1.innerHTML += string_html + `</div>`
@@ -48,7 +48,7 @@ var get_product_id = setInterval(function () {
             el1.appendChild(child1);
             axios.post("https://odoo.website/shopify_bundle/get_bundle_detail", {
                 jsonrpc: "2.0",
-                params: {product_id: ShopifyAnalytics.meta['product']['id']}
+                params: { product_id: ShopifyAnalytics.meta['product']['id'] }
             }).then(response => {
                 var bundles = response.data.result.bundle_infors
                 var quantities = response.data.result.quantity_infors

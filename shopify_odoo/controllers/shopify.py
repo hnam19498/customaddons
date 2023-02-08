@@ -4,19 +4,6 @@ import shopify, binascii, os, werkzeug, json, string, base64, logging, random, s
 
 
 class ShopifyMain(http.Controller):
-
-    def initSession(self):
-
-        api_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_key")
-        secret_key = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_secret_key")
-        api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
-
-        shopify.Session.setup(api_key=api_key, secret=secret_key)
-        shopify_url = "shop-odoo-hnam.myshopify.com"
-        newSession = shopify.Session(shopify_url, api_version)
-
-        return newSession
-
     @http.route("/shopify/shopify_test", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopifytest(self, **kw):
 
@@ -25,7 +12,7 @@ class ShopifyMain(http.Controller):
         api_version = request.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
 
         shopify.Session.setup(api_key=api_key, secret=secret_key)
-        shopify_url = "shop-odoo-hnam.myshopify.com"
+        shopify_url = kw['shop']
         state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
         redirect_uri = "https://odoo.website/auth/shopify/callback"
         scopes = ["write_price_rules", "read_price_rules", "read_products", "read_orders", 'read_script_tags', 'write_script_tags', "read_draft_orders", 'write_draft_orders']

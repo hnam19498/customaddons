@@ -6,9 +6,7 @@
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             </head>
             <body>
-                <div>
-                    <canvas id="myChart"></canvas>
-                </div>
+                <canvas id="myChart"></canvas>
                 <script>
 data_analytic = <t t-raw="data"/>
 const ctx = document.getElementById('myChart')
@@ -18,7 +16,7 @@ let list_money = []
 for (let line of data_analytic) {
     list_date.push(line['date'])
     list_time.push(line['time'])
-    list_money.push(line['price_reduce'])
+    list_money.push(line['price_reduce']/10)
 }
 new Chart(ctx, {
     data: {
@@ -27,21 +25,13 @@ new Chart(ctx, {
             label: 'Time',
             data: list_time,
             borderWidth: 1,
-            type: "bar"
+            type: "line"
         }, {
-            label: "Price reduce",
+            label: "Price reduce x10",
             data: list_money,
             type: "line",
             borderWidth: 1
         }]},
-    options: {
-        scales: {
-            y: {
-                beginAtZero: true,
-                text: 'value'
-            }
-        }
-    }
 })
                 </script>
             </body>

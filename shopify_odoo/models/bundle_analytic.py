@@ -36,15 +36,12 @@ class BundleAnalytic(models.Model):
                         count += count_bundle.time
                         price_reduce += count_bundle.price_reduce
 
-                    b = {
+                    list_count.append({
                         "count": count,
                         "price_reduce": price_reduce,
                         "date": count_bundle.date,
                         'bundle_id': self.bundle_id.id
-                    }
-
-                    if b not in list_count:
-                        list_count.append(b)
+                    })
 
                 list_date = []
                 for i in range(len(list_count)):
