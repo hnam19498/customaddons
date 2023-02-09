@@ -7,7 +7,6 @@ class XeroController(http.Controller):
     @http.route('/xero/authenticate/', auth='public')
     def xero_authenticate(self, **kw):
         try:
-            print(kw['code'])
             current_app = request.env.ref('shopify_odoo.xero_app_data').sudo()
             xero_store = request.env['xero.store'].sudo().search([('shop_shopify_id', '=', request.env["shop.shopify"].sudo().search([("url", '=', kw['state'])]).id)])
             time_now = datetime.datetime.now()

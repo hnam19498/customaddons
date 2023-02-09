@@ -44,7 +44,6 @@ class SyncInvoice(models.Model):
                         'access_token_time_out': time_now + datetime.timedelta(minutes=30),
                         'refresh_token_time_out': time_now + datetime.timedelta(days=60),
                     })
-                    print(new_xero_token)
 
     def sync_invoice(self):
         list_invoice_ids = []
