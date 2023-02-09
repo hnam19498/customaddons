@@ -32,7 +32,6 @@ class ShopifyMain(http.Controller):
     @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def testshopify(self, **kw):
         try:
-            print(kw)
             if 'shop' in kw:
                 current_app = request.env.ref('shopify_odoo.shopify_app_data').sudo()
                 if current_app:
