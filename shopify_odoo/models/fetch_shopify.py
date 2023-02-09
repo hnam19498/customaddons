@@ -15,10 +15,12 @@ class FetchShopify(models.Model):
         list_order_ids = []
         count_fetch_order = 0
 
-        api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
-
-        shopify_access_token = self.shop_id.token
+        api_version = self.env.ref('shopify_odoo.shopify_app_data').api_version
+        app_id = self.env.ref('shopify_odoo.shopify_app_data').id
+        shop_id = self.shop_id.id
         store_url = self.shop_id.url
+
+        shopify_access_token = self.env['shop.app.shopify'].sudo().search([('shopify_id', "=", shop_id), ("app_id", "=", app_id)]).access_token
         new_session = shopify.Session(store_url, api_version, token=shopify_access_token)
         shopify.ShopifyResource.activate_session(new_session)
 
@@ -107,10 +109,11 @@ class FetchShopify(models.Model):
                     })
 
     def fetch_product(self):
-        api_version = self.env["ir.config_parameter"].sudo().get_param("shopify_odoo.app_api_version")
-
-        shopify_access_token = self.shop_id.token
+        api_version = self.env.ref('shopify_odoo.shopify_app_data').api_version
+        app_id = self.env.ref('shopify_odoo.shopify_app_data').id
+        shop_id = self.shop_id.id
         store_url = self.shop_id.url
+        shopify_access_token = self.env['shop.app.shopify'].sudo().search([('shopify_id', "=", shop_id), ("app_id", "=", app_id)]).access_token
         new_session = shopify.Session(store_url, api_version, token=shopify_access_token)
         shopify.ShopifyResource.activate_session(new_session)
 

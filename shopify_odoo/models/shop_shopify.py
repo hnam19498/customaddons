@@ -5,7 +5,6 @@ class Shop(models.Model):
     _name = "shop.shopify"
 
     shopify_id = fields.Char()
-    token = fields.Char()
     name = fields.Char()
     email = fields.Char()
     currencyCode = fields.Char()
@@ -16,3 +15,22 @@ class Shop(models.Model):
     password = fields.Char()
     admin = fields.Many2one('res.users')
     fetch_ids = fields.One2many('fetch.shopify', 'shop_id')
+
+
+class ShopAppShopify(models.Model):
+    _name = "shop.app.shopify"
+
+    access_token = fields.Char()
+    shopify_id = fields.Many2one("shop.shopify")
+    app_id = fields.Many2one('shopify.app')
+    status = fields.Boolean()
+
+
+class AppShopify(models.Model):
+    _name = 'shopify.app'
+
+    api_key = fields.Char()
+    base_url = fields.Char()
+    name = fields.Char()
+    api_version = fields.Char()
+    secret_key = fields.Char()

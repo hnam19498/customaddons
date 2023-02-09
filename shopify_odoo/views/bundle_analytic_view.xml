@@ -73,8 +73,8 @@ new Chart(ctx, {
 
         <menuitem name="Bundle analytic"
                   id="menu_bundle_analytic"
-                  sequence="10"
-                  parent="menu_shopify_root"
+                  sequence="11"
+                  parent="shopify_odoo.menu_bundle_list"
                   action="bundle_analytic_action"/>
 
     </data>

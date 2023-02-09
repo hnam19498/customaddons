@@ -11,4 +11,5 @@ class XeroToken(models.Model):
     refresh_token_time_out = fields.Datetime()
     id_token_time_out = fields.Datetime()
     token_type = fields.Char()
-    shop_id = fields.Many2one('shop.shopify')
+    store_id = fields.Many2one('xero.store')
+    app_id = fields.Many2one('xero.app')

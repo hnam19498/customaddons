@@ -25,14 +25,48 @@
             <field name="type">ir.actions.act_window</field>
             <field name="res_model">shop.shopify</field>
             <field name="view_mode">tree,form</field>
-            <field name="help" type="html">
-                <p class="o_view_nocontent_smiling_face">Create your first shopify shop!</p>
-            </field>
         </record>
 
         <menuitem id="menu_shopify_root"
                   name="Shopify"
-                  action="action_shopify_odoo"
                   sequence="0"/>
+
+        <menuitem id="shopify_menu"
+                  name="Shopify menu"
+                  parent="menu_shopify_root"
+                  sequence="-10"/>
+
+        <menuitem id="shopify_infor"
+                  name="Shopify infor"
+                  action="action_shopify_odoo"
+                  parent="shopify_menu"
+                  sequence="-10"/>
+
+
+        <record id="view_shop_app_tree" model="ir.ui.view">
+            <field name="name">shop.app.tree</field>
+            <field name="model">shop.app.shopify</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="shopify_id"/>
+                    <field name="app_id"/>
+                    <field name="access_token"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_shop_app" model="ir.actions.act_window">
+            <field name="name">Shop app infor</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">shop.app.shopify</field>
+            <field name="view_mode">tree</field>
+        </record>
+
+        <menuitem id="shop_app"
+                  name="Shop app infor"
+                  action="action_shop_app"
+                  parent="shopify_menu"
+                  sequence="-1"/>
+
     </data>
 </odoo>

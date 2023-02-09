@@ -20,6 +20,7 @@ function redirect_to_check_out(draft_order_url) {
 }
 
 function render_bundle(bundles, quantities, bundle_setting) {
+    if(bundle_setting)
     if (bundles.length > 0) {
         for (let bundle of bundles) {
             string_html = `<div style="border: 1px solid black; color: ${bundle_setting.color}">${bundle_setting.bundle_label} - Mua combo giảm ${bundle.discount_value}%: `

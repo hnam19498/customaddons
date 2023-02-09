@@ -8,8 +8,9 @@
     "depends": ["base", "product", "sale", "web"],
     "demo": [],
     "data": [
+        'data/app_data.xml',
+        'data/xero_data.xml',
         'security/ir.model.access.csv',
-        "views/setting_view.xml",
         "views/shop_infor_view.xml",
         "views/fetch_shopify_view.xml",
         'views/xero_infor_view.xml',

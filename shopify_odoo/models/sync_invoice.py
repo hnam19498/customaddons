@@ -1,5 +1,5 @@
 from odoo import api, models, fields, _
-import requests, datetime
+import requests, datetime, base64
 
 
 class SyncInvoice(models.Model):
@@ -9,8 +9,42 @@ class SyncInvoice(models.Model):
     financial_status = fields.Char()
     end_date = fields.Date()
     xero_invoice_ids = fields.One2many('xero.invoice', 'sync_invoice_id')
-    shop_id = fields.Many2one('shop.shopify')
     store_id = fields.Many2one("xero.store")
+
+    def update_token(self):
+        current_app = self.env.ref('shopify_odoo.xero_app_data').sudo()
+        xero_store = self.store_id
+        time_now = datetime.datetime.now()
+        xero_token = self.env["xero.token"].sudo().search([('store_id', '=', xero_store.id), ("app_id", '=', current_app.id)])
+
+        if xero_token:
+            if xero_token.refresh_token_time_out >= time_now:
+                if xero_token.access_token_time_out < time_now:
+                    xero_authorization = base64.urlsafe_b64encode((current_app.client_id + ":" + current_app.client_secret).encode()).decode()
+
+                    auth_headers = {
+                        'Authorization': "Basic " + xero_authorization,
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    }
+                    auth_body = {
+                        'grant_type': "refresh_token",
+                        'refresh_token': xero_token.refresh_token,
+                    }
+
+                    new_xero_token = requests.post('https://identity.xero.com/connect/token', headers=auth_headers, data=auth_body).json()
+
+                    xero_token.write({
+                        "id_token": new_xero_token['id_token'],
+                        "access_token": new_xero_token['access_token'],
+                        "refresh_token": new_xero_token['refresh_token'],
+                        'token_type': new_xero_token['token_type'],
+                        'app_id': current_app.id,
+                        "store_id": xero_store.id,
+                        'id_token_time_out': time_now + datetime.timedelta(minutes=5),
+                        'access_token_time_out': time_now + datetime.timedelta(minutes=30),
+                        'refresh_token_time_out': time_now + datetime.timedelta(days=60),
+                    })
+                    print(new_xero_token)
 
     def sync_invoice(self):
         list_invoice_ids = []
@@ -21,11 +55,13 @@ class SyncInvoice(models.Model):
                 if invoice.invoice_id not in list_invoice_ids:
                     list_invoice_ids.append(invoice.invoice_id)
 
-        xero_token = self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)], limit=1)
+        xero_store = self.store_id
+        current_app = self.env.ref('shopify_odoo.xero_app_data').sudo()
+        xero_token = self.env['xero.token'].sudo().search([('app_id', '=', current_app.id), ("store_id", "=", xero_store.id)])
 
         invoice_headers = {
             'Authorization': "Bearer " + xero_token.access_token,
-            'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)], limit=1).tenantId,
+            'Xero-Tenant-Id': xero_store.tenantId,
             'Accept': "application/json",
         }
 
@@ -47,7 +83,7 @@ class SyncInvoice(models.Model):
                         'invoice_date': datetime.datetime.strptime(invoice['DateString'], "%Y-%m-%dT%H:%M:%S"),
                         'price_total': invoice['Total'],
                         "sync_invoice_id": self.id,
-                        'store_id': self.store_id.id,
+                        'store_id': xero_store.id,
                     })
                     count_xero_invoice += 1
                 else:
@@ -59,7 +95,7 @@ class SyncInvoice(models.Model):
                 'start_date': self.start_date.strftime("%Y-%m-%d"),
                 'end_date': self.end_date.strftime("%Y-%m-%d"),
                 'count': count_xero_invoice,
-                'store_name': self.store_id.name,
+                'store_name': xero_store.name,
             })
 
     def put_invoice(self):
@@ -100,9 +136,13 @@ class SyncInvoice(models.Model):
                     ]
                 }
 
+                xero_store = self.store_id
+                current_app = self.env.ref('shopify_odoo.xero_app_data').sudo()
+                xero_token = self.env['xero.token'].sudo().search([('app_id', '=', current_app.id), ("store_id", "=", xero_store.id)])
+
                 hearder_post_invoice = {
-                    'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
-                    'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
+                    'Authorization': 'Bearer ' + xero_token.access_token,
+                    'Xero-Tenant-Id': xero_store.tenantId,
                     'Content-Type': 'application/json',
                     "Accept": "application/json",
                 }
@@ -115,8 +155,8 @@ class SyncInvoice(models.Model):
 
                 if order.financial_status == 'paid':
                     hearder_post_payments = {
-                        'Authorization': 'Bearer ' + self.env['xero.token'].sudo().search([('shop_id', '=', self.shop_id.id)]).access_token,
-                        'Xero-Tenant-Id': self.env['xero.store'].sudo().search([('shop_shopify_id', '=', self.shop_id.id)]).tenantId,
+                        'Authorization': 'Bearer ' + xero_token.access_token,
+                        'Xero-Tenant-Id': xero_store.tenantId,
                         'Content-Type': 'application/json',
                         "Accept": "application/json",
                     }
@@ -141,7 +181,7 @@ class SyncInvoice(models.Model):
                 'start_date': self.start_date.strftime("%Y-%m-%d"),
                 'end_date': self.end_date.strftime("%Y-%m-%d"),
                 'count': count_put_invoice,
-                'store_name': self.store_id.name,
+                'store_name': xero_store.name,
             })
 
         if count_paid_invoice != 0:
@@ -150,5 +190,5 @@ class SyncInvoice(models.Model):
                 'start_date': self.start_date.strftime("%Y-%m-%d"),
                 'end_date': self.end_date.strftime("%Y-%m-%d"),
                 'count': count_paid_invoice,
-                'store_name': self.store_id.name,
+                'store_name': xero_store.name,
             })

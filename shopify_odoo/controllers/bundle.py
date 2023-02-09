@@ -13,12 +13,18 @@ class ShopifyBundle(http.Controller):
         list_bundle_ids = product.get_list_bundle()
         today = datetime.datetime.now()
         setting_data = request.env["shopify.bundle.setting"].sudo().search([("shop_id", "=", request.env["shopify.product"].sudo().search([("shopify_product_id", "=", kw["product_id"])]).shop_id.id)])
-
-        bundle_setting = {
-            "color": setting_data.color,
-            "bundle_position": setting_data.bundle_position,
-            "bundle_label": setting_data.bundle_label,
-        }
+        if setting_data:
+            bundle_setting = {
+                "color": setting_data.color,
+                "bundle_position": setting_data.bundle_position,
+                "bundle_label": setting_data.bundle_label,
+            }
+        else:
+            bundle_setting = {
+                "color": "black",
+                "bundle_position": 'above',
+                "bundle_label": ''
+            }
 
         if list_bundle_ids:
             for id in list_bundle_ids:

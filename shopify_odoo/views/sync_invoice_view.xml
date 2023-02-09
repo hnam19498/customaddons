@@ -9,11 +9,11 @@
                 <form>
                     <button type="object" name="sync_invoice">Sync invoice</button>
                     <button type="object" name="put_invoice">Put invoice</button>
+                    <button type="object" name="update_token">Update token</button>
                     <group>
                         <field name="start_date"/>
                         <field name="end_date"/>
                         <field name="store_id"/>
-                        <field name="shop_id"/>
                     </group>
                     <group>
                         <group>
@@ -51,8 +51,8 @@
         <menuitem id="menu_sync_shopify"
                   name="Sync invoice"
                   action="action_sync_shopify"
-                  parent="menu_shopify_root"
-                  sequence="0"/>
+                  parent="menu_xero"
+                  sequence="-8"/>
 
 
         <record id="sync_history_view_tree" model="ir.ui.view">
@@ -78,9 +78,9 @@
 
         <menuitem id="menu_sync_history"
                   name="Sync history"
-                  parent="menu_shopify_root"
+                  parent="menu_xero"
                   action="action_sync_history"
-                  sequence="0"/>
+                  sequence="-7"/>
 
     </data>
 </odoo>

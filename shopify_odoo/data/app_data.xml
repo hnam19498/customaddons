@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record forcecreate="True" id="shopify_app_data" model="shopify.app">
+            <field name="name">shopify_app_data</field>
+            <field name="base_url">https://odoo.website</field>
+            <field name="api_version">2022-10</field>
+            <field name="api_key">5892f02d957648897d49a2ada904aa0c</field>
+            <field name="secret_key">a698e932d0348b5d262ec4d83d1e0df9</field>
+        </record>
+    </data>
+</odoo>
