@@ -41,17 +41,17 @@ class ShopifyBundle(http.Controller):
                     "discount_value": bundle.discount_value,
                     "title": bundle.title
                 })
-
-                if bundle.indefinite_bundle or bundle.start_time <= today <= bundle.end_time:
-                    product_lines = request.env["bundle.product.quantity"].sudo().search([("bundle_id", "=", bundle.id)])
-                    for line in product_lines:
-                        quantity_infors.append({
-                            "product_id": line.product_id.id,
-                            "product_name": request.env["shopify.product"].sudo().search([("id", "=", line.product_id.id)], limit=1).name,
-                            "bundle_id": line.bundle_id.id,
-                            "quantity": line.qty,
-                            "img": request.env["shopify.product"].sudo().search([("id", "=", line.product_id.id)], limit=1).url_img,
-                        })
+                if bundle.enable:
+                    if bundle.indefinite_bundle or bundle.start_time <= today <= bundle.end_time:
+                        product_lines = request.env["bundle.product.quantity"].sudo().search([("bundle_id", "=", bundle.id)])
+                        for line in product_lines:
+                            quantity_infors.append({
+                                "product_id": line.product_id.id,
+                                "product_name": request.env["shopify.product"].sudo().search([("id", "=", line.product_id.id)], limit=1).name,
+                                "bundle_id": line.bundle_id.id,
+                                "quantity": line.qty,
+                                "img": request.env["shopify.product"].sudo().search([("id", "=", line.product_id.id)], limit=1).url_img,
+                            })
 
             return {
                 "bundle_infors": bundle_infors,
