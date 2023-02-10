@@ -142,19 +142,21 @@ class SyncInvoice(models.Model):
                     count_paid_invoice += 1
 
         if count_put_invoice != 0:
-            self.env['sync.history'].sudo().create({
-                'type': "Put invoice",
-                'start_date': self.start_date.strftime("%Y-%m-%d"),
-                'end_date': self.end_date.strftime("%Y-%m-%d"),
-                'count': count_put_invoice,
-                'store_name': xero_store.name,
-            })
-
-        if count_paid_invoice != 0:
-            self.env['sync.history'].sudo().create({
-                'type': "Put paid invoice",
-                'start_date': self.start_date.strftime("%Y-%m-%d"),
-                'end_date': self.end_date.strftime("%Y-%m-%d"),
-                'count': count_paid_invoice,
-                'store_name': xero_store.name,
-            })
+            if count_paid_invoice != 0:
+                self.env['sync.history'].sudo().create({
+                    'type': "Put invoice",
+                    'start_date': self.start_date.strftime("%Y-%m-%d"),
+                    'end_date': self.end_date.strftime("%Y-%m-%d"),
+                    'count': count_put_invoice,
+                    "count_paid": count_paid_invoice,
+                    'store_name': xero_store.name,
+                })
+            else:
+                self.env['sync.history'].sudo().create({
+                    'type': "Put invoice",
+                    'start_date': self.start_date.strftime("%Y-%m-%d"),
+                    'end_date': self.end_date.strftime("%Y-%m-%d"),
+                    'count': count_put_invoice,
+                    "count_paid": 0,
+                    'store_name': xero_store.name,
+                })

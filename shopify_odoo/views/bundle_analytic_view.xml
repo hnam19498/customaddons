@@ -2,7 +2,6 @@
     <data>
         <template id="chart_bundle">
             <head>
-                <script src="https://code.jquery.com/jquery-3.6.2.js"></script>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
             </head>
             <body>
