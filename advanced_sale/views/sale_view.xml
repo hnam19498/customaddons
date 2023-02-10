@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_sale_vip_form_inherit" model="ir.ui.view">
+            <field name="name">sale.order.inherit</field>
+            <field name="model">sale.order</field>
+            <field name="inherit_id" ref="sale.view_order_form"></field>
+            <field name="arch" type="xml">
+                <xpath expr="//field[@name='tax_totals_json']" position="before">
+                    <field name="sale_order_discount_estimated" widget="monetary"></field>
+                </xpath>
+                <xpath expr="//tree/field[@name='price_subtotal']" position="before">
+                    <field name="sale_order_discount_estimated_line" widget="monetary"></field>
+                </xpath>
+            </field>
+        </record>
+    </data>
+</odoo>

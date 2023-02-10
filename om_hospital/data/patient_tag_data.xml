@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+<!--    <record id="patient_tag_boss1" model="patient.tag">-->
+<!--        <field name="name">boss1</field>-->
+<!--    </record>-->
+<!--    <record id="patient_tag_boss2" model="patient.tag">-->
+<!--        <field name="name">boss2</field>-->
+<!--    </record>-->
+<!--    <record id="patient_tag_vip1" model="patient.tag">-->
+<!--        <field name="name">vip1</field>-->
+<!--    </record>-->
+<!--    <record id="patient_tag_vip2" model="patient.tag">-->
+<!--        <field name="name">vip2</field>-->
+<!--    </record>-->
+<!--    <record id="patient_tag_vip3" model="patient.tag">-->
+<!--        <field name="name">vip3</field>-->
+<!--    </record>-->
+</odoo>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<odoo>
+    <data>
+        <record id="group1" model="ir.module.category">
+            <field name="name">vip</field>
+        </record>
+        <record id="vip00" model="res.groups">
+            <field name="name">Advanced Sale</field>
+            <field name="category_id" ref="group1"></field>
+        </record>
+    </data>
+</odoo>
