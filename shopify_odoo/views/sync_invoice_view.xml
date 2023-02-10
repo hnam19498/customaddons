@@ -9,7 +9,6 @@
                 <form>
                     <button type="object" name="sync_invoice">Sync invoice</button>
                     <button type="object" name="put_invoice">Put invoice</button>
-                    <button type="object" name="update_token">Update token</button>
                     <group>
                         <field name="start_date"/>
                         <field name="end_date"/>
