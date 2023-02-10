@@ -31,7 +31,15 @@ class SyncInvoice(models.Model):
             'Accept': "application/json",
         }
 
-        xero_invoices = requests.get('https://api.xero.com/api.xro/2.0/Invoices?ContactIDs=61ef5b44-a7a2-4775-a81d-de61c95bf5e9', headers=invoice_headers).json()['Invoices']
+        get_contact_header = {
+            'Authorization': 'Bearer ' + xero_token.access_token,
+            'Xero-Tenant-Id': xero_store.tenantId,
+            "Accept": "application/json",
+        }
+        result_get_contact = requests.get('https://api.xero.com/api.xro/2.0/Contacts', headers=get_contact_header).json()
+        print(result_get_contact['Contacts'][0]['ContactID'])
+
+        xero_invoices = requests.get(f"https://api.xero.com/api.xro/2.0/Invoices?ContactIDs={result_get_contact['Contacts'][0]['ContactID']}", headers=invoice_headers).json()['Invoices']
         if xero_invoices:
             for invoice in xero_invoices:
                 if invoice['InvoiceID'] not in list_invoice_ids:
@@ -79,6 +87,13 @@ class SyncInvoice(models.Model):
                 lineitems = []
                 lines = self.env['quantity.order.line'].sudo().search([('order_id', '=', order.id)])
 
+                get_contact_header = {
+                    'Authorization': 'Bearer ' + xero_token.access_token,
+                    'Xero-Tenant-Id': xero_store.tenantId,
+                    "Accept": "application/json",
+                }
+                result_get_contact = requests.get('https://api.xero.com/api.xro/2.0/Contacts', headers=get_contact_header).json()
+                
                 for line in lines:
                     lineitems.append({
                         "Description": "Test",
@@ -96,7 +111,7 @@ class SyncInvoice(models.Model):
                     "Invoices": [
                         {
                             "Type": "ACCREC",
-                            "Contact": {"ContactID": "61ef5b44-a7a2-4775-a81d-de61c95bf5e9"},
+                            "Contact": {"ContactID": result_get_contact['Contacts'][0]['ContactID']},
                             "LineItems": lineitems,
                             "Date": order.created_date,
                             "DueDate": order.created_date,

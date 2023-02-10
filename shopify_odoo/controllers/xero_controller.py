@@ -22,7 +22,6 @@ class XeroController(http.Controller):
                 'redirect_uri': 'https://odoo.website/xero/authenticate/',
             }
             auth_xero = requests.post('https://identity.xero.com/connect/token', headers=auth_headers, data=auth_body).json()
-            xero_store = request.env['xero.store'].sudo().search([('shop_shopify_id', '=', request.env["shop.shopify"].sudo().search([("url", '=', kw['state'])]).id)], limit=1)
             xero_token = request.env["xero.token"].sudo().search([('store_id', '=', xero_store.id), ("app_id", '=', current_app.id)])
             time_now = datetime.datetime.now()
 
@@ -36,7 +35,7 @@ class XeroController(http.Controller):
                     'refresh_token_time_out': time_now + datetime.timedelta(days=60),
                 })
             else:
-                request.env['xero_token'].sudo().create({
+                request.env['xero.token'].sudo().create({
                     "access_token": auth_xero['access_token'],
                     "refresh_token": auth_xero['refresh_token'],
                     'app_id': current_app.id,
@@ -46,9 +45,19 @@ class XeroController(http.Controller):
                     'access_token_time_out': time_now + datetime.timedelta(minutes=30),
                     'refresh_token_time_out': time_now + datetime.timedelta(days=60),
                 })
-            xero_store.sudo().write({'status_connect': "Connected"})
+
+            check_headers = {
+                'Authorization': "Bearer " + auth_xero['access_token'],
+                'Content-Type': 'application/json',
+            }
+            store_infor = requests.get('https://api.xero.com/connections', headers=check_headers).json()[0]
+            xero_store.sudo().write({
+                'status_connect': "Connected",
+                "tenantId": store_infor['tenantId'],
+                'name': store_infor['tenantName']
+            })
             return werkzeug.utils.redirect(redirectUrl)
-        except  Exception as e:
+        except Exception as e:
             print(e)
             xero_store.sudo().write({'status_connect': "Disconnected"})
             return werkzeug.utils.redirect(redirectUrl)
