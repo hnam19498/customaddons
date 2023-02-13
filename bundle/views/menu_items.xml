@@ -1,0 +1,11 @@
+<odoo>
+    <data>
+        <menuitem name="Product Bundles" id="bundle.menu_product_bundles_root"/>
+<!--        <menuitem name="Bundles" id="s_shopify_bundle.menu_root_client_shopify_bundle_settings_label" sequence="300"-->
+<!--                  action="s_shopify_bundle.sp_shop_product_bundle_action_server"-->
+<!--                  parent="s_shopify_bundle.menu_root_client_shopify_bundle_shop_root"/>-->
+        <menuitem name="Bundle List" id="bundle.menu_bundle_list" sequence="310"
+                  action="product_bundle_action"
+                  parent="bundle.menu_product_bundles_root"/>
+    </data>
+</odoo>
