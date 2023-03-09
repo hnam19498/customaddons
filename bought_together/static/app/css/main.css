@@ -1,0 +1,18 @@
+#app .ant-layout-header {
+    height: 83px;
+    padding: 0 0;
+}
+
+#app .ant-layout .ant-layout-sider {
+    width: 276px !important;
+    min-width: 276px !important;
+    max-width: 276px !important;
+}
+
+#app .ant-layout-content {
+    background-color: white;
+}
+
+#app .ant-layout-has-sider {
+    height: 100%;
+}
