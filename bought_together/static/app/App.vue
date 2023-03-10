@@ -18,6 +18,7 @@
 import NavHeader from "./components/NavHeader.vue"
 import SideBarMenu from "./components/SideBarMenu.vue"
 import NavMenu from "./components/NavMenu.vue"
+import Loading from "./components/main_page/Loading.vue"
 import AddProduct from "./components/main_page/AddProduct.vue"
 import {Layout, LayoutHeader, LayoutContent, LayoutSider} from "ant-design-vue"
 
@@ -30,7 +31,7 @@ export default {
         Layout,
         LayoutHeader,
         LayoutContent,
-        LayoutSider
+        LayoutSider, Loading
     },
     data() {
         return {}

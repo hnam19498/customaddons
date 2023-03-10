@@ -1,168 +1,173 @@
 <template>
-    <div>
-        <div class="setting-btn">
-            <button class="btn-setting" id="btn-cancel">Cancel</button>
-            <button class="btn-setting" id="btn-save">SAVE</button>
-        </div>
-        <div id="setting_widget">
-            <label id="enable_widget">Enable Widget</label>
-            <a-switch v-model:checked="checked" checked-children="ON" un-checked-children="OFF"/>
-        </div>
-        <div id="manual-recommendation">
-            <span>Manual Recommendation</span>
-            <font-awesome-icon icon="fa-solid fa-circle-question"/>
-        </div>
-        <div style="position: relative; width: 100%">
-            <div id="choose-recommendation-product">
-                <div id="choose-recommendation">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
-                    <span>Choose recommendation product(s)</span>
-                </div>
-                <div id="search">
-                    <a-input placeholder="Search product by name" suffix="0 selected"/>
-                </div>
-                <div id="table-product">
-                    <table>
-                        <tr class="table-col-name">
-                            <td><input id="checkbox-table-recommendation-product" type="checkbox"/></td>
-                            <td>Image</td>
-                            <td>Product Name</td>
-                            <td>Price</td>
-                            <td>Compare At Price</td>
-                            <td>In Stock</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 1</td>
-                            <td>Price test 1</td>
-                            <td>Test 1</td>
-                            <td>Quantity 1</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 2</td>
-                            <td>Price test 2</td>
-                            <td>Test 2</td>
-                            <td>Quantity 2</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 3</td>
-                            <td>Price test 3</td>
-                            <td>Test 3</td>
-                            <td>Quantity 3</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-
-            <div id="choose-excluded-product">
-                <div id="choose-excluded">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
-                    <span>Choose excluded product(s)</span>
-                </div>
-                <div id="search">
-                    <a-input placeholder="Search product by name" suffix="0 selected"/>
-                </div>
-                <div id="table-product">
-                    <table>
-                        <tr class="table-col-name">
-                            <td><input id="checkbox-table-excluded-product" type="checkbox"/></td>
-                            <td>Image</td>
-                            <td>Product Name</td>
-                            <td>Price</td>
-                            <td>Compare At Price</td>
-                            <td>In Stock</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 1</td>
-                            <td>Price test 1</td>
-                            <td>Test 1</td>
-                            <td>Quantity 1</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 2</td>
-                            <td>Price test 2</td>
-                            <td>Test 2</td>
-                            <td>Quantity 2</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 3</td>
-                            <td>Price test 3</td>
-                            <td>Test 3</td>
-                            <td>Quantity 3</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 4</td>
-                            <td>Price test 4</td>
-                            <td>Test 4</td>
-                            <td>Quantity 4</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 5</td>
-                            <td>Price test 5</td>
-                            <td>Test 5</td>
-                            <td>Quantity 5</td>
-                        </tr>
-                        <tr class="table-row">
-                            <td><input type="checkbox"/></td>
-                            <td>
-                                <img src="/bought_together/static/app/img/LogoNestScale.png"
-                                     style="width: 28px; height: 30px">
-                            </td>
-                            <td>Name test 6</td>
-                            <td>Price test 6</td>
-                            <td>Test 6</td>
-                            <td>Quantity 6</td>
-                        </tr>
-                    </table>
-                </div>
-            </div>
-            <div v-if="!checked" class="blur"></div>
-        </div>
+    <!--    <div v-if="data">-->
+    <div class="setting-btn">
+        <button class="btn-setting" id="btn-cancel">Cancel</button>
+        <button class="btn-setting" id="btn-save">SAVE</button>
     </div>
+    <div id="setting_widget">
+        <label id="enable_widget">Enable Widget</label>
+        <a-switch v-model:checked="checked" checked-children="ON" un-checked-children="OFF"/>
+    </div>
+    <div id="manual-recommendation">
+        <span>Manual Recommendation</span>
+        <font-awesome-icon icon="fa-solid fa-circle-question"/>
+    </div>
+    <div style="position: relative; width: 100%">
+        <div id="choose-recommendation-product">
+            <div id="choose-recommendation">
+                <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                <span>Choose recommendation product(s)</span>
+            </div>
+            <div id="search">
+                <a-input placeholder="Search product by name" suffix="0 selected"/>
+            </div>
+            <div id="table-product">
+                <table>
+                    <tr class="table-col-name">
+                        <td><input id="checkbox-table-recommendation-product" type="checkbox"/></td>
+                        <td>Image</td>
+                        <td>Product Name</td>
+                        <td>Price</td>
+                        <td>Compare At Price</td>
+                        <td>In Stock</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 1</td>
+                        <td>Price test 1</td>
+                        <td>Test 1</td>
+                        <td>Quantity 1</td>
+                    </tr>yuu
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 2</td>
+                        <td>Price test 2</td>
+                        <td>Test 2</td>
+                        <td>Quantity 2</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 3</td>
+                        <td>Price test 3</td>
+                        <td>Test 3</td>
+                        <td>Quantity 3</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+
+        <div id="choose-excluded-product">
+            <div id="choose-excluded">
+                <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                <span>Choose excluded product(s)</span>
+            </div>
+            <div id="search">
+                <a-input placeholder="Search product by name" suffix="0 selected"/>
+            </div>
+            <div id="table-product">
+                <table>
+                    <tr class="table-col-name">
+                        <td><input id="checkbox-table-excluded-product" type="checkbox"/></td>
+                        <td>Image</td>
+                        <td>Product Name</td>
+                        <td>Price</td>
+                        <td>Compare At Price</td>
+                        <td>In Stock</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 1</td>
+                        <td>Price test 1</td>
+                        <td>Test 1</td>
+                        <td>Quantity 1</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 2</td>
+                        <td>Price test 2</td>
+                        <td>Test 2</td>
+                        <td>Quantity 2</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 3</td>
+                        <td>Price test 3</td>
+                        <td>Test 3</td>
+                        <td>Quantity 3</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 4</td>
+                        <td>Price test 4</td>
+                        <td>Test 4</td>
+                        <td>Quantity 4</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 5</td>
+                        <td>Price test 5</td>
+                        <td>Test 5</td>
+                        <td>Quantity 5</td>
+                    </tr>
+                    <tr class="table-row">
+                        <td><input type="checkbox"/></td>
+                        <td>
+                            <img src="/bought_together/static/app/img/LogoNestScale.png"
+                                 style="width: 28px; height: 30px">
+                        </td>
+                        <td>Name test 6</td>
+                        <td>Price test 6</td>
+                        <td>Test 6</td>
+                        <td>Quantity 6</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        <div v-if="!checked" class="blur"></div>
+    </div>
+    <!--    </div>-->
+    <!--    <div v-else>-->
+    <!--        <loading/>-->
+    <!--    </div>-->
 </template>
 <script>
-import {reactive, toRefs} from 'vue';
+import {reactive, toRefs} from 'vue'
+import Loading from "./Loading.vue"
 
 export default {
+    components: {Loading},
     setup() {
         const state = reactive({checked: false})
         return {...toRefs(state)}
@@ -177,7 +182,7 @@ svg {
 
 .setting-btn {
     text-align: right;
-    margin-top: 15px;
+    margin-top: 11px;
     margin-right: 30px;
 }
 
@@ -347,7 +352,6 @@ svg {
 #table-product {
     width: 95%;
     height: 50%;
-    overflow-y: scroll;
     margin-left: 1rem;
     margin-top: 1rem;
 }

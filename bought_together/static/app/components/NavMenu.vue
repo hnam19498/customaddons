@@ -1,6 +1,6 @@
 <template>
     <div class="nav-menu">
-        <div class="nav-item">Kiana</div>
+        <div class="nav-item active">Kiana</div>
         <div class="nav-item">Mei</div>
         <div class="nav-item">Bronya</div>
     </div>
@@ -38,11 +38,15 @@ export default {
     padding: 6px 16px;
     width: 184.67px;
     height: 36px;
-    background: #FFFFFF;
-    box-shadow: -1px 1px 4px rgba(0, 0, 0, 0.25);
     border-radius: 4px;
     flex: none;
     order: 0;
     flex-grow: 1;
+    background-color: #C8C8C8;
+    color:white;
+}
+.nav-menu .active{
+    background: white;
+    color: black;
 }
 </style>
