@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record forcecreate="True" id="xero_app_data" model="xero.app">
+            <field name="name">Xero app</field>
+            <field name="base_url">https://odoo.website</field>
+            <field name="client_id">858A0FFED5C94D77A40A47E5D6B2EE3A</field>
+            <field name="client_secret">2aROUEvjF7cxBhW9GARLvb159SIRG0KJnR72obm2oZ8SdJ0L</field>
+            <field name="redirect_uri">https://odoo.website/xero/authenticate/</field>
+        </record>
+    </data>
+</odoo>
