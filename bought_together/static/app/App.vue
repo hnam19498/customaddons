@@ -31,7 +31,8 @@ export default {
         Layout,
         LayoutHeader,
         LayoutContent,
-        LayoutSider, Loading
+        LayoutSider,
+        Loading
     },
     data() {
         return {}

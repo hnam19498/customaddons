@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="view_shopify_odoo_form" model="ir.ui.view">
+            <field name="name">shopify.odoo.form</field>
+            <field name="model">shop.shopify</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="name"/>
+                        <field name="email"/>
+                        <field name="currencyCode"/>
+                        <field name="url"/>
+                        <field name="country"/>
+                        <field name="status"/>
+                        <field name="shopify_owner"/>
+                        <field name="password"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+        <record id="action_shopify_odoo" model="ir.actions.act_window">
+            <field name="name">Shopify infor</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">shop.shopify</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_shopify_root"
+                  name="Shopify"
+                  sequence="0"/>
+    </data>
+</odoo>

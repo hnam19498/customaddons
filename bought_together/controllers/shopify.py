@@ -5,7 +5,7 @@ from odoo.http import request
 
 class ShopifyMain(http.Controller):
     @http.route("/bought_together/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
-    def shopify_test(self, **kw):
+    def shopify_auth(self, **kw):
         try:
             if "shop" in kw:
                 shopify_app = request.env.ref('bought_together.shopify_app_data').sudo()
@@ -23,14 +23,13 @@ class ShopifyMain(http.Controller):
                     ]
                     new_session = shopify.Session(kw['shop'], shopify_app.api_version)
                     auth_url = new_session.create_permission_url(scopes, redirect_uri, state)
-
                     return werkzeug.utils.redirect(auth_url)
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
 
     @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*", save_session=False)
-    def test_shopify(self, **kw):
+    def shopify_callback(self, **kw):
         try:
             if 'shop' in kw:
                 shopify_app = request.env.ref('bought_together.shopify_app_data').sudo()
@@ -167,18 +166,19 @@ class ShopifyMain(http.Controller):
                         if not current_shopify_shop.password:
                             current_shopify_shop.password = password_generate
 
-                        shop_app = request.env['shop.app.shopify'].sudo().search([("shopify_id", '=', current_shopify_shop.id), ('app_id', '=', shopify_app.id)])
+                        shop_app = request.env['shop.app.shopify'].sudo().search([("shop_id", '=', current_shopify_shop.id), ('app_id', '=', shopify_app.id)])
                         if not shop_app:
                             request.env['shop.app.shopify'].sudo().create({
                                 "access_token": access_token,
-                                'shopify_id': current_shopify_shop.id,
+                                'shop_id': current_shopify_shop.id,
                                 'app_id': shopify_app.id,
                                 "status": True
                             })
 
-                        menu_id = request.env.ref('bought_together.menu_shopify_root').id
-                        redirect_url = f'{shopify_app.base_url}/web?#menu_id={str(menu_id)}'
-                        return werkzeug.utils.redirect(redirect_url)
+                        # menu_id = request.env.ref('bought_together.menu_shopify_root').id
+                        # redirect_url = f'{shopify_app.base_url}/web?#menu_id={str(menu_id)}'
+                        # return werkzeug.utils.redirect(redirect_url)
+                        return werkzeug.utils.redirect(f'{shopify_app.base_url}/bought_together')
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')

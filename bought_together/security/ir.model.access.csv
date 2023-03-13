@@ -1,0 +1,3 @@
+access.shop.shopify,access_shop_shopify,model_shop_shopify,base.group_user,1,1,1,1
+access.shopify.app,access_shopify_app,model_shopify_app,base.group_user,1,1,1,1
+access.shop.app.shopify,access_shop_app_shopify,model_shop_app_shopify,base.group_user,1,1,1,1
