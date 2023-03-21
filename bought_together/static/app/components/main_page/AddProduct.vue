@@ -33,7 +33,7 @@
                             <input
                                 id="checkbox-table-recommendation-product"
                                 type="checkbox"
-                                @click="SelectAllRecommendation"
+                                @change="SelectAllRecommendation"
                                 v-model="tickAllRecommendation"
                             >
                         </td>
@@ -49,7 +49,6 @@
                                 type="checkbox"
                                 class="item-recommendation-checkbox"
                                 :id="product.id"
-                                v-model="list_recommendation"
                                 @change="select_recommendation"
                                 :value="{
                                     id:product.id,
@@ -57,7 +56,7 @@
                                     price:product.price,
                                     compare_at_price:product.compare_at_price,
                                     quantity:product.quantity}"
-                                :checked="this.list_ids_recommendation.includes(product.id)"
+                                :checked="list_recommendation.filter(e => e.id === product.id).length > 0"
                             >
                         </td>
                         <td><img :src="product.img" style="width: 30px; height: 30px"></td>
@@ -90,7 +89,7 @@
                             <input
                                 id="checkbox-table-excluded-product"
                                 type="checkbox"
-                                @click="SelectAllExcluded"
+                                @change="SelectAllExcluded"
                                 v-model="tickAllExcluded"
                             >
                         </td>
@@ -104,14 +103,15 @@
                         <td>
                             <input
                                 type="checkbox"
-                                v-model="list_excluded"
                                 @change="select_excluded"
+                                class="item-excluded-checkbox"
                                 :value="{
                                     id:product.id,
                                     name:product.name,
                                     price:product.price,
                                     compare_at_price:product.compare_at_price,
                                     quantity:product.quantity}"
+                                :checked="list_excluded.filter(e => e.id === product.id).length > 0"
                             >
                         </td>
                         <td>
@@ -142,15 +142,20 @@ export default {
         const state = reactive({checked1: false})
         return {...toRefs(state)}
     },
+    watch: {
+        list_recommendation: function () {
+            this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
+        },
+        list_excluded: function () {
+            this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
+        }
+    },
     data() {
         return {
-
             tickAllRecommendation: false,
-            list_ids_recommendation: [],
             tickAllExcluded: false,
             list_recommendation: [],
             list_excluded: [],
-            list_ids_excluded: [],
             excluded_products: [
                 {
                     id: 1,
@@ -230,96 +235,29 @@ export default {
     },
     methods: {
         SelectAllRecommendation() {
-            this.list_recommendation = []
-            this.list_ids_recommendation = []
-            if (!this.tickAllRecommendation) {
-                for (let product of this.recommendation_products) {
-                    let data = {
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        compare_at_price: product.compare_at_price,
-                        quantity: product.quantity,
-                        img: product.img
-                    }
-                    this.list_recommendation.push(data)
-                    this.list_ids_recommendation.push(product.id)
-                }
-            }
+            this.tickAllRecommendation ? this.list_recommendation = this.recommendation_products : this.list_recommendation = []
         },
-        select_recommendation() {
-            let count = 0
-            for (let i in this.list_recommendation) {
-                let item_data = JSON.parse(JSON.stringify(this.list_recommendation[i]))
-                if (item_data !== false) {
-                    count++
-                }
-            }
-            if (this.recommendation_products.length === count) {
-                this.tickAllRecommendation = true;
+        select_recommendation(ob) {
+            if (!ob.target.checked) {
+                this.list_recommendation = this.list_recommendation.filter(e => e.id !== ob.target._value.id)
             } else {
-                this.tickAllRecommendation = false;
-            }
-            for (let product of this.list_recommendation) {
-                if (this.list_ids_recommendation.includes(product.id) === false) {
-                    this.list_ids_recommendation.push(product.id)
-                }
+                this.list_recommendation.push(ob.target._value)
+                this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
             }
         },
+
         SelectAllExcluded() {
-            this.list_excluded = []
-            this.list_ids_excluded = []
-            if (!this.tickAllExcluded) {
-                for (let product of this.excluded_products) {
-                    let data = {
-                        id: product.id,
-                        name: product.name,
-                        price: product.price,
-                        compare_at_price: product.compare_at_price,
-                        quantity: product.quantity,
-                        img: product.img
-                    }
-                    this.list_excluded.push(data)
-                    this.list_ids_excluded.push(product.id)
-                }
-            }
-            window.list_ids_excluded = this.list_ids_excluded
+            this.tickAllExcluded ? this.list_excluded = this.excluded_products : this.list_excluded = []
         },
-        select_excluded() {
-            let count = 0
-            for (let i in this.list_excluded) {
-                let item_data = JSON.parse(JSON.stringify(this.list_excluded[i]))
-                if (item_data !== false) {
-                    count++
-                }
-            }
-            if (this.excluded_products.length === count) {
-                this.tickAllExcluded = true;
+        select_excluded(ob) {
+            if (!ob.target.checked) {
+                this.list_excluded = this.list_excluded.filter(e => e.id !== ob.target._value.id)
             } else {
-                this.tickAllExcluded = false;
+                this.list_excluded.push(ob.target._value)
+                this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
             }
-            for (let product of this.list_excluded) {
-                if (this.list_ids_excluded.includes(product.id) === false) {
-                    this.list_ids_excluded.push(product.id)
-                }
-            }
-        },
-    },
-    // mounted() {
-    //     $('#checkbox-table-recommendation-product').on('click', function () {
-    //         if ($(this).is(':checked')) {
-    //             $('.item-recommendation-checkbox').each(function (index, item) {
-    //                 $(item).prop('checked', true)
-    //                 console.log(this)
-    //             })
-    //         } else {
-    //             $('.item-recommendation-checkbox').each(function (index, item) {
-    //                 $(item).prop('checked', false)
-    //                 console.log(this)
-    //             })
-    //         }
-    //     })
-    // }
+        }
+    }
 }
 </script>
 <style scoped>

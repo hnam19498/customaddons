@@ -2,9 +2,7 @@
     <data>
         <template id="bought_together">
             <html>
-                <head>
-                    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
-                </head>
+                <head></head>
                 <body>
                     <div id="app"/>
                     <script src="/bought_together/static/js/index.js"/>
