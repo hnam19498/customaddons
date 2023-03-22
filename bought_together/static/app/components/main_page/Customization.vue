@@ -89,10 +89,10 @@
                 </div>
                 <input type="text" class="text-color">
             </div>
-            <div style="display: flex; flex-direction: row">
+            <div style="display: flex; flex-direction: row; margin-top: 10px">
                 <div style="display: flex; flex-direction: column">
                     <div class="color">Background Color</div>
-                    <div style="display: flex; flex-direction: row">
+                    <div style="display: flex; flex-direction: row; margin-top: 20px">
                         <div class="input-color">
                             <input type="color">
                         </div>
@@ -101,12 +101,65 @@
                 </div>
                 <div style="display: flex; flex-direction: column">
                     <div id="border-color">Border Color</div>
-                    <div style="display: flex; flex-direction: row">
+                    <div style="display: flex; margin-top: 20px; flex-direction: row">
                         <div class="input-color">
                             <input type="color">
                         </div>
                         <input type="text" class="text-color">
                     </div>
+                </div>
+            </div>
+        </div>
+        <div style="display: flex; flex-direction: column; width: 100%">
+            <div class="configuration" style="margin-left: -50px">
+                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
+                <span>Preview</span>
+            </div>
+            <div id="preview">
+                <div
+                    style=" margin-top:32px; color: black; height: 24px; font-style: normal; font-weight: 700; font-size: 20px; line-height: 22px">
+                    YOU MAY ALSO LIKE...
+                </div>
+                <div
+                    style="margin-top: 14px; color: black; height: 25px; font-style: normal; font-weight: 400; font-size: 14px; line-height: 22px">
+                    Good deals only for you!
+                </div>
+                <div style="display: flex; flex-direction: row">
+                    <div style="display: flex; flex-direction: row; margin-top: 50px; margin-left: 15px">
+                        <div
+                            style="background: white; border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"/>
+                        <div
+                            style="background: white; border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"/>
+                        <div
+                            style="background: white; border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"/>
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-right: 60px; margin-left: auto">
+                        <div
+                            style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
+                            <div style="color: black">Total:</div>
+                            <div style="color: red; margin-left: 3px">$123</div>
+                        </div>
+                        <div
+                            style="width: auto; background: #D9D9D9; border-radius: 3px; margin-left: -30px; height: 24px; margin-right: -33px"/>
+                    </div>
+                </div>
+                <div style="margin-top: 18px; margin-bottom: 17px">
+                    <div style="display: flex; flex-direction: row" class="item">
+                        <input type="checkbox">
+                        <div class="item-1">test 1</div>
+                        <span style="color: red">$123</span>
+                    </div>
+                    <div style="display: flex; flex-direction: row" class="item">
+                        <input type="checkbox">
+                        <div class="item-1">test 1</div>
+                        <span style="color: red">$123</span>
+                    </div>
+                    <div style="display: flex; flex-direction: row" class="item">
+                        <input type="checkbox">
+                        <div class="item-1">test 1</div>
+                        <span style="color: red">$123</span>
+                    </div>
+                    <strike>$456</strike>
                 </div>
             </div>
         </div>
@@ -335,7 +388,7 @@ export default {
     font-weight: 400;
     font-size: 14px;
     line-height: 16px;
-    color: #000000;
+    color: black;
     border-radius: 5px;
     width: 140px;
     margin-top: 17px;
@@ -348,5 +401,60 @@ export default {
     color: black;
     height: 22px;
     line-height: 22px;
+}
+
+#preview {
+    display: flex;
+    flex-direction: column;
+    background: white;
+    border: 1px solid #BFBFBF;
+    border-radius: 5px;
+    text-align: center;
+    margin-top: 25px;
+    margin-right: 42px;
+}
+
+.item {
+    height: 16px;
+    align-items: center;
+    margin-top: 12px;
+}
+
+.item input {
+    width: 16px;
+    background: white;
+    border-radius: 2px;
+    margin-left: 30px;
+}
+
+.item div {
+    color: black;
+    font-style: normal;
+    font-weight: 400;
+    margin-left: 14px;
+    font-size: 14px;
+    line-height: 17px;
+}
+
+.item span {
+    color: red;
+    font-style: normal;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 22px;
+    margin-right: 84px;
+    margin-left: auto;
+}
+
+strike {
+    margin-top: -19px;
+    margin-right: 16px;
+    float: right;
+    font-style: normal;
+    height: 19px;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 22px;
+    color: #848484;
 }
 </style>
