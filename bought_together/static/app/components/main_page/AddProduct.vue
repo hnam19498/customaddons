@@ -18,7 +18,7 @@
                 <font-awesome-icon icon="fa-solid fa-circle-question"/>
                 <span>Choose recommendation product(s)</span>
             </div>
-            <div id="search">
+            <div class="search">
                 <a-input placeholder="Search product by name" :suffix="this.list_recommendation.length + ' selected'"/>
             </div>
             <div style="display: flex" class="recommendation_products" v-if="this.list_recommendation.length>0">
@@ -80,7 +80,7 @@
                 <font-awesome-icon icon="fa-solid fa-circle-question"/>
                 <span>Choose excluded product(s)</span>
             </div>
-            <div id="search" style="display: flex">
+            <div class="search">
                 <a-input placeholder="Search product by name" :suffix="this.list_excluded.length + ' selected'"/>
             </div>
             <div style="display: flex" class="excluded_products" v-if="this.list_excluded.length>0">
@@ -116,7 +116,6 @@
                                 type="checkbox"
                                 @change="select_excluded"
                                 class="item-excluded-checkbox"
-                                ref="{{product.id}}"
                                 :value="{
                                     id:product.id,
                                     name:product.name,
@@ -520,12 +519,12 @@ svg {
     margin-left: 28px;
 }
 
-#search {
+.search {
     display: flex;
     width: 100%;
 }
 
-#search span {
+.search span {
     background: white;
     border: 1px solid #E2E2E2;
     border-radius: 5px;
