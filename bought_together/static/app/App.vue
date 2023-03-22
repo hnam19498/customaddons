@@ -9,7 +9,8 @@
             </LayoutHeader>
             <LayoutContent>
                 <nav-menu/>
-                <add-product/>
+<!--                <add-product/>-->
+                <customization/>
             </LayoutContent>
         </Layout>
     </Layout>
@@ -21,11 +22,12 @@ import NavMenu from "./components/NavMenu.vue"
 import Loading from "./components/main_page/Loading.vue"
 import AddProduct from "./components/main_page/AddProduct.vue"
 import {Layout, LayoutHeader, LayoutContent, LayoutSider} from "ant-design-vue"
+import Customization from './components/main_page/Customization.vue'
 
 export default {
     components: {
         NavHeader,
-        SideBarMenu,
+        SideBarMenu, Customization,
         AddProduct,
         NavMenu,
         Layout,

@@ -22,8 +22,14 @@
                 <a-input placeholder="Search product by name" :suffix="this.list_recommendation.length + ' selected'"/>
             </div>
             <div style="display: flex" class="recommendation_products" v-if="this.list_recommendation.length>0">
-                <div v-for="recommendation_product of this.list_recommendation" class="recommendation_product">
-                    {{ recommendation_product.name }}
+                <div style="margin-right: 15px" v-for="recommendation_product of this.list_recommendation"
+                     class="recommendation_product">
+                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
+                        {{ recommendation_product.name }}
+                    </div>
+                    <font-awesome-icon :icon="['fas', 'circle-xmark']"
+                                       size="sm" @click="handleClickRecommendationProduct(recommendation_product.id)"
+                                       style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"/>
                 </div>
             </div>
             <div id="table-product">
@@ -78,8 +84,13 @@
                 <a-input placeholder="Search product by name" :suffix="this.list_excluded.length + ' selected'"/>
             </div>
             <div style="display: flex" class="excluded_products" v-if="this.list_excluded.length>0">
-                <div v-for="excluded_product of this.list_excluded" class="excluded_product">
-                    {{ excluded_product.name }}
+                <div v-for="excluded_product of this.list_excluded" class="excluded_product" style="margin-right: 15px">
+                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
+                        {{ excluded_product.name }}
+                    </div>
+                    <font-awesome-icon :icon="['fas', 'circle-xmark']" size="sm"
+                                       @click="handleClickExcludedProduct(excluded_product.id)"
+                                       style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"/>
                 </div>
             </div>
             <div id="table-product">
@@ -105,6 +116,7 @@
                                 type="checkbox"
                                 @change="select_excluded"
                                 class="item-excluded-checkbox"
+                                ref="{{product.id}}"
                                 :value="{
                                     id:product.id,
                                     name:product.name,
@@ -131,13 +143,16 @@
     <!--    <div v-else>-->
     <!--        <loading/>-->
     <!--    </div>-->
+
 </template>
 <script>
-import {reactive, toRefs} from 'vue'
+import {reactive, h, toRefs} from 'vue'
 import Loading from "./Loading.vue"
+import {notification} from 'ant-design-vue'
+import {CloseCircleFilled} from "@ant-design/icons-vue"
 
 export default {
-    components: {Loading},
+    components: {Loading, CloseCircleFilled},
     setup() {
         const state = reactive({checked1: false})
         return {...toRefs(state)}
@@ -234,8 +249,49 @@ export default {
         }
     },
     methods: {
+        show_toast: function (type, message, description, duration) {
+            notification[type]({
+                description: description,
+                message: message,
+                duration: duration,
+                class: 'error_popup',
+                closeIcon: function (e) {
+                    return (<CloseCircleFilled/>)
+                }
+            })
+        },
+        handleClickRecommendationProduct(product_id) {
+            for (let i = 0; i < this.list_recommendation.length; i++) {
+                if (product_id == this.list_recommendation[i].id) {
+                    this.list_recommendation.splice(i, 1)
+                }
+            }
+            this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
+        },
         SelectAllRecommendation() {
-            this.tickAllRecommendation ? this.list_recommendation = this.recommendation_products : this.list_recommendation = []
+            this.list_recommendation = []
+            if (this.tickAllRecommendation == true) {
+                for (let product of this.recommendation_products) {
+                    let data = {
+                        id: product.id,
+                        img: product.img,
+                        name: product.name,
+                        price: product.price,
+                        compare_at_price: product.compare_at_price,
+                        quantity: product.quantity
+                    }
+                    this.list_recommendation.push(data)
+                }
+            } else {
+                this.list_recommendation = []
+            }
+            if (this.list_recommendation.length > 3) {
+                this.show_toast('open',
+                    'You have reach the product limitation.',
+                    'Please untick any products from the list to continue selecting.',
+                    3
+                )
+            }
         },
         select_recommendation(ob) {
             if (!ob.target.checked) {
@@ -244,10 +300,38 @@ export default {
                 this.list_recommendation.push(ob.target._value)
                 this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
             }
+            if (this.list_recommendation.length > 3) {
+                this.show_toast('open',
+                    'You have reach the product limitation.',
+                    'Please untick any products from the list to continue selecting.',
+                    3
+                )
+            }
         },
-
         SelectAllExcluded() {
-            this.tickAllExcluded ? this.list_excluded = this.excluded_products : this.list_excluded = []
+            this.list_excluded = []
+            if (this.tickAllExcluded == true) {
+                for (let product of this.excluded_products) {
+                    let data = {
+                        id: product.id,
+                        img: product.img,
+                        name: product.name,
+                        price: product.price,
+                        compare_at_price: product.compare_at_price,
+                        quantity: product.quantity
+                    }
+                    this.list_excluded.push(data)
+                }
+            } else {
+                this.list_excluded = []
+            }
+            if (this.list_excluded.length > 3) {
+                this.show_toast('open',
+                    'You have reach the product limitation.',
+                    'Please untick any products from the list to continue selecting.',
+                    3
+                )
+            }
         },
         select_excluded(ob) {
             if (!ob.target.checked) {
@@ -256,6 +340,21 @@ export default {
                 this.list_excluded.push(ob.target._value)
                 this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
             }
+            if (this.list_excluded.length > 3) {
+                this.show_toast('open',
+                    'You have reach the product limitation.',
+                    'Please untick any products from the list to continue selecting.',
+                    3
+                )
+            }
+        },
+        handleClickExcludedProduct(product_id) {
+            for (let i = 0; i < this.list_excluded.length; i++) {
+                if (product_id == this.list_excluded[i].id) {
+                    this.list_excluded.splice(i, 1)
+                }
+            }
+            this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
         }
     }
 }
@@ -516,4 +615,7 @@ svg {
     color: black;
 }
 
+.recommendation_products .recommendation_product svg {
+    cursor: pointer;
+}
 </style>

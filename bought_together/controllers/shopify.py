@@ -175,9 +175,6 @@ class ShopifyMain(http.Controller):
                                 "status": True
                             })
 
-                        # menu_id = request.env.ref('bought_together.menu_shopify_root').id
-                        # redirect_url = f'{shopify_app.base_url}/web?#menu_id={str(menu_id)}'
-                        # return werkzeug.utils.redirect(redirect_url)
                         return werkzeug.utils.redirect(f'{shopify_app.base_url}/bought_together')
         except Exception as e:
             print(e)
