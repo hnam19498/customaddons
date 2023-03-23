@@ -23,8 +23,8 @@ class Shop(models.Model):
     status = fields.Boolean()
     shopify_owner = fields.Char()
     password = fields.Char()
+    product_ids = fields.One2many("shopify.product", 'shop_id')
     admin = fields.Many2one('res.users')
-    # fetch_ids = fields.One2many('fetch.shopify', 'shop_id')
 
 
 class ShopAppShopify(models.Model):
@@ -34,3 +34,14 @@ class ShopAppShopify(models.Model):
     shop_id = fields.Many2one("shop.shopify")
     app_id = fields.Many2one('shopify.app')
     status = fields.Boolean()
+
+
+class ShopifyProduct(models.Model):
+    _name = 'shopify.product'
+
+    shopify_product_id = fields.Char()
+    name = fields.Char()
+    shop_id = fields.Many2one('shop.shopify')
+    price = fields.Float()
+    qty = fields.Integer('Quantity')
+    url_img = fields.Char()

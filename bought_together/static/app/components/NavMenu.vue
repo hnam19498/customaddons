@@ -1,8 +1,7 @@
 <template>
     <div class="nav-menu">
-        <div class="nav-item active">Kiana</div>
-        <div class="nav-item">Mei</div>
-        <div class="nav-item">Bronya</div>
+        <div @click="changeTab(tab)" class="nav-item" v-for="tab in navtabs" :class="{active:tab==currentTab}">{{ tab }}
+        </div>
     </div>
 </template>
 <script>
@@ -10,6 +9,16 @@ export default {
     name: "NavMenu",
     data() {
         return {}
+    },
+    props: {
+        navtabs: Array,
+        currentTab: String
+    },
+    methods: {
+        changeTab(tab) {
+            // console.log('change tab to ' + tab + ' from NavMenu.vue')
+            this.$emit('changeTab', tab)
+        }
     }
 }
 </script>
@@ -39,13 +48,15 @@ export default {
     width: 184.67px;
     height: 36px;
     border-radius: 4px;
+    cursor: pointer;
     flex: none;
     order: 0;
     flex-grow: 1;
     background-color: #C8C8C8;
-    color:white;
+    color: white;
 }
-.nav-menu .active{
+
+.nav-menu .active {
     background: white;
     color: black;
 }

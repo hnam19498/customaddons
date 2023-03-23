@@ -4,6 +4,20 @@ from odoo.http import request
 
 
 class ShopifyMain(http.Controller):
+    @http.route('/bought_together/get_product', auth="public", type="json", csrf=False, cors="*", save_session=False)
+    def get_data(self):
+        product_data = []
+        products = request.env['shopify.product'].sudo().search([])
+        for product in products:
+            product_data.append({
+                'id': product.shopify_product_id,
+                'name': product.name,
+                'price': product.price,
+                "url_img": product.url_img,
+                "qty": product.qty
+            })
+        return {'product_data': product_data}
+
     @http.route("/bought_together/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopify_auth(self, **kw):
         try:
@@ -39,7 +53,8 @@ class ShopifyMain(http.Controller):
                     access_token = session.request_token(kw)
                     shopify.ShopifyResource.activate_session(session)
 
-                    shopify_infor = shopify.GraphQL().execute("{shop{id name email currencyCode url billingAddress{country}}}")
+                    shopify_infor = shopify.GraphQL().execute(
+                        "{shop{id name email currencyCode url billingAddress{country}}}")
                     shopify_data = json.loads(shopify_infor)
                     shopify_id = shopify_data["data"]["shop"]["id"].split("/")[-1]
 
@@ -95,7 +110,8 @@ class ShopifyMain(http.Controller):
                         #         "src": new_script_tag_url
                         #     })
 
-                        current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
+                        current_shopify_shop = request.env["shop.shopify"].sudo().search(
+                            [("shopify_id", "=", shopify_id)], limit=1)
 
                         if current_shopify_shop:
                             current_shopify_shop.status = True
@@ -166,7 +182,8 @@ class ShopifyMain(http.Controller):
                         if not current_shopify_shop.password:
                             current_shopify_shop.password = password_generate
 
-                        shop_app = request.env['shop.app.shopify'].sudo().search([("shop_id", '=', current_shopify_shop.id), ('app_id', '=', shopify_app.id)])
+                        shop_app = request.env['shop.app.shopify'].sudo().search(
+                            [("shop_id", '=', current_shopify_shop.id), ('app_id', '=', shopify_app.id)])
                         if not shop_app:
                             request.env['shop.app.shopify'].sudo().create({
                                 "access_token": access_token,
@@ -175,6 +192,27 @@ class ShopifyMain(http.Controller):
                                 "status": True
                             })
 
+                        products = shopify.Product.find()
+                        exist_products = request.env['shopify.product'].sudo().search([])
+                        list_product_ids = []
+
+                        if exist_products:
+                            for product in exist_products:
+                                if str(product.shopify_product_id) not in list_product_ids:
+                                    list_product_ids.append(product.shopify_product_id)
+
+                        if products:
+                            for product in products:
+                                if str(product.id) not in list_product_ids:
+                                    request.env['shopify.product'].sudo().create({
+                                        'shopify_product_id': product.id,
+                                        'name': product.title,
+                                        'shop_id': current_shopify_shop.id,
+                                        'url_img': product.attributes['images'][0].attributes['src'],
+                                        'price': float(product.variants[0].price),
+                                    })
+                                else:
+                                    print(f'Product id "{product.id}" đã trong database!')
                         return werkzeug.utils.redirect(f'{shopify_app.base_url}/bought_together')
         except Exception as e:
             print(e)

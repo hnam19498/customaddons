@@ -1,7 +1,7 @@
 <template>
     <div class="installation-btn">
         <button class="btn" id="btn-home">Home</button>
-        <button class="btn" id="btn-themes">Go to Themes Customization</button>
+        <button class="btn" id="btn-themes" @click="handleThemeCustomization">Go to Themes Customization</button>
     </div>
     <div id="congratulation">CONGRATULATION! YOU HAVE CREATED WIDGET SUCCESSFULLY!</div>
     <div id="now">Now please follow these steps below to display it on your product pages</div>
@@ -21,6 +21,11 @@
 export default {
     data() {
         return {}
+    },
+    methods:{
+        handleThemeCustomization(){
+            window.location.replace('https://shop-odoo-hnam.myshopify.com/admin/themes/current/editor')
+        }
     }
 }
 </script>

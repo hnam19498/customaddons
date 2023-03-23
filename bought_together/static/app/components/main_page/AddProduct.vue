@@ -21,10 +21,9 @@
             <div class="search">
                 <a-input placeholder="Search product by name" :suffix="this.list_recommendation.length + ' selected'"/>
             </div>
-            <div style="display: flex" class="recommendation_products" v-if="this.list_recommendation.length>0">
-                <div style="margin-right: 15px" v-for="recommendation_product of this.list_recommendation"
-                     class="recommendation_product">
-                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
+            <div class="recommendation_products" v-if="this.list_recommendation.length>0">
+                <div v-for="recommendation_product of this.list_recommendation" class="recommendation_product">
+                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                         {{ recommendation_product.name }}
                     </div>
                     <font-awesome-icon :icon="['fas', 'circle-xmark']"
@@ -37,7 +36,6 @@
                     <tr class="table-col-name">
                         <td>
                             <input
-                                id="checkbox-table-recommendation-product"
                                 type="checkbox"
                                 @change="SelectAllRecommendation"
                                 v-model="tickAllRecommendation"
@@ -49,27 +47,27 @@
                         <td>Compare at price</td>
                         <td>In Stock</td>
                     </tr>
-                    <tr class="table-row" v-for="product in this.recommendation_products" :key="product.id">
+                    <tr class="table-row" v-for="product in products" :key="product.id">
                         <td>
                             <input
                                 type="checkbox"
-                                class="item-recommendation-checkbox"
                                 :id="product.id"
                                 @change="select_recommendation"
                                 :value="{
-                                    id:product.id,
-                                    name:product.name,
-                                    price:product.price,
-                                    compare_at_price:product.compare_at_price,
-                                    quantity:product.quantity}"
+                                    id: product.id,
+                                    name: product.name,
+                                    price: product.price,
+                                    img: product.url_img,
+                                    compare_at_price: product.compare_at_price,
+                                    quantity: product.qty}"
                                 :checked="list_recommendation.filter(e => e.id === product.id).length > 0"
                             >
                         </td>
-                        <td><img :src="product.img" style="width: 30px; height: 30px"></td>
+                        <td><img :src="product.url_img" style="width: 30px; height: 30px"></td>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
                         <td>{{ product.compare_at_price }}</td>
-                        <td>{{ product.quantity }}</td>
+                        <td>{{ product.qty }}</td>
                     </tr>
                 </table>
             </div>
@@ -83,9 +81,9 @@
             <div class="search">
                 <a-input placeholder="Search product by name" :suffix="this.list_excluded.length + ' selected'"/>
             </div>
-            <div style="display: flex" class="excluded_products" v-if="this.list_excluded.length>0">
-                <div v-for="excluded_product of this.list_excluded" class="excluded_product" style="margin-right: 15px">
-                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px;">
+            <div class="excluded_products" v-if="this.list_excluded.length>0">
+                <div v-for="excluded_product of this.list_excluded" class="excluded_product">
+                    <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                         {{ excluded_product.name }}
                     </div>
                     <font-awesome-icon :icon="['fas', 'circle-xmark']" size="sm"
@@ -110,28 +108,29 @@
                         <td>Compare At Price</td>
                         <td>In Stock</td>
                     </tr>
-                    <tr class="table-row" v-for="product in this.excluded_products" :key="product.id">
+                    <tr class="table-row" v-for="product in products" :key="product.id">
                         <td>
                             <input
                                 type="checkbox"
                                 @change="select_excluded"
                                 class="item-excluded-checkbox"
                                 :value="{
-                                    id:product.id,
-                                    name:product.name,
-                                    price:product.price,
-                                    compare_at_price:product.compare_at_price,
-                                    quantity:product.quantity}"
+                                    id: product.id,
+                                    name: product.name,
+                                    img: product.url_img,
+                                    price: product.price,
+                                    compare_at_price: product.compare_at_price,
+                                    quantity: product.qty}"
                                 :checked="list_excluded.filter(e => e.id === product.id).length > 0"
                             >
                         </td>
                         <td>
-                            <img :src='product.img' style="width: 30px; height: 30px">
+                            <img :src='product.url_img' style="width: 30px; height: 30px">
                         </td>
                         <td>{{ product.name }}</td>
                         <td>{{ product.price }}</td>
                         <td>{{ product.compare_at_price }}</td>
-                        <td>{{ product.quantity }}</td>
+                        <td>{{ product.qty }}</td>
                     </tr>
                 </table>
             </div>
@@ -151,6 +150,9 @@ import {notification} from 'ant-design-vue'
 import {CloseCircleFilled} from "@ant-design/icons-vue"
 
 export default {
+    props: {
+        products: Array,
+    },
     components: {Loading, CloseCircleFilled},
     setup() {
         const state = reactive({checked1: false})
@@ -158,10 +160,10 @@ export default {
     },
     watch: {
         list_recommendation: function () {
-            this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
+            this.tickAllRecommendation = this.list_recommendation.length === this.products.length
         },
         list_excluded: function () {
-            this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
+            this.tickAllExcluded = this.list_excluded.length === this.products.length
         }
     },
     data() {
@@ -170,81 +172,6 @@ export default {
             tickAllExcluded: false,
             list_recommendation: [],
             list_excluded: [],
-            excluded_products: [
-                {
-                    id: 1,
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 1',
-                    price: 'Price test 1',
-                    compare_at_price: 'Test 1',
-                    quantity: 1
-                }, {
-                    id: 2,
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 2',
-                    price: 'Price test 2',
-                    compare_at_price: 'Test 2',
-                    quantity: 2
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 3',
-                    price: 'Price test 3',
-                    compare_at_price: 'Test 3',
-                    id: 3,
-                    quantity: 3
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 4',
-                    id: 4,
-                    price: 'Price test 4',
-                    compare_at_price: 'Test 4',
-                    quantity: 4
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 5',
-                    price: 'Price test 5',
-                    id: 5,
-                    compare_at_price: 'Test 5',
-                    quantity: 5
-                }
-            ], recommendation_products: [
-                {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 1',
-                    id: 1,
-                    price: 'Price test 1',
-                    compare_at_price: 'Test 1',
-                    quantity: 1
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 2',
-                    price: 'Price test 2',
-                    compare_at_price: 'Test 2',
-                    id: 2,
-                    quantity: 2
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 3',
-                    price: 'Price test 3',
-                    id: 3,
-                    compare_at_price: 'Test 3',
-                    quantity: 3
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 4',
-                    price: 'Price test 4',
-                    compare_at_price: 'Test 4',
-                    id: 4,
-                    quantity: 4
-                }, {
-                    img: "/bought_together/static/app/img/LogoNestScale.png",
-                    name: 'Name test 5',
-                    price: 'Price test 5',
-                    id: 5,
-                    compare_at_price: 'Test 5',
-                    quantity: 5
-                }
-            ]
         }
     },
     methods: {
@@ -265,12 +192,12 @@ export default {
                     this.list_recommendation.splice(i, 1)
                 }
             }
-            this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
+            this.tickAllRecommendation = this.list_recommendation.length === this.products.length
         },
         SelectAllRecommendation() {
             this.list_recommendation = []
             if (this.tickAllRecommendation == true) {
-                for (let product of this.recommendation_products) {
+                for (let product of this.products) {
                     let data = {
                         id: product.id,
                         img: product.img,
@@ -297,7 +224,7 @@ export default {
                 this.list_recommendation = this.list_recommendation.filter(e => e.id !== ob.target._value.id)
             } else {
                 this.list_recommendation.push(ob.target._value)
-                this.tickAllRecommendation = this.list_recommendation.length === this.recommendation_products.length
+                this.tickAllRecommendation = this.list_recommendation.length === this.products.length
             }
             if (this.list_recommendation.length > 3) {
                 this.show_toast('open',
@@ -310,7 +237,7 @@ export default {
         SelectAllExcluded() {
             this.list_excluded = []
             if (this.tickAllExcluded == true) {
-                for (let product of this.excluded_products) {
+                for (let product of this.products) {
                     let data = {
                         id: product.id,
                         img: product.img,
@@ -337,7 +264,7 @@ export default {
                 this.list_excluded = this.list_excluded.filter(e => e.id !== ob.target._value.id)
             } else {
                 this.list_excluded.push(ob.target._value)
-                this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
+                this.tickAllExcluded = this.list_excluded.length === this.products.length
             }
             if (this.list_excluded.length > 3) {
                 this.show_toast('open',
@@ -353,7 +280,7 @@ export default {
                     this.list_excluded.splice(i, 1)
                 }
             }
-            this.tickAllExcluded = this.list_excluded.length === this.excluded_products.length
+            this.tickAllExcluded = this.list_excluded.length === this.products.length
         }
     }
 }
@@ -551,14 +478,14 @@ svg {
 
 #table-product table .table-row {
     height: 3rem;
-    border-bottom: 1px solid;
+    border-bottom: 1px groove #EFEFEF;
     font-size: 14px;
 }
 
 #table-product table .table-col-name {
     height: 3rem;
-    border-bottom: 1px groove #979191;
-    border-top: 1px groove #979191;
+    border-bottom: 1px groove #EFEFEF;
+    border-top: 1px groove #EFEFEF;
     color: rgba(0, 0, 0);
     font-weight: 700;
     font-size: 14px;
@@ -577,7 +504,8 @@ svg {
 
 .recommendation_products {
     margin-left: 21px;
-    height: 24px;
+    width: 100%;
+    height: max-content;
     margin-top: 13px;
 }
 
@@ -589,6 +517,9 @@ svg {
     border-radius: 5px;
     font-size: 14px;
     background: white;
+    margin-right: 15px;
+    float: left;
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     line-height: 17px;
@@ -597,7 +528,8 @@ svg {
 
 .excluded_products {
     margin-left: 21px;
-    height: 24px;
+    width: 100%;
+    height: max-content;
     margin-top: 13px;
 }
 
@@ -611,10 +543,17 @@ svg {
     display: flex;
     align-items: center;
     line-height: 17px;
+    margin-right: 15px;
+    float: left;
+    margin-bottom: 10px;
     color: black;
 }
 
 .recommendation_products .recommendation_product svg {
+    cursor: pointer;
+}
+
+.excluded_products .excluded_product svg {
     cursor: pointer;
 }
 </style>

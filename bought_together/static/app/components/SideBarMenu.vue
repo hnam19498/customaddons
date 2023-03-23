@@ -4,18 +4,10 @@
             <img src="/bought_together/static/app/img/LogoNestScale.png" class="black-circle">
             <p class="company-name">NestScale</p>
         </div>
-        <div class="menu-item">
-            <div class="item">
-                <font-awesome-icon icon="fas fa-circle"/>
-                Kiana
-            </div>
-            <div class="item">
-                <font-awesome-icon icon="fas fa-circle"/>
-                Mei
-            </div>
-            <div class="item">
-                <font-awesome-icon icon="fas fa-circle"/>
-                Bronya
+        <div class="menu-item" v-for="tab in tabs" :key="tab">
+            <div class="item" :class="{active:tab==currentTab}" @click="changeTab(tab)">
+                <font-awesome-icon icon="fas fa-circle" style="margin-right: 10px"/>
+                {{ tab }}
             </div>
         </div>
     </div>
@@ -24,6 +16,14 @@
 export default {
     data() {
         return {}
+    },
+    props: {
+        tabs: Array, currentTab: String
+    },
+    methods: {
+        changeTab(tab) {
+            this.$emit('changeTab', tab)
+        }
     }
 }
 </script>
@@ -72,10 +72,21 @@ export default {
     display: flex;
     align-items: center;
     margin-bottom: 16px;
+    cursor: pointer;
+    height: 40px;
 }
 
 .item svg {
     color: #D9D9D9;
     font-size: 32px;
+    margin-left: 10px;
+}
+
+.active {
+    background: white;
+    color: black;
+    width: 180px;
+    border-radius: 5px;
+    height: 40px;
 }
 </style>
