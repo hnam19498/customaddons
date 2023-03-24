@@ -18,7 +18,8 @@ export default {
         return {}
     },
     props: {
-        tabs: Array, currentTab: String
+        tabs: Array,
+        currentTab: String
     },
     methods: {
         changeTab(tab) {

@@ -45,3 +45,23 @@ class ShopifyProduct(models.Model):
     price = fields.Float()
     qty = fields.Integer('Quantity')
     url_img = fields.Char()
+    compare_at_price = fields.Float()
+
+
+class ShopifyWidget(models.Model):
+    _name = "shopify.widget"
+
+    widget_description = fields.Char()
+    title_color = fields.Char()
+    status = fields.Boolean()
+    background_color = fields.Char()
+    product_ids = fields.Many2many('shopify.product', "widget_product_ref")
+    description_font_size = fields.Char()
+    btn_text = fields.Char()
+    widget_title = fields.Char()
+    total_price = fields.Float()
+    total_compare_at_price = fields.Float()
+    description_color = fields.Char()
+    border_color = fields.Char()
+    title_font_size = fields.Char()
+    text_color = fields.Char()

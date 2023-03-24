@@ -11,13 +11,14 @@
                 <td class="status">Status</td>
             </tr>
             <tr class="table-row">
-                <td>1</td>
-                <td>You May Also Like...</td>
-                <td>Good deals only for you!</td>
-                <td style="text-align: center">3</td>
-                <td>$100.05</td>
+                <td>{{ this.widget.id }}</td>
+                <td>{{ this.widget.widget_title }}</td>
+                <td>{{ this.widget.widget_description }}</td>
+                <td style="text-align: center">{{ this.products_included }}</td>
+                <td>${{ this.widget.total_price }}</td>
                 <td class="status">
-                    <a-switch v-model:checked="checked1" checked-children="ON" un-checked-children="OFF"/>
+                    <a-switch @change="changeWidgetStatus" v-model:checked="this.widget.status" checked-children="ON"
+                              un-checked-children="OFF"/>
                 </td>
             </tr>
         </table>
@@ -25,11 +26,37 @@
 </template>
 <script>
 import {reactive, toRefs} from 'vue'
+import axios from "axios"
 
 export default {
-
+    methods: {
+        changeWidgetStatus() {
+            let self = this
+            axios.post('https://odoo.website/bought_together/change_status_widget', {
+                jsonrpc: "2.0",
+                params: {widget_status: self.widget.status}
+            }).then(function (res) {
+                console.log(self.widget.status)
+            }).catch(error => {
+                console.log(error)
+            })
+        }
+    },
+    mounted() {
+        let self = this
+        axios.post('https://odoo.website/bought_together/get_widget', {
+            jsonrpc: "2.0",
+            params: {}
+        }).then(function (res) {
+            self.widget = res.data.result.widget_data
+            self.products_included = res.data.result.products_included
+            console.log(self.widget.status)
+        }).catch(error => {
+            console.log(error)
+        })
+    },
     data() {
-        return {}
+        return {widget: [], products_included: 0}
     },
     setup() {
         const state = reactive({checked1: false})
@@ -50,10 +77,11 @@ export default {
 }
 
 #table-product {
-    width: 95%;
+    width: 90%;
     height: 50%;
-    margin-left: 1rem;
+    margin-left: 60px;
     margin-top: 1rem;
+    margin-right: 100px;
 }
 
 #table-product table {

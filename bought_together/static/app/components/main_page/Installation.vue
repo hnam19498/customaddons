@@ -1,6 +1,6 @@
 <template>
     <div class="installation-btn">
-        <button class="btn" id="btn-home">Home</button>
+        <button class="btn" id="btn-home" @click="redirectToDashboard">Home</button>
         <button class="btn" id="btn-themes" @click="handleThemeCustomization">Go to Themes Customization</button>
     </div>
     <div id="congratulation">CONGRATULATION! YOU HAVE CREATED WIDGET SUCCESSFULLY!</div>
@@ -19,12 +19,19 @@
 </template>
 <script>
 export default {
+    emits: ['changeTab'],
     data() {
         return {}
     },
-    methods:{
-        handleThemeCustomization(){
-            window.location.replace('https://shop-odoo-hnam.myshopify.com/admin/themes/current/editor')
+    props: {
+        shop_url: String
+    },
+    methods: {
+        handleThemeCustomization() {
+            window.location.replace('https://' + this.shop_url + '/admin/themes/current/editor')
+        },
+        redirectToDashboard() {
+            this.$emit('changeTab', 'Dashboard')
         }
     }
 }

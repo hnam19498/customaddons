@@ -1,11 +1,60 @@
-import shopify, binascii, os, werkzeug, json, string, random, datetime
+import shopify, binascii, os, werkzeug, json, string, random
 from odoo import http, _
 from odoo.http import request
 
 
 class ShopifyMain(http.Controller):
-    @http.route('/bought_together/get_product', auth="public", type="json", csrf=False, cors="*", save_session=False)
-    def get_data(self):
+    @http.route('/bought_together/change_status_widget', type='json', auth="user")
+    def change_status_widget(self, **kw):
+        exist_widget = request.env['shopify.widget'].sudo().search([], limit=1)
+        exist_widget.sudo().write({'status': kw['widget_status']})
+
+    @http.route('/bought_together/get_widget', type='json', auth='user')
+    def get_widget(self):
+        widget = request.env['shopify.widget'].sudo().search([], limit=1)
+        widget_data = {
+            "id": widget.id,
+            'widget_title': widget.widget_title,
+            'widget_description': widget.widget_description,
+            "total_price": widget.total_price,
+            "status": widget.status
+        }
+        return {
+            'products_included': len(widget.product_ids),
+            'widget_data': widget_data
+        }
+
+    @http.route("/bought_together/save_widget", type='json', auth="user")
+    def save_widget(self, **kw):
+        list_product_ids = []
+        for product in kw['products']:
+            list_product_ids.append(
+                request.env['shopify.product'].sudo().search([("shopify_product_id", '=', product['id'])]).id
+            )
+        exist_widget = request.env['shopify.widget'].sudo().search([])
+        data = {
+            'product_ids': [(6, 0, list_product_ids)],
+            "widget_description": kw['widget_description'],
+            "total_compare_at_price": float(kw['total_compare_at_price']),
+            'title_color': kw['title_color'],
+            'background_color': kw['background_color'],
+            "description_font_size": kw["description_font_size"],
+            'btn_text': kw['btn_text'],
+            "widget_title": kw['widget_title'],
+            "total_price": float(kw['total_price']),
+            'description_color': kw['description_color'],
+            "border_color": kw['border_color'],
+            'title_font_size': kw['title_font_size'],
+            'text_color': kw['text_color'],
+            'status': True
+        }
+        if not exist_widget:
+            request.env['shopify.widget'].sudo().create(data)
+        else:
+            exist_widget.sudo().write(data)
+
+    @http.route('/bought_together/get_product', auth="user", type="json", csrf=False, cors="*", save_session=False)
+    def get_product(self):
         product_data = []
         products = request.env['shopify.product'].sudo().search([])
         for product in products:
@@ -14,9 +63,10 @@ class ShopifyMain(http.Controller):
                 'name': product.name,
                 'price': product.price,
                 "url_img": product.url_img,
+                'compare_at_price': product.compare_at_price,
                 "qty": product.qty
             })
-        return {'product_data': product_data}
+        return {'product_data': product_data, 'shop_url': request.env.user.login}
 
     @http.route("/bought_together/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopify_auth(self, **kw):
@@ -210,6 +260,8 @@ class ShopifyMain(http.Controller):
                                         'shop_id': current_shopify_shop.id,
                                         'url_img': product.attributes['images'][0].attributes['src'],
                                         'price': float(product.variants[0].price),
+                                        "compare_at_price": product.variants[0].compare_at_price,
+                                        'qty': product.variants[0].inventory_quantity
                                     })
                                 else:
                                     print(f'Product id "{product.id}" đã trong database!')

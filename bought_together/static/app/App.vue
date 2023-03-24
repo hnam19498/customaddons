@@ -10,9 +10,11 @@
             <layout-content>
                 <nav-menu @changeTab="changeTab" :currentTab='currentTab' :navtabs="navtabs"
                           v-if="navtabs.includes(currentTab)"/>
-                <add-product :products="products" v-if="currentTab=='AddProduct'"/>
-                <customization v-if="currentTab=='Customization'"/>
-                <installation v-if="currentTab=='Installation'"/>
+                <add-product @addProductToCustomization="addProductToCustomization" :products="products"
+                             v-if="currentTab=='AddProduct'"/>
+                <customization @changeTab="changeTab" v-if="currentTab=='Customization'"
+                               :list_recommendation="list_recommendation"/>
+                <installation @changeTab="changeTab" :shop_url="shop_url" v-if="currentTab=='Installation'"/>
                 <dashboard v-if="currentTab=='Dashboard'"/>
             </layout-content>
         </layout>
@@ -32,12 +34,13 @@ import axios from 'axios'
 
 export default {
     mounted() {
-        var self = this
+        let self = this
         axios.post('https://odoo.website/bought_together/get_product', {
             jsonrpc: "2.0",
             params: {}
         }).then(function (res) {
             self.products = res.data.result.product_data
+            self.shop_url = res.data.result.shop_url
         }).catch(error => {
             console.log(error)
         })
@@ -59,14 +62,20 @@ export default {
     data() {
         return {
             products: [],
+            shop_url: '',
             currentTab: 'AddProduct',
             tabs: ['AddProduct', 'Customization', 'Installation', 'Dashboard'],
-            navtabs: ['AddProduct', 'Customization', 'Installation']
+            navtabs: ['AddProduct', 'Customization', 'Installation'],
+            list_recommendation: [], list_product_customization: []
         }
     },
     methods: {
         changeTab(tab) {
             this.currentTab = tab
+        },
+        addProductToCustomization(tab, list_recommendation) {
+            this.currentTab = tab
+            this.list_recommendation = list_recommendation
         }
     }
 }
