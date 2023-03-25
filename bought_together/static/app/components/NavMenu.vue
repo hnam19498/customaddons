@@ -1,6 +1,6 @@
 <template>
     <div class="nav-menu">
-        <div @click="changeTab(tab)" class="nav-item" v-for="tab in navtabs" :class="{active:tab==currentTab}">{{ tab }}
+        <div :key="tab" @click="changeTab(tab)" class="nav-item" v-for="tab in navtabs" :class="{active:tab==currentTab}">{{ tab }}
         </div>
     </div>
 </template>
@@ -16,7 +16,6 @@ export default {
     },
     methods: {
         changeTab(tab) {
-            // console.log('change tab to ' + tab + ' from NavMenu.vue')
             this.$emit('changeTab', tab)
         }
     }

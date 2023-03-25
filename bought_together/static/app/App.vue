@@ -66,7 +66,9 @@ export default {
             currentTab: 'AddProduct',
             tabs: ['AddProduct', 'Customization', 'Installation', 'Dashboard'],
             navtabs: ['AddProduct', 'Customization', 'Installation'],
-            list_recommendation: [], list_product_customization: []
+            list_recommendation: [],
+            list_product_customization: [],
+            user: ''
         }
     },
     methods: {

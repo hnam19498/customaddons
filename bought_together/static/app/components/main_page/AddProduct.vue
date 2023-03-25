@@ -3,47 +3,43 @@
         <div class="setting-btn">
             <button @click="cancelAddProducts" class="btn-setting" id="btn-cancel">Cancel</button>
             <button :disabled="list_recommendation.length > 5 || list_recommendation.length == 0" class="btn-setting"
-                    id="btn-save" @click="saveAddProducts">SAVE
+                id="btn-save" @click="saveAddProducts">SAVE
             </button>
         </div>
         <div id="setting_widget">
             <label id="enable_widget">Enable Widget</label>
-            <a-switch v-model:checked="checked1" checked-children="ON" un-checked-children="OFF"/>
+            <a-switch v-model:checked="checked1" checked-children="ON" un-checked-children="OFF" />
         </div>
         <div id="manual-recommendation">
             <span>Manual Recommendation</span>
-            <font-awesome-icon icon="fa-solid fa-circle-question"/>
+            <font-awesome-icon icon="fa-solid fa-circle-question" />
         </div>
         <div style="position: relative; width: 100%">
             <div id="choose-recommendation-product">
                 <div id="choose-recommendation">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                    <font-awesome-icon icon="fa-solid fa-circle-question" />
                     <span>Choose recommendation product(s)</span>
                 </div>
                 <div class="search">
                     <a-input v-model:value="search_recommendation" placeholder="Search product by name"
-                             :suffix="this.list_recommendation.length + ' selected'"/>
+                        :suffix="this.list_recommendation.length + ' selected'" />
                 </div>
-                <div class="recommendation_products" v-if="this.list_recommendation.length>0">
-                    <div v-for="recommendation_product of this.list_recommendation" class="recommendation_product">
+                <div class="recommendation_products" v-if="this.list_recommendation.length > 0">
+                    <div :key="recommendation_product.id" v-for="recommendation_product of this.list_recommendation"
+                        class="recommendation_product">
                         <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                             {{ recommendation_product.name }}
                         </div>
-                        <font-awesome-icon :icon="['fas', 'circle-xmark']"
-                                           size="sm"
-                                           @click="handleClickRecommendationProduct(recommendation_product.id)"
-                                           style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"/>
+                        <font-awesome-icon :icon="['fas', 'circle-xmark']" size="sm"
+                            @click="handleClickRecommendationProduct(recommendation_product.id)"
+                            style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px" />
                     </div>
                 </div>
                 <div id="table-product">
                     <table>
                         <tr class="table-col-name">
                             <td>
-                                <input
-                                    type="checkbox"
-                                    @change="SelectAllRecommendation"
-                                    v-model="tickAllRecommendation"
-                                >
+                                <input type="checkbox" @change="SelectAllRecommendation" v-model="tickAllRecommendation">
                             </td>
                             <td>Image</td>
                             <td>Product name</td>
@@ -53,19 +49,14 @@
                         </tr>
                         <tr class="table-row" v-for="product in filteredRecommendation" :key="product.id">
                             <td>
-                                <input
-                                    type="checkbox"
-                                    :id="product.id"
-                                    @change="select_recommendation"
-                                    :value="{
+                                <input type="checkbox" :id="product.id" @change="select_recommendation" :value="{
                                     id: product.id,
                                     name: product.name,
                                     price: product.price,
                                     img: product.url_img,
                                     compare_at_price: product.compare_at_price,
-                                    quantity: product.qty}"
-                                    :checked="list_recommendation.filter(e => e.id == product.id).length > 0"
-                                >
+                                    quantity: product.qty
+                                }" :checked="list_recommendation.filter(e => e.id == product.id).length > 0">
                             </td>
                             <td><img :src="product.url_img" style="width: 30px; height: 30px"></td>
                             <td>{{ product.name }}</td>
@@ -79,33 +70,29 @@
 
             <div id="choose-excluded-product">
                 <div id="choose-excluded">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                    <font-awesome-icon icon="fa-solid fa-circle-question" />
                     <span>Choose excluded product(s)</span>
                 </div>
                 <div class="search">
                     <a-input v-model:value="search_excluded" placeholder="Search product by name"
-                             :suffix="this.list_excluded.length + ' selected'"/>
+                        :suffix="this.list_excluded.length + ' selected'" />
                 </div>
-                <div class="excluded_products" v-if="this.list_excluded.length>0">
-                    <div v-for="excluded_product of this.list_excluded" class="excluded_product">
+                <div class="excluded_products" v-if="this.list_excluded.length > 0">
+                    <div v-for="excluded_product of this.list_excluded" class="excluded_product" :key="excluded_product.id">
                         <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                             {{ excluded_product.name }}
                         </div>
                         <font-awesome-icon :icon="['fas', 'circle-xmark']" size="sm"
-                                           @click="handleClickExcludedProduct(excluded_product.id)"
-                                           style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"/>
+                            @click="handleClickExcludedProduct(excluded_product.id)"
+                            style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px" />
                     </div>
                 </div>
                 <div id="table-product">
                     <table>
                         <tr class="table-col-name">
                             <td>
-                                <input
-                                    id="checkbox-table-excluded-product"
-                                    type="checkbox"
-                                    @change="SelectAllExcluded"
-                                    v-model="tickAllExcluded"
-                                >
+                                <input id="checkbox-table-excluded-product" type="checkbox" @change="SelectAllExcluded"
+                                    v-model="tickAllExcluded">
                             </td>
                             <td>Image</td>
                             <td>Product Name</td>
@@ -115,19 +102,14 @@
                         </tr>
                         <tr class="table-row" v-for="product in filteredExcluded" :key="product.id">
                             <td>
-                                <input
-                                    type="checkbox"
-                                    @change="select_excluded"
-                                    class="item-excluded-checkbox"
-                                    :value="{
+                                <input type="checkbox" @change="select_excluded" class="item-excluded-checkbox" :value="{
                                     id: product.id,
                                     name: product.name,
                                     img: product.url_img,
                                     price: product.price,
                                     compare_at_price: product.compare_at_price,
-                                    quantity: product.qty}"
-                                    :checked="list_excluded.filter(e => e.id == product.id).length > 0"
-                                >
+                                    quantity: product.qty
+                                }" :checked="list_excluded.filter(e => e.id == product.id).length > 0">
                             </td>
                             <td>
                                 <img :src='product.url_img' style="width: 30px; height: 30px">
@@ -144,25 +126,24 @@
         </div>
     </div>
     <div v-else>
-        <loading/>
+        <loading />
     </div>
-
 </template>
 <script>
-import {reactive, h, toRefs} from 'vue'
+import { reactive, h, toRefs } from 'vue'
 import Loading from "./Loading.vue"
-import {notification} from 'ant-design-vue'
-import {CloseCircleFilled} from "@ant-design/icons-vue"
+import { notification } from 'ant-design-vue'
+import { CloseCircleFilled } from "@ant-design/icons-vue"
 
 export default {
     emits: ['addProductToCustomization'],
     props: {
         products: Array,
     },
-    components: {Loading, CloseCircleFilled},
+    components: { Loading, CloseCircleFilled },
     setup() {
-        const state = reactive({checked1: false})
-        return {...toRefs(state)}
+        const state = reactive({ checked1: false })
+        return { ...toRefs(state) }
     },
     watch: {
         list_recommendation: function () {
@@ -201,7 +182,7 @@ export default {
                 duration: duration,
                 class: 'error_popup',
                 closeIcon: function (e) {
-                    return (<CloseCircleFilled/>)
+                    return (<CloseCircleFilled />)
                 }
             })
         },
