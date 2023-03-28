@@ -198,9 +198,7 @@ export default {
                 }
             }).then(function (res) {
                 self.$emit('changeTab', 'Installation')
-            }).catch(error => {
-                console.log(error)
-            })
+            }).catch(error => { console.log(error) })
         }
     },
     data() {
@@ -220,9 +218,7 @@ export default {
             total_compare_at_price: 0
         }
     },
-    props: {
-        list_recommendation: Array
-    },
+    props: { list_recommendation: Array },
     emits: ['changeTab'],
     mounted() {
         for (let product of this.list_recommendation) {

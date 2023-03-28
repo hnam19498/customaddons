@@ -55,9 +55,7 @@ export default {
             console.log(error)
         })
     },
-    data() {
-        return { widget: [], products_included: 0 }
-    },
+    data() { return { widget: [], products_included: 0 } },
     setup() {
         const state = reactive({ checked1: false })
         return { ...toRefs(state) }

@@ -5,8 +5,8 @@
             <p class="company-name">NestScale</p>
         </div>
         <div class="menu-item" v-for="tab in tabs" :key="tab">
-            <div class="item" :class="{active:tab==currentTab}" @click="changeTab(tab)">
-                <font-awesome-icon icon="fas fa-circle" style="margin-right: 10px"/>
+            <div class="item" :class="{ active: tab == currentTab }" @click="changeTab(tab)">
+                <font-awesome-icon icon="fas fa-circle" style="margin-right: 10px" />
                 {{ tab }}
             </div>
         </div>
@@ -14,18 +14,12 @@
 </template>
 <script>
 export default {
-    data() {
-        return {}
-    },
+    data() { return {} },
     props: {
         tabs: Array,
         currentTab: String
     },
-    methods: {
-        changeTab(tab) {
-            this.$emit('changeTab', tab)
-        }
-    }
+    methods: { changeTab(tab) { this.$emit('changeTab', tab) } }
 }
 </script>
 <style scoped>

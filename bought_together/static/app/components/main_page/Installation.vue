@@ -8,8 +8,8 @@
     <div id="content">
         <p>1. Lorem ipsum is placeholder text commonly used in the graphic, print</p>
         <p>2. and publishing industries for previewing layouts and visual mockups.</p>
-        <p>3. Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for
-            previewing layouts and visual mockups.</p>
+        <p>3. Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for previewing
+            layouts and visual mockups.</p>
     </div>
     <div style="width: 100%; display: flex; justify-content: center; margin-top: 60px">
         <video controls height="60%" width="60%">
@@ -20,12 +20,8 @@
 <script>
 export default {
     emits: ['changeTab'],
-    data() {
-        return {}
-    },
-    props: {
-        shop_url: String
-    },
+    data() { return {} },
+    props: { shop_url: String },
     methods: {
         handleThemeCustomization() {
             window.location.replace('https://' + this.shop_url + '/admin/themes/current/editor')

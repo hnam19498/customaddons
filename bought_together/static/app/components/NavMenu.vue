@@ -1,24 +1,19 @@
 <template>
     <div class="nav-menu">
-        <div :key="tab" @click="changeTab(tab)" class="nav-item" v-for="tab in navtabs" :class="{active:tab==currentTab}">{{ tab }}
+        <div :key="tab" @click="changeTab(tab)" class="nav-item" v-for="tab in navtabs" :class="{ active: tab == currentTab }">{{
+            tab }}
         </div>
     </div>
 </template>
 <script>
 export default {
     name: "NavMenu",
-    data() {
-        return {}
-    },
+    data() { return {} },
     props: {
         navtabs: Array,
         currentTab: String
     },
-    methods: {
-        changeTab(tab) {
-            this.$emit('changeTab', tab)
-        }
-    }
+    methods: { changeTab(tab) { this.$emit('changeTab', tab) } }
 }
 </script>
 <style scoped>

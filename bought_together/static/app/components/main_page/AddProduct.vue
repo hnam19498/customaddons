@@ -164,9 +164,7 @@ export default {
         }
     },
     methods: {
-        saveAddProducts() {
-            this.$emit('addProductToCustomization', "Customization", this.list_recommendation)
-        },
+        saveAddProducts() { this.$emit('addProductToCustomization', "Customization", this.list_recommendation) },
         cancelAddProducts() {
             this.tickAllRecommendation = false
             this.tickAllExcluded = false
@@ -208,9 +206,8 @@ export default {
                     }
                     this.list_recommendation.push(data)
                 }
-            } else {
-                this.list_recommendation = []
             }
+            else { this.list_recommendation = [] }
             if (this.list_recommendation.length > 5) {
                 this.show_toast('open',
                     'You have reach the product limitation.',
@@ -222,7 +219,8 @@ export default {
         select_recommendation(ob) {
             if (!ob.target.checked) {
                 this.list_recommendation = this.list_recommendation.filter(e => e.id !== ob.target._value.id)
-            } else {
+            }
+            else {
                 this.list_recommendation.push(ob.target._value)
                 this.tickAllRecommendation = this.list_recommendation.length == this.filteredRecommendation.length
             }
@@ -248,9 +246,8 @@ export default {
                     }
                     this.list_excluded.push(data)
                 }
-            } else {
-                this.list_excluded = []
             }
+            else { this.list_excluded = [] }
             if (this.list_excluded.length > 5) {
                 this.show_toast('open',
                     'You have reach the product limitation.',
@@ -260,9 +257,8 @@ export default {
             }
         },
         select_excluded(ob) {
-            if (!ob.target.checked) {
-                this.list_excluded = this.list_excluded.filter(e => e.id !== ob.target._value.id)
-            } else {
+            if (!ob.target.checked) { this.list_excluded = this.list_excluded.filter(e => e.id !== ob.target._value.id) }
+            else {
                 this.list_excluded.push(ob.target._value)
                 this.tickAllExcluded = this.list_excluded.length == this.filteredExcluded.length
             }
@@ -284,16 +280,8 @@ export default {
         }
     },
     computed: {
-        filteredRecommendation() {
-            return this.products.filter(product => {
-                return product.name.toLowerCase().includes(this.search_recommendation.toLowerCase())
-            })
-        },
-        filteredExcluded() {
-            return this.products.filter(product => {
-                return product.name.toLowerCase().includes(this.search_excluded.toLowerCase())
-            })
-        }
+        filteredRecommendation() { return this.products.filter(product => { return product.name.toLowerCase().includes(this.search_recommendation.toLowerCase()) }) },
+        filteredExcluded() { return this.products.filter(product => { return product.name.toLowerCase().includes(this.search_excluded.toLowerCase()) }) }
     }
 }
 </script>
