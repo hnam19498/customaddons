@@ -13,7 +13,9 @@
 <script>
 export default {
     name: 'Loading',
-    data() { return {} }
+    data() {
+        return {}
+    }
 }
 </script>
 <style scoped>

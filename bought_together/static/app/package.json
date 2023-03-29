@@ -4,7 +4,8 @@
     "main": "app.js",
     "license": "ISC",
     "scripts": {
-        "build": "webpack --env NODE_ENV=development --config ./webpack.config.dev.js"
+        "build_odoo": "webpack --env NODE_ENV=development --config ./webpack.config.dev.js",
+        "build_shopify": "webpack --env NODE_ENV=development --config ./webpack.config.dev.shopify.js"
     },
     "dependencies": {
         "@ant-design/icons-vue": "^6.1.0",

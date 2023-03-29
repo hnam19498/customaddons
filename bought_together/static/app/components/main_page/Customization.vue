@@ -5,12 +5,12 @@
     </div>
     <div id="setting_customization">
         <label id="settings">Settings</label>
-        <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62" />
+        <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
     </div>
     <div style="display: flex; flex-direction: row; margin-top: 30px">
         <div style="display:flex; flex-direction: column">
             <div class="configuration">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62" />
+                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
                 <span>General Configuration</span>
             </div>
             <div class="widget">Widget Title</div>
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="configuration" style="margin-top: 25px">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62" />
+                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
                 <span>Button Configuration</span>
             </div>
             <div class="widget">Button Text</div>
@@ -112,49 +112,57 @@
         </div>
         <div style="display: flex; flex-direction: column; width: 100%">
             <div class="configuration" style="margin-left: -50px">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62" />
+                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
                 <span>Preview</span>
             </div>
             <div id="preview">
                 <div :style="{ color: title_color, fontSize: title_font_size }"
-                    style="margin-top:32px; height: 24px; font-style: normal; font-weight: 700; line-height: 22px">
+                     style="margin-top:32px; height: 24px; font-style: normal; font-weight: 700; line-height: 22px">
                     {{ this.widget_title }}
                 </div>
                 <div :style="{ color: description_color, fontSize: description_font_size }"
-                    style="margin-top: 14px; height: 25px; font-style: normal; font-weight: 400; line-height: 22px">
+                     style="margin-top: 14px; height: 25px; font-style: normal; font-weight: 400; line-height: 22px">
                     {{ this.widget_description }}
                 </div>
                 <div style="display: flex; flex-direction: row">
-                    <div style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
-                        <div :key="product.id" v-for="product in this.list_recommendation"
-                            style="display: flex; align-items: center">
+                    <div
+                        style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
+                        <div :key="product.id"
+                             v-for="product in this.list_recommendation"
+                             style="display: flex; align-items: center">
                             <img :src="product.img"
-                                style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px">
+                                 style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px">
                             <div style="margin: 5px; font-weight: 600; font-size: 16px"
-                                v-if="this.list_ids[this.list_ids.length - 1] != product.id">+
+                                 v-if="this.list_ids[this.list_ids.length - 1] != product.id">+
                             </div>
                         </div>
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
+                    <div
+                        style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
                         <div
                             style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                             <div style="color: black">Total:</div>
                             <div style="color: red; margin-left: 3px">${{ this.total_price }}</div>
                         </div>
                         <button :style="{ background: background_color, borderColor: border_color, color: text_color }"
-                            style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px">
+                                style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px">
                             {{ this.btn_text }}
                         </button>
                     </div>
                 </div>
                 <div style="margin-top: 18px; margin-bottom: 17px">
-                    <div style="display: flex; flex-direction: row" class="item" v-for="product in this.list_recommendation"
-                        :key="product.id">
-                        <input type="checkbox" :value="product.id" disabled :checked="this.list_ids.includes(product.id)">
+                    <div style="display: flex; flex-direction: row"
+                         class="item"
+                         v-for="product in this.list_recommendation"
+                         :key="product.id">
+                        <input type="checkbox"
+                               :value="product.id"
+                               disabled
+                               :checked="this.list_ids.includes(product.id)">
                         <div>{{ product.name }}</div>
                         <span style="color: red">${{ product.price }}</span>
                     </div>
-                    <span>${{ this.total_compare_at_price }}</span>
+                    <span id="total_compare_at_price">${{ this.total_compare_at_price }}</span>
                 </div>
             </div>
         </div>
@@ -182,7 +190,7 @@ export default {
             axios.post('https://odoo.website/bought_together/save_widget', {
                 jsonrpc: "2.0",
                 params: {
-                    products: self.list_recommendation,
+                    recommendation_products: self.list_recommendation,
                     widget_description: self.widget_description,
                     title_color: self.title_color,
                     description_color: self.description_color,
@@ -194,11 +202,14 @@ export default {
                     btn_text: self.btn_text,
                     widget_title: self.widget_title,
                     total_price: self.total_price,
+                    excluded_products: self.list_excluded,
                     total_compare_at_price: self.total_compare_at_price
                 }
             }).then(function (res) {
                 self.$emit('changeTab', 'Installation')
-            }).catch(error => { console.log(error) })
+            }).catch(error => {
+                console.log(error)
+            })
         }
     },
     data() {
@@ -218,7 +229,13 @@ export default {
             total_compare_at_price: 0
         }
     },
-    props: { list_recommendation: Array },
+    props: {
+        list_recommendation: Array,
+        list_excluded: {
+            type: Array,
+            default: []
+        }
+    },
     emits: ['changeTab'],
     mounted() {
         for (let product of this.list_recommendation) {
@@ -504,7 +521,7 @@ export default {
     margin-left: auto;
 }
 
-#preview span {
+#total_compare_at_price {
     margin-top: -19px;
     margin-right: 16px;
     float: right;

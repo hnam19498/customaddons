@@ -9,31 +9,76 @@ class ShopifyMain(http.Controller):
         exist_widget = request.env['shopify.widget'].sudo().search([], limit=1)
         exist_widget.sudo().write({'status': kw['widget_status']})
 
-    @http.route('/bought_together/get_widget', type='json', auth='user')
+    @http.route('/bought_together/get_widget', type='json', auth='public', method=['POST'], csrf=False, cors="*")
     def get_widget(self):
         widget = request.env['shopify.widget'].sudo().search([], limit=1)
+        list_recommendation_shopify_product_ids = []
+        list_excluded_shopify_product_ids = []
+        recommendation_products = []
+        excluded_products = []
+        for product in widget.recommendation_product_ids:
+            list_recommendation_shopify_product_ids.append(product.shopify_product_id)
+            recommendation_products.append({
+                'img': product.url_img,
+                "name": product.name,
+                "variant_id": product.variant_id,
+                'price': product.price,
+                "compare_at_price": product.compare_at_price,
+                'shopify_product_id': product.shopify_product_id
+            })
+        for product in widget.excluded_product_ids:
+            list_excluded_shopify_product_ids.append(product.shopify_product_id)
+            excluded_products.append({
+                'img': product.url_img,
+                "name": product.name,
+                'price': product.price,
+                "compare_at_price": product.compare_at_price,
+                'shopify_product_id': product.shopify_product_id,
+                "variant_id": product.variant_id
+            })
+
         widget_data = {
             "id": widget.id,
             'widget_title': widget.widget_title,
             'widget_description': widget.widget_description,
             "total_price": widget.total_price,
-            "status": widget.status
+            "status": widget.status,
+            'title_color': widget.title_color,
+            "background_color": widget.background_color,
+            'description_font_size': widget.description_font_size,
+            'btn_text': widget.btn_text,
+            'total_compare_at_price': widget.total_compare_at_price,
+            "description_color": widget.description_color,
+            'border_color': widget.border_color,
+            "title_font_size": widget.title_font_size,
+            "text_color": widget.text_color,
+            'list_excluded_shopify_product_ids': list_excluded_shopify_product_ids,
+            "list_recommendation_shopify_product_ids": list_recommendation_shopify_product_ids,
+            "excluded_products": excluded_products,
+            "recommendation_products": recommendation_products
         }
         return {
-            'products_included': len(widget.product_ids),
+            'products_included': len(widget.recommendation_product_ids),
             'widget_data': widget_data
         }
 
     @http.route("/bought_together/save_widget", type='json', auth="user")
     def save_widget(self, **kw):
-        list_product_ids = []
-        for product in kw['products']:
-            list_product_ids.append(
+        list_excluded_product_ids = []
+        list_recommendation_product_ids = []
+        for product in kw['recommendation_products']:
+            list_recommendation_product_ids.append(
                 request.env['shopify.product'].sudo().search([("shopify_product_id", '=', product['id'])]).id
             )
+        for product in kw['excluded_products']:
+            list_excluded_product_ids.append(
+                request.env['shopify.product'].sudo().search([("shopify_product_id", '=', product['id'])]).id
+            )
+
         exist_widget = request.env['shopify.widget'].sudo().search([])
         data = {
-            'product_ids': [(6, 0, list_product_ids)],
+            'excluded_product_ids': [(6, 0, list_excluded_product_ids)],
+            'recommendation_product_ids': [(6, 0, list_recommendation_product_ids)],
             "widget_description": kw['widget_description'],
             "total_compare_at_price": float(kw['total_compare_at_price']),
             'title_color': kw['title_color'],
@@ -145,20 +190,23 @@ class ShopifyMain(http.Controller):
                         webhook_products_update.save()
                         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
-                        # existing_script_tag = shopify.ScriptTag.find()
-                        # new_script_tag_url = 'https://odoo.website/bought_together/static/src/js/script_tag_1.js?v=' + str(datetime.datetime.now())
-                        # if existing_script_tag:
-                        #     if existing_script_tag.src != new_script_tag_url:
-                        #         shopify.ScriptTag.find(existing_script_tag.id).destroy()
-                        #         shopify.ScriptTag.create({
-                        #             "event": "onload",
-                        #             "src": new_script_tag_url
-                        #         })
-                        # else:
-                        #     shopify.ScriptTag.create({
-                        #         "event": "onload",
-                        #         "src": new_script_tag_url
-                        #     })
+                        existing_script_tag = shopify.ScriptTag.find()
+                        new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js'
+                        if existing_script_tag:
+                            for script_tag in existing_script_tag:
+                                print(script_tag)
+                                # if existing_script_tag.src != new_script_tag_url:
+                                shopify.ScriptTag.find(script_tag.id).destroy()
+                                new_script_tag = shopify.ScriptTag.create({
+                                    "event": "onload",
+                                    "src": new_script_tag_url
+                                })
+                        else:
+                            new_script_tag = shopify.ScriptTag.create({
+                                "event": "onload",
+                                "src": new_script_tag_url
+                            })
+                        print(new_script_tag)
 
                         current_shopify_shop = request.env["shop.shopify"].sudo().search(
                             [("shopify_id", "=", shopify_id)], limit=1)
@@ -261,7 +309,8 @@ class ShopifyMain(http.Controller):
                                         'url_img': product.attributes['images'][0].attributes['src'],
                                         'price': float(product.variants[0].price),
                                         "compare_at_price": product.variants[0].compare_at_price,
-                                        'qty': product.variants[0].inventory_quantity
+                                        'qty': product.variants[0].inventory_quantity,
+                                        "variant_id": product.attributes['variants'][0].id
                                     })
                                 else:
                                     print(f'Product id "{product.id}" đã trong database!')

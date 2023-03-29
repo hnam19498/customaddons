@@ -17,15 +17,17 @@
                 <td style="text-align: center">{{ this.products_included }}</td>
                 <td>${{ this.widget.total_price }}</td>
                 <td class="status">
-                    <a-switch @change="changeWidgetStatus" v-model:checked="this.widget.status" checked-children="ON"
-                        un-checked-children="OFF" />
+                    <a-switch @change="changeWidgetStatus"
+                              v-model:checked="this.widget.status"
+                              checked-children="ON"
+                              un-checked-children="OFF"/>
                 </td>
             </tr>
         </table>
     </div>
 </template>
 <script>
-import { reactive, toRefs } from 'vue'
+import {reactive, toRefs} from 'vue'
 import axios from "axios"
 
 export default {
@@ -34,9 +36,8 @@ export default {
             let self = this
             axios.post('https://odoo.website/bought_together/change_status_widget', {
                 jsonrpc: "2.0",
-                params: { widget_status: self.widget.status }
+                params: {widget_status: self.widget.status}
             }).then(function (res) {
-                console.log(self.widget.status)
             }).catch(error => {
                 console.log(error)
             })
@@ -50,15 +51,19 @@ export default {
         }).then(function (res) {
             self.widget = res.data.result.widget_data
             self.products_included = res.data.result.products_included
-            console.log(self.widget.status)
         }).catch(error => {
             console.log(error)
         })
     },
-    data() { return { widget: [], products_included: 0 } },
+    data() {
+        return {
+            widget: [],
+            products_included: 0
+        }
+    },
     setup() {
-        const state = reactive({ checked1: false })
-        return { ...toRefs(state) }
+        const state = reactive({checked1: false})
+        return {...toRefs(state)}
     },
 }
 </script>

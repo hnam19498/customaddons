@@ -46,6 +46,7 @@ class ShopifyProduct(models.Model):
     qty = fields.Integer('Quantity')
     url_img = fields.Char()
     compare_at_price = fields.Float()
+    variant_id = fields.Char()
 
 
 class ShopifyWidget(models.Model):
@@ -54,8 +55,9 @@ class ShopifyWidget(models.Model):
     widget_description = fields.Char()
     title_color = fields.Char()
     status = fields.Boolean()
+    recommendation_product_ids = fields.Many2many('shopify.product', "widget_recommendation_product")
     background_color = fields.Char()
-    product_ids = fields.Many2many('shopify.product', "widget_product_ref")
+    excluded_product_ids = fields.Many2many('shopify.product', "widget_excluded_product")
     description_font_size = fields.Char()
     btn_text = fields.Char()
     widget_title = fields.Char()
