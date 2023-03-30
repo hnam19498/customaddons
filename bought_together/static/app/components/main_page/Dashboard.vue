@@ -10,7 +10,7 @@
                 <td>Total Price</td>
                 <td class="status">Status</td>
             </tr>
-            <tr class="table-row">
+            <tr class="table-row" v-if="'id' in this.widget">
                 <td>{{ this.widget.id }}</td>
                 <td>{{ this.widget.widget_title }}</td>
                 <td>{{ this.widget.widget_description }}</td>

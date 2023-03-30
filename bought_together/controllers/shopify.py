@@ -1,4 +1,4 @@
-import shopify, binascii, os, werkzeug, json, string, random
+import shopify, binascii, os, werkzeug, json, string, random, datetime
 from odoo import http, _
 from odoo.http import request
 
@@ -22,6 +22,7 @@ class ShopifyMain(http.Controller):
                 'img': product.url_img,
                 "name": product.name,
                 "variant_id": product.variant_id,
+                'url': product.url,
                 'price': product.price,
                 "compare_at_price": product.compare_at_price,
                 'shopify_product_id': product.shopify_product_id
@@ -191,22 +192,21 @@ class ShopifyMain(http.Controller):
                         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
                         existing_script_tag = shopify.ScriptTag.find()
-                        new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js'
+                        new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(
+                            datetime.datetime.now())
                         if existing_script_tag:
                             for script_tag in existing_script_tag:
-                                print(script_tag)
-                                # if existing_script_tag.src != new_script_tag_url:
-                                shopify.ScriptTag.find(script_tag.id).destroy()
-                                new_script_tag = shopify.ScriptTag.create({
-                                    "event": "onload",
-                                    "src": new_script_tag_url
-                                })
+                                if script_tag.src != new_script_tag_url:
+                                    shopify.ScriptTag.find(script_tag.id).destroy()
+                                    new_script_tag = shopify.ScriptTag.create({
+                                        "event": "onload",
+                                        "src": new_script_tag_url
+                                    })
                         else:
-                            new_script_tag = shopify.ScriptTag.create({
+                            shopify.ScriptTag.create({
                                 "event": "onload",
                                 "src": new_script_tag_url
                             })
-                        print(new_script_tag)
 
                         current_shopify_shop = request.env["shop.shopify"].sudo().search(
                             [("shopify_id", "=", shopify_id)], limit=1)
@@ -305,6 +305,7 @@ class ShopifyMain(http.Controller):
                                     request.env['shopify.product'].sudo().create({
                                         'shopify_product_id': product.id,
                                         'name': product.title,
+                                        'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
                                         'shop_id': current_shopify_shop.id,
                                         'url_img': product.attributes['images'][0].attributes['src'],
                                         'price': float(product.variants[0].price),

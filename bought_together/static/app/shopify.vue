@@ -16,6 +16,7 @@
                      v-for="product in this.widget.recommendation_products"
                      style="display: flex; align-items: center">
                     <img :src="product.img"
+                         @click="redirectToProduct(product.url)"
                          style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px">
                     <div style="margin: 5px; font-weight: 600; font-size: 16px"
                          v-if="this.widget.list_recommendation_shopify_product_ids[this.widget.list_recommendation_shopify_product_ids.length - 1] != product.shopify_product_id">
@@ -47,7 +48,7 @@
                        :value="product.variant_id"
                        disabled
                        :checked="this.cart.includes(product.variant_id)">
-                <div>{{ product.name }}</div>
+                <div @click="redirectToProduct(product.url)">{{ product.name }}</div>
                 <span style="color: red">${{ product.price }}</span>
             </div>
             <span id="total_compare_at_price">${{ this.widget.total_compare_at_price }}</span>
@@ -67,6 +68,7 @@ export default {
             params: {}
         }).then(function (res) {
             self.widget = res.data.result.widget_data
+            console.log(self.widget)
         }).catch(error => {
             console.log(error)
         })
@@ -93,6 +95,10 @@ export default {
         }
     },
     methods: {
+        redirectToProduct(product_url){
+            window.location.replace(product_url)
+            console.log(product_url)
+        },
         addBoughtTogether() {
             let items = []
             for (let item of this.widget.recommendation_products) {

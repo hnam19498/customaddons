@@ -44,6 +44,7 @@ class ShopifyProduct(models.Model):
     shop_id = fields.Many2one('shop.shopify')
     price = fields.Float()
     qty = fields.Integer('Quantity')
+    url = fields.Char()
     url_img = fields.Char()
     compare_at_price = fields.Float()
     variant_id = fields.Char()
