@@ -1,6 +1,6 @@
 <template>
     <div class="setting-btn">
-        <button class="btn-setting" @click="cancelCustomization" id="btn-cancel">Cancel</button>
+        <button class="btn-setting" id="btn-cancel" @click="cancelCustomization">Cancel</button>
         <button class="btn-setting" id="btn-save" @click="saveCustomization">SAVE</button>
     </div>
     <div id="setting_customization">

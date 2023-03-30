@@ -17,7 +17,8 @@
                      style="display: flex; align-items: center">
                     <img :src="product.img"
                          @click="redirectToProduct(product.url)"
-                         style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px">
+                         style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"
+                         class="redirectToProduct">
                     <div style="margin: 5px; font-weight: 600; font-size: 16px"
                          v-if="this.widget.list_recommendation_shopify_product_ids[this.widget.list_recommendation_shopify_product_ids.length - 1] != product.shopify_product_id">
                         +
@@ -48,7 +49,7 @@
                        :value="product.variant_id"
                        disabled
                        :checked="this.cart.includes(product.variant_id)">
-                <div @click="redirectToProduct(product.url)">{{ product.name }}</div>
+                <div class="redirectToProduct" @click="redirectToProduct(product.url)">{{ product.name }}</div>
                 <span style="color: red">${{ product.price }}</span>
             </div>
             <span id="total_compare_at_price">${{ this.widget.total_compare_at_price }}</span>
@@ -95,7 +96,7 @@ export default {
         }
     },
     methods: {
-        redirectToProduct(product_url){
+        redirectToProduct(product_url) {
             window.location.replace(product_url)
             console.log(product_url)
         },
@@ -107,14 +108,10 @@ export default {
                     "quantity": 1
                 })
             }
-            let formData = {
-                'items': items
-            }
+            let formData = {'items': items}
             fetch(window.Shopify.routes.root + 'cart/add.js', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
+                headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formData)
             }).then(response => {
                 return response.json();
@@ -185,5 +182,9 @@ export default {
     font-size: 12px;
     line-height: 22px;
     color: #848484;
+}
+
+.redirectToProduct {
+    cursor: pointer;
 }
 </style>

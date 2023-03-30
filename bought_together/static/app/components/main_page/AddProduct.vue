@@ -1,16 +1,14 @@
 <template>
     <div v-if="products">
         <div class="setting-btn">
-            <button @click="cancelAddProducts" class="btn-setting" id="btn-cancel">Cancel</button>
-            <button :disabled="list_recommendation.length > 5 || list_recommendation.length == 0"
-                    class="btn-setting"
-                    id="btn-save"
-                    @click="saveAddProducts">SAVE
+            <button class="btn-setting" id="btn-cancel" @click="cancelAddProducts">Cancel</button>
+            <button class="btn-setting" id="btn-save" @click="saveAddProducts"
+                    :disabled="list_recommendation.length > 5 || list_recommendation.length == 0">SAVE
             </button>
         </div>
         <div id="setting_widget">
             <label id="enable_widget">Enable Widget</label>
-            <a-switch v-model:checked="checked1" checked-children="ON" un-checked-children="OFF"/>
+            <a-switch v-model:checked="enable_widget" checked-children="ON" un-checked-children="OFF"/>
         </div>
         <div id="manual-recommendation">
             <span>Manual Recommendation</span>
@@ -140,7 +138,7 @@
                     </table>
                 </div>
             </div>
-            <div v-if="!checked1" class="blur"></div>
+            <div v-if="!enable_widget" class="blur"></div>
         </div>
     </div>
     <div v-else>
@@ -158,7 +156,7 @@ export default {
     props: {products: Array},
     components: {Loading, CloseCircleFilled},
     setup() {
-        const state = reactive({checked1: false})
+        const state = reactive({enable_widget: false})
         return {...toRefs(state)}
     },
     watch: {
@@ -303,15 +301,11 @@ export default {
     },
     computed: {
         filteredRecommendation() {
-            return this.products.filter(product => {
-                return product.name.toLowerCase().includes(this.search_recommendation.toLowerCase())
-            })
+            return this.products.filter(product => product.name.toLowerCase().includes(this.search_recommendation.toLowerCase()))
         },
         filteredExcluded() {
-            return this.products.filter(product => {
-                return product.name.toLowerCase().includes(this.search_excluded.toLowerCase())
-            })
-        }
+            return this.products.filter(product => product.name.toLowerCase().includes(this.search_excluded.toLowerCase()))
+        },
     }
 }
 </script>
