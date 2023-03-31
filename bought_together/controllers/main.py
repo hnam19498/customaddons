@@ -4,6 +4,6 @@ from odoo.http import request
 
 
 class BoughtTogether(http.Controller):
-    @http.route('/bought_together', auth='public', type='http', website=True)
+    @http.route('/bought_together', auth='user', type='http', website=True)
     def bought_together(self, **kw):
         return request.render('bought_together.bought_together')

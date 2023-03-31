@@ -323,8 +323,9 @@ export default {
     },
     computed: {
         filteredRecommendation() {
-            return this.products.filter(function (product) {
-                return product.name.toLowerCase().includes(this.search_recommendation.toLowerCase())
+            let self = this
+            return self.products.filter(function (product) {
+                return product.name.toLowerCase().includes(self.search_recommendation.toLowerCase())
             })
         },
         filteredExcluded() {
