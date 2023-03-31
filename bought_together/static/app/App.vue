@@ -47,7 +47,7 @@ export default {
         axios.post('https://odoo.website/bought_together/get_product', {
             jsonrpc: "2.0",
             params: {}
-        }).then(function (res) {
+        }).then(res => {
             self.products = res.data.result.product_data
             self.shop_url = res.data.result.shop_url
         }).catch(error => {

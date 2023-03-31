@@ -21,7 +21,6 @@ class ShopifyMain(http.Controller):
             recommendation_products = []
 
             for product in widget.recommendation_product_ids:
-                list_recommendation_shopify_product_ids.append(product.shopify_product_id)
                 recommendation_products.append({
                     'img': product.url_img,
                     "name": product.name,
@@ -29,7 +28,6 @@ class ShopifyMain(http.Controller):
                     'url': product.url,
                     'price': product.price,
                     "compare_at_price": product.compare_at_price,
-                    'shopify_product_id': product.shopify_product_id
                 })
             for product in widget.excluded_product_ids:
                 list_excluded_shopify_product_ids.append(product.shopify_product_id)

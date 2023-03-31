@@ -126,7 +126,7 @@
                 </div>
                 <div style="display: flex; flex-direction: row">
                     <div
-                        style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
+                            style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
                         <div :key="product.id"
                              v-for="product in this.list_recommendation"
                              style="display: flex; align-items: center">
@@ -139,7 +139,7 @@
                     </div>
                     <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
                         <div
-                            style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
+                                style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                             <div style="color: black">Total:</div>
                             <div style="color: red; margin-left: 3px">${{ this.total_price }}</div>
                         </div>
@@ -204,7 +204,7 @@ export default {
                     excluded_products: self.list_excluded,
                     total_compare_at_price: self.total_compare_at_price
                 }
-            }).then(function (res) {
+            }).then(() => {
                 self.$emit('changeTab', 'Installation')
             }).catch(error => {
                 console.log(error)

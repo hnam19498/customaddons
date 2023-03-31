@@ -27,7 +27,7 @@
                 </div>
                 <div class="selected_products" v-if="this.list_recommendation.length > 0">
                     <div :key="recommendation_product.id"
-                         v-for="recommendation_product of this.list_recommendation"
+                         v-for="recommendation_product in this.list_recommendation"
                          class="selected_product">
                         <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                             {{ recommendation_product.name }}
@@ -89,7 +89,7 @@
                              placeholder="Search product by name"/>
                 </div>
                 <div class="selected_products" v-if="this.list_excluded.length > 0">
-                    <div v-for="excluded_product of this.list_excluded"
+                    <div v-for="excluded_product in this.list_excluded"
                          class="selected_product"
                          :key="excluded_product.id">
                         <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
@@ -178,7 +178,12 @@ export default {
     },
     methods: {
         saveAddProducts() {
-            this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded)
+            this.$emit(
+                'addProductToCustomization',
+                "Customization",
+                this.list_recommendation,
+                this.list_excluded
+            )
         },
         cancelAddProducts() {
             this.tickAllRecommendation = false
@@ -243,7 +248,7 @@ export default {
         },
         select_recommendation(ob) {
             if (!ob.target.checked) {
-                this.list_recommendation = this.list_recommendation.filter(e => e.id !== ob.target._value.id)
+                this.list_recommendation = this.list_recommendation.filter(e => e.id != ob.target._value.id)
             } else {
                 this.list_recommendation.push(ob.target._value)
                 this.tickAllRecommendation = this.list_recommendation.length == this.filteredRecommendation.length
@@ -285,13 +290,14 @@ export default {
         },
         select_excluded(ob) {
             if (!ob.target.checked) {
-                this.list_excluded = this.list_excluded.filter(e => e.id !== ob.target._value.id)
+                this.list_excluded = this.list_excluded.filter(e => e.id != ob.target._value.id)
             } else {
                 this.list_excluded.push(ob.target._value)
                 this.tickAllExcluded = this.list_excluded.length == this.filteredExcluded.length
             }
             if (this.list_excluded.length > 5) {
-                this.show_toast('open',
+                this.show_toast(
+                    'open',
                     'You have reach the product limitation.',
                     'Please untick any products from the list to continue selecting.',
                     3
@@ -306,7 +312,8 @@ export default {
             }
             this.tickAllExcluded = this.list_excluded.length == this.filteredExcluded.length
             if (this.list_excluded.length > 5) {
-                this.show_toast('open',
+                this.show_toast(
+                    'open',
                     'You have reach the product limitation.',
                     'Please untick any products from the list to continue selecting.',
                     3

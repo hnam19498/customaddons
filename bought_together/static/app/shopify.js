@@ -9,5 +9,5 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 
 library.add(fas, far)
 if (window.location.href.indexOf('products') > -1) {
-    createApp(shopify).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount('#test_app_1')
+    createApp(shopify).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount('#test_app')
 }

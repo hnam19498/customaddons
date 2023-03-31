@@ -11,6 +11,7 @@
 </template>
 <script>
 export default {
+    emits:['changeTab'],
     name: "NavMenu",
     data() {
         return {}

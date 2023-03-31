@@ -37,7 +37,6 @@ export default {
             axios.post('https://odoo.website/bought_together/change_status_widget', {
                 jsonrpc: "2.0",
                 params: {widget_status: self.widget.status}
-            }).then(function (res) {
             }).catch(error => {
                 console.log(error)
             })
@@ -48,7 +47,7 @@ export default {
         axios.post('https://odoo.website/bought_together/get_widget', {
             jsonrpc: "2.0",
             params: {}
-        }).then(function (res) {
+        }).then(res => {
             self.widget = res.data.result.widget_data
             self.products_included = res.data.result.products_included
         }).catch(error => {
@@ -87,19 +86,19 @@ export default {
     margin-right: 100px;
 }
 
-#table-product table {
+table {
     width: 100%;
     margin-top: 81px;
     font-size: 14px;
 }
 
-#table-product table .table-row {
+.table-row {
     height: 3rem;
     border-bottom: 1px groove #EFEFEF;
     font-size: 14px;
 }
 
-#table-product table .table-col-name {
+.table-col-name {
     height: 3rem;
     border-bottom: 1px groove #EFEFEF;
     border-top: 1px groove #EFEFEF;
