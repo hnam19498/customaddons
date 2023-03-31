@@ -34,7 +34,7 @@
                 </div>
                 <button
                     :style="{ background: widget.background_color, borderColor: widget.border_color, color: widget.text_color }"
-                    style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px"
+                    style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center"
                     @click="addBoughtTogether">
                     {{ widget.btn_text }}
                 </button>
@@ -69,7 +69,6 @@ export default {
             params: {}
         }).then(function (res) {
             self.widget = res.data.result.widget_data
-            console.log(self.widget)
         }).catch(error => {
             console.log(error)
         })
@@ -84,7 +83,7 @@ export default {
         axios.get(window.location.href + '.js')
             .then(function (res) {
                 self.product_id = res.data.id.toString()
-            }).catch(function (e) {
+            }).catch(e => {
             console.log(e)
         })
     },
@@ -98,15 +97,11 @@ export default {
     methods: {
         redirectToProduct(product_url) {
             window.location.replace(product_url)
-            console.log(product_url)
         },
         addBoughtTogether() {
             let items = []
             for (let item of this.widget.recommendation_products) {
-                items.push({
-                    'id': item.variant_id,
-                    "quantity": 1
-                })
+                items.push({'id': item.variant_id, "quantity": 1})
             }
             let formData = {'items': items}
             fetch(window.Shopify.routes.root + 'cart/add.js', {
@@ -115,7 +110,7 @@ export default {
                 body: JSON.stringify(formData)
             }).then(response => {
                 return response.json();
-            }).catch((error) => {
+            }).catch(error => {
                 console.error('Error:', error)
             })
             setTimeout(function () {

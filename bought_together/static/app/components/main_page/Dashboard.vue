@@ -111,4 +111,8 @@ export default {
 .status {
     width: 70px;
 }
+
+.ant-switch {
+    width: 56px
+}
 </style>

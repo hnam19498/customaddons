@@ -5,12 +5,12 @@
     </div>
     <div id="setting_customization">
         <label id="settings">Settings</label>
-        <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
+        <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
     </div>
     <div style="display: flex; flex-direction: row; margin-top: 30px">
         <div style="display:flex; flex-direction: column">
             <div class="configuration">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
+                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
                 <span>General Configuration</span>
             </div>
             <div class="widget">Widget Title</div>
@@ -77,7 +77,7 @@
                 </div>
             </div>
             <div class="configuration" style="margin-top: 25px">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
+                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
                 <span>Button Configuration</span>
             </div>
             <div class="widget">Button Text</div>
@@ -112,7 +112,7 @@
         </div>
         <div style="display: flex; flex-direction: column; width: 100%">
             <div class="configuration" style="margin-left: -50px">
-                <font-awesome-icon :icon="['fass', 'circle-question']" style="color: #5C5F62"/>
+                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
                 <span>Preview</span>
             </div>
             <div id="preview">
@@ -137,8 +137,7 @@
                             </div>
                         </div>
                     </div>
-                    <div
-                        style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
+                    <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
                         <div
                             style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                             <div style="color: black">Total:</div>
