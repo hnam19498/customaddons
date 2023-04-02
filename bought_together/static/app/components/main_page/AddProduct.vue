@@ -12,12 +12,12 @@
         </div>
         <div id="manual-recommendation">
             <span>Manual Recommendation</span>
-            <font-awesome-icon icon="fa-solid fa-circle-question"/>
+            <font-awesome-icon style="color: #5C5F62" icon="fa-solid fa-circle-question"/>
         </div>
         <div style="position: relative; width: 100%">
             <div id="choose-recommendation-product">
                 <div id="choose-recommendation">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                    <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
                     <span>Choose recommendation product(s)</span>
                 </div>
                 <div class="search">
@@ -68,7 +68,7 @@
                                        :id="product.id"
                                        @change="select_recommendation">
                             </td>
-                            <td><img :src="product.url_img" style="width: 30px; height: 30px"></td>
+                            <td><img :alt="product.name" :src="product.url_img" style="width: 30px; height: 30px"></td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.price }}</td>
                             <td>{{ product.compare_at_price }}</td>
@@ -80,7 +80,7 @@
 
             <div id="choose-excluded-product">
                 <div id="choose-excluded">
-                    <font-awesome-icon icon="fa-solid fa-circle-question"/>
+                    <font-awesome-icon style="color: #5C5F62" icon="fa-solid fa-circle-question"/>
                     <span>Choose excluded product(s)</span>
                 </div>
                 <div class="search">
@@ -128,7 +128,7 @@
                                            quantity: product.qty}"
                                        type="checkbox">
                             </td>
-                            <td><img :src='product.url_img' style="width: 30px; height: 30px"></td>
+                            <td><img :alt="product.name" :src='product.url_img' style="width: 30px; height: 30px"></td>
                             <td>{{ product.name }}</td>
                             <td>{{ product.price }}</td>
                             <td>{{ product.compare_at_price }}</td>
@@ -151,6 +151,14 @@ import {notification} from 'ant-design-vue'
 import {CloseCircleFilled} from "@ant-design/icons-vue"
 
 export default {
+    mounted() {
+        let self = this
+        if (window.list_recommendation) {
+            self.list_recommendation = window.list_recommendation
+            self.list_excluded = window.list_excluded
+            self.enable_widget = window.enable_widget
+        }
+    },
     emits: ['addProductToCustomization'],
     props: {products: Array},
     components: {Loading, CloseCircleFilled},
@@ -182,7 +190,8 @@ export default {
                 'addProductToCustomization',
                 "Customization",
                 this.list_recommendation,
-                this.list_excluded
+                this.list_excluded,
+                this.enable_widget
             )
         },
         cancelAddProducts() {
@@ -199,7 +208,7 @@ export default {
                 message: message,
                 duration: duration,
                 class: 'error_popup',
-                closeIcon: function (e) {
+                closeIcon: e => {
                     return (<CloseCircleFilled/>)
                 }
             })

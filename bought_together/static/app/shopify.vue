@@ -15,6 +15,7 @@
                      v-for="product in this.widget.recommendation_products"
                      style="display: flex; align-items: center">
                     <img :src="product.img"
+                         :alt="product.name"
                          @click="redirectToProduct(product.url)"
                          style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"
                          class="redirectToProduct">
@@ -43,8 +44,8 @@
                  :key="product.variant_id">
                 <input type="checkbox"
                        :value="product.variant_id"
-                       disabled
-                       :checked="this.cart.includes(product.variant_id)">
+                       :checked="this.cart.includes(product.variant_id)"
+                       disabled>
                 <div class="redirectToProduct" @click="redirectToProduct(product.url)">{{ product.name }}</div>
                 <span style="color: red">${{ product.price }}</span>
             </div>

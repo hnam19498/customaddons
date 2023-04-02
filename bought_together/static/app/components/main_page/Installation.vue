@@ -26,7 +26,7 @@ export default {
     props: {shop_url: String},
     methods: {
         handleThemeCustomization() {
-            window.location.replace('https://' + this.shop_url + '/admin/themes/current/editor')
+            window.open('https://' + this.shop_url + '/admin/themes/current/editor', '_blank')
         },
         redirectToDashboard() {
             this.$emit('changeTab', 'Dashboard')

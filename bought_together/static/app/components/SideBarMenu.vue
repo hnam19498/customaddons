@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar-menu">
         <div class="company-icon">
-            <img class="black-circle" src="/bought_together/static/app/img/LogoNestScale.png">
+            <img alt="LogoNestScale" class="black-circle" src="/bought_together/static/app/img/LogoNestScale.png">
             <p class="company-name">NestScale</p>
         </div>
         <div class="menu-item" v-for="tab in tabs" :key="tab">
@@ -14,7 +14,7 @@
 </template>
 <script>
 export default {
-    emits:['changeTab'],
+    emits: ['changeTab'],
     data() {
         return {}
     },
@@ -73,9 +73,9 @@ export default {
 .item {
     display: flex;
     align-items: center;
-    margin-bottom: 16px;
     cursor: pointer;
     height: 40px;
+    margin-bottom: -25px;
 }
 
 .item svg {
@@ -87,8 +87,7 @@ export default {
 .active {
     background: white;
     color: black;
-    width: 180px;
+    width: 236px;
     border-radius: 5px;
-    height: 40px;
 }
 </style>

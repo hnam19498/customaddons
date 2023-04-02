@@ -11,7 +11,7 @@
         'security/ir.model.access.csv',
         'views/index.xml',
         'data/shopify_app.xml',
-        "views/shopify_view.xml",
+        "views/shopify_view.xml"
     ],
     'assets': {
     },

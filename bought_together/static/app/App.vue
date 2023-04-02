@@ -85,10 +85,13 @@ export default {
         changeTab(tab) {
             this.currentTab = tab
         },
-        addProductToCustomization(tab, list_recommendation, list_excluded) {
+        addProductToCustomization(tab, list_recommendation, list_excluded, enable_widget) {
             this.list_recommendation = list_recommendation
             this.list_excluded = list_excluded
             this.currentTab = tab
+            window.list_recommendation = list_recommendation
+            window.list_excluded = list_excluded
+            window.enable_widget = enable_widget
         }
     }
 }
