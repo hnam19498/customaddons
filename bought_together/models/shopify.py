@@ -59,3 +59,4 @@ class ShopifyWidget(models.Model):
     border_color = fields.Char()
     title_font_size = fields.Char()
     text_color = fields.Char()
+    shop_id = fields.Many2one('shop.shopify')

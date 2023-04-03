@@ -63,7 +63,9 @@ export default {
         let self = this
         axios.post('https://odoo.website/bought_together/get_widget', {
             jsonrpc: "2.0",
-            params: {}
+            params: {
+                shop_url: window.location.origin
+            }
         }).then(res => {
             self.widget = res.data.result.widget_data
         }).catch(error => {

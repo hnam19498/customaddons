@@ -14,9 +14,15 @@ class ShopifyMain(http.Controller):
             print(e)
 
     @http.route('/bought_together/get_widget', type='json', auth='public', method=['POST'], csrf=False, cors="*")
-    def get_widget(self):
+    def get_widget(self, **kw):
         try:
-            widget = request.env['shopify.widget'].sudo().search([], limit=1)
+            if not kw:
+                current_user = request.env.user
+                current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
+            else:
+                current_shop = request.env["shop.shopify"].sudo().search([('url', '=', kw['shop_url'])])
+
+            widget = request.env['shopify.widget'].sudo().search([('shop_id', '=', current_shop.id)], limit=1)
             list_recommendation_shopify_product_ids = []
             list_excluded_shopify_product_ids = []
             recommendation_products = []
@@ -62,18 +68,21 @@ class ShopifyMain(http.Controller):
     @http.route("/bought_together/save_widget", type='json', auth="user")
     def save_widget(self, **kw):
         try:
+            current_user = request.env.user
+            current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
+
             list_excluded_product_ids = []
             list_recommendation_product_ids = []
-            exist_widget = request.env['shopify.widget'].sudo().search([], limit=1)
+            exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
 
             for product in kw['recommendation_products']:
                 list_recommendation_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             for product in kw['excluded_products']:
                 list_excluded_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             data = {
@@ -91,7 +100,8 @@ class ShopifyMain(http.Controller):
                 "border_color": kw['border_color'],
                 'title_font_size': kw['title_font_size'],
                 'text_color': kw['text_color'],
-                'status': True
+                'status': True,
+                'shop_id': current_shop.id
             }
             if not exist_widget:
                 request.env['shopify.widget'].sudo().create(data)
