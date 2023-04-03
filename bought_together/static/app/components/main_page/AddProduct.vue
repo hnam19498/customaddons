@@ -2,8 +2,7 @@
     <div v-if="products">
         <div class="setting-btn">
             <button class="btn-setting" id="btn-cancel" @click="cancelAddProducts">Cancel</button>
-            <button class="btn-setting" id="btn-save" @click="saveAddProducts"
-                    :disabled="list_recommendation.length > 5 || list_recommendation.length == 0">NEXT
+            <button class="btn-setting" id="btn-save" @click="saveAddProducts">NEXT
             </button>
         </div>
         <div id="setting_widget">
@@ -186,7 +185,16 @@ export default {
     },
     methods: {
         saveAddProducts() {
-            this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget)
+            if (this.list_recommendation.length > 5 || this.list_recommendation.length == 0) {
+                this.show_toast(
+                    'open',
+                    'You have reach the product limitation.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
+                    3
+                )
+            } else {
+                this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget)
+            }
         },
         cancelAddProducts() {
             this.tickAllRecommendation = false
