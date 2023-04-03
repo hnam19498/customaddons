@@ -8,7 +8,9 @@ class ShopifyMain(http.Controller):
     @http.route('/bought_together/change_status_widget', type='json', auth="user")
     def change_status_widget(self, **kw):
         try:
-            exist_widget = request.env['shopify.widget'].sudo().search([], limit=1)
+            current_user = request.env.user
+            current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
+            exist_widget = request.env['shopify.widget'].sudo().search([('shop_id', '=', current_shop.id)], limit=1)
             exist_widget.sudo().write({'status': kw['widget_status']})
         except Exception as e:
             print(e)

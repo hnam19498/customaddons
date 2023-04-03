@@ -79,7 +79,7 @@ export default {
             }).catch(error => {
             console.log(error)
         })
-        axios.get(window.location.href + '.js')
+        axios.get(window.location.origin + window.location.pathname + '.js')
             .then(res => {
                 self.product_id = res.data.id.toString()
             }).catch(error => {
@@ -100,7 +100,10 @@ export default {
         addBoughtTogether() {
             let items = []
             for (let item of this.widget.recommendation_products) {
-                items.push({'id': item.variant_id, "quantity": 1})
+                items.push({
+                    'id': item.variant_id,
+                    "quantity": 1
+                })
             }
             let formData = {'items': items}
             fetch(window.Shopify.routes.root + 'cart/add.js', {
