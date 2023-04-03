@@ -1,14 +1,13 @@
 from odoo import api, models, fields
 
 
-class AppShopify(models.Model):
-    _name = 'shopify.app'
+class ResConfigSettings(models.TransientModel):
+    _inherit = 'res.config.settings'
 
-    api_key = fields.Char()
-    base_url = fields.Char()
-    name = fields.Char()
-    api_version = fields.Char()
-    secret_key = fields.Char()
+    api_key = fields.Char('API Key', config_parameter='bought_together.api_key')
+    base_url = fields.Char('Base URL', config_parameter='bought_together.base_url')
+    api_version = fields.Char('API version', config_parameter='bought_together.api_version')
+    secret_key = fields.Char('Secret Key', config_parameter='bought_together.secret_key')
 
 
 class Shop(models.Model):
@@ -17,6 +16,7 @@ class Shop(models.Model):
     shopify_id = fields.Char()
     name = fields.Char()
     email = fields.Char()
+    access_token = fields.Char()
     currencyCode = fields.Char()
     url = fields.Char()
     country = fields.Char()
@@ -25,15 +25,6 @@ class Shop(models.Model):
     password = fields.Char()
     product_ids = fields.One2many("shopify.product", 'shop_id')
     admin = fields.Many2one('res.users')
-
-
-class ShopAppShopify(models.Model):
-    _name = "shop.app.shopify"
-
-    access_token = fields.Char()
-    shop_id = fields.Many2one("shop.shopify")
-    app_id = fields.Many2one('shopify.app')
-    status = fields.Boolean()
 
 
 class ShopifyProduct(models.Model):

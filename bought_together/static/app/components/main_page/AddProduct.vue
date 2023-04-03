@@ -3,7 +3,7 @@
         <div class="setting-btn">
             <button class="btn-setting" id="btn-cancel" @click="cancelAddProducts">Cancel</button>
             <button class="btn-setting" id="btn-save" @click="saveAddProducts"
-                    :disabled="list_recommendation.length > 5 || list_recommendation.length == 0">SAVE
+                    :disabled="list_recommendation.length > 5 || list_recommendation.length == 0">NEXT
             </button>
         </div>
         <div id="setting_widget">

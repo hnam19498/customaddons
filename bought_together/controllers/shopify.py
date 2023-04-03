@@ -122,200 +122,202 @@ class ShopifyMain(http.Controller):
     def shopify_auth(self, **kw):
         try:
             if "shop" in kw:
-                shopify_app = request.env.ref('bought_together.shopify_app_data').sudo()
-                if shopify_app:
-                    shopify.Session.setup(api_key=shopify_app.api_key, secret=shopify_app.secret_key)
-                    state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
-                    redirect_uri = f"{shopify_app.base_url}/auth/shopify/callback"
-                    scopes = [
-                        "read_products",
-                        "read_orders",
-                        'read_script_tags',
-                        'write_script_tags',
-                        "read_draft_orders",
-                        'write_draft_orders'
-                    ]
-                    new_session = shopify.Session(kw['shop'], shopify_app.api_version)
-                    auth_url = new_session.create_permission_url(scopes, redirect_uri, state)
-                    return werkzeug.utils.redirect(auth_url)
+                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
+                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
+                base_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.base_url')
+                api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
+
+                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
+                redirect_uri = f"{base_url}/auth/shopify/callback"
+                scopes = [
+                    "read_products",
+                    "read_orders",
+                    'read_script_tags',
+                    'write_script_tags',
+                    "read_draft_orders",
+                    'write_draft_orders'
+                ]
+                new_session = shopify.Session(kw['shop'], api_version)
+                auth_url = new_session.create_permission_url(scopes, redirect_uri, state)
+                return werkzeug.utils.redirect(auth_url)
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
 
-    @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*", save_session=False)
+    @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*")
     def shopify_callback(self, **kw):
         try:
             if 'shop' in kw:
-                shopify_app = request.env.ref('bought_together.shopify_app_data').sudo()
-                if shopify_app:
-                    shopify.Session.setup(api_key=shopify_app.api_key, secret=shopify_app.secret_key)
-                    session = shopify.Session(kw["shop"], shopify_app.api_version)
-                    access_token = session.request_token(kw)
-                    shopify.ShopifyResource.activate_session(session)
+                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
+                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
+                base_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.base_url')
+                api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
 
-                    shopify_infor = shopify.GraphQL().execute("{shop{id name email currencyCode url billingAddress{country}}}")
-                    shopify_data = json.loads(shopify_infor)
-                    shopify_id = shopify_data["data"]["shop"]["id"].split("/")[-1]
+                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                session = shopify.Session(kw["shop"], api_version)
+                access_token = session.request_token(kw)
+                shopify.ShopifyResource.activate_session(session)
 
-                    if access_token:
-                        existing_webhooks = shopify.Webhook.find()
-                        for webhook in existing_webhooks:
-                            print(webhook.id, webhook.topic)
-                            shopify.Webhook.find(webhook.id).destroy()
+                shopify_infor = shopify.GraphQL().execute("{shop{id name email currencyCode url billingAddress{country}}}")
+                shopify_data = json.loads(shopify_infor)
+                shopify_id = shopify_data["data"]["shop"]["id"].split("/")[-1]
 
-                        print("*******************")
-                        ngrok_url = 'https://bce9-116-97-240-10.ap.ngrok.io'
+                if access_token:
+                    existing_webhooks = shopify.Webhook.find()
+                    for webhook in existing_webhooks:
+                        print(webhook.id, webhook.topic)
+                        shopify.Webhook.find(webhook.id).destroy()
 
-                        webhook_order_create = shopify.Webhook()
-                        webhook_order_create.topic = "orders/create"
-                        webhook_order_create.address = ngrok_url + "/webhook/order_create/" + shopify_id
-                        webhook_order_create.format = "json"
-                        webhook_order_create.save()
-                        print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
+                    print("*******************")
+                    ngrok_url = 'https://bce9-116-97-240-10.ap.ngrok.io'
 
-                        webhook_order_updated = shopify.Webhook()
-                        webhook_order_updated.topic = "orders/updated"
-                        webhook_order_updated.address = ngrok_url + "/webhook/order_updated/" + shopify_id
-                        webhook_order_updated.format = "json"
-                        webhook_order_updated.save()
-                        print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
+                    webhook_order_create = shopify.Webhook()
+                    webhook_order_create.topic = "orders/create"
+                    webhook_order_create.address = ngrok_url + "/webhook/order_create/" + shopify_id
+                    webhook_order_create.format = "json"
+                    webhook_order_create.save()
+                    print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
 
-                        webhook_products_create = shopify.Webhook()
-                        webhook_products_create.topic = "products/create"
-                        webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
-                        webhook_products_create.format = "json"
-                        webhook_products_create.save()
-                        print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
+                    webhook_order_updated = shopify.Webhook()
+                    webhook_order_updated.topic = "orders/updated"
+                    webhook_order_updated.address = ngrok_url + "/webhook/order_updated/" + shopify_id
+                    webhook_order_updated.format = "json"
+                    webhook_order_updated.save()
+                    print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
 
-                        webhook_products_update = shopify.Webhook()
-                        webhook_products_update.topic = "products/update"
-                        webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
-                        webhook_products_update.format = "json"
-                        webhook_products_update.save()
-                        print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+                    webhook_products_create = shopify.Webhook()
+                    webhook_products_create.topic = "products/create"
+                    webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
+                    webhook_products_create.format = "json"
+                    webhook_products_create.save()
+                    print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
 
-                        existing_script_tag = shopify.ScriptTag.find()
-                        new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
-                        if existing_script_tag:
-                            for script_tag in existing_script_tag:
-                                if script_tag.src != new_script_tag_url:
-                                    shopify.ScriptTag.find(script_tag.id).destroy()
-                                    shopify.ScriptTag.create({
-                                        "event": "onload",
-                                        "src": new_script_tag_url
-                                    })
-                        else:
-                            shopify.ScriptTag.create({
-                                "event": "onload",
-                                "src": new_script_tag_url
-                            })
+                    webhook_products_update = shopify.Webhook()
+                    webhook_products_update.topic = "products/update"
+                    webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
+                    webhook_products_update.format = "json"
+                    webhook_products_update.save()
+                    print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
-                        current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
-
-                        if current_shopify_shop:
-                            current_shopify_shop.status = True
-                            if not current_shopify_shop.shopify_owner:
-                                current_shop = shopify.Shop.current()
-                                current_shopify_shop.shopify_owner = current_shop.attributes['shop_owner']
-                                current_shopify_shop.sudo().write({
-                                    "name": shopify_data["data"]["shop"]["name"],
-                                    "email": shopify_data["data"]["shop"]["email"],
-                                    "currencyCode": shopify_data["data"]["shop"]["currencyCode"],
-                                    "url": shopify_data["data"]["shop"]["url"],
-                                    "country": shopify_data["data"]["shop"]["billingAddress"]["country"]
+                    existing_script_tag = shopify.ScriptTag.find()
+                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
+                    if existing_script_tag:
+                        for script_tag in existing_script_tag:
+                            if script_tag.src != new_script_tag_url:
+                                shopify.ScriptTag.find(script_tag.id).destroy()
+                                shopify.ScriptTag.create({
+                                    "event": "onload",
+                                    "src": new_script_tag_url
                                 })
-                        else:
-                            current_shopify_shop = request.env["shop.shopify"].sudo().create({
-                                "shopify_id": shopify_id,
+                    else:
+                        shopify.ScriptTag.create({
+                            "event": "onload",
+                            "src": new_script_tag_url
+                        })
+
+                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
+
+                    if current_shopify_shop:
+                        current_shopify_shop.status = True
+                        if not current_shopify_shop.shopify_owner:
+                            current_shop = shopify.Shop.current()
+                            current_shopify_shop.shopify_owner = current_shop.attributes['shop_owner']
+                            current_shopify_shop.sudo().write({
+                                "access_token": access_token,
                                 "name": shopify_data["data"]["shop"]["name"],
                                 "email": shopify_data["data"]["shop"]["email"],
                                 "currencyCode": shopify_data["data"]["shop"]["currencyCode"],
                                 "url": shopify_data["data"]["shop"]["url"],
                                 "country": shopify_data["data"]["shop"]["billingAddress"]["country"]
                             })
+                    else:
+                        current_shopify_shop = request.env["shop.shopify"].sudo().create({
+                            "shopify_id": shopify_id,
+                            'access_token': access_token,
+                            "name": shopify_data["data"]["shop"]["name"],
+                            "email": shopify_data["data"]["shop"]["email"],
+                            "currencyCode": shopify_data["data"]["shop"]["currencyCode"],
+                            "url": shopify_data["data"]["shop"]["url"],
+                            "country": shopify_data["data"]["shop"]["billingAddress"]["country"]
+                        })
 
-                        current_company = request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
-                        current_user = request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
+                    current_company = request.env['res.company'].sudo().search([('name', '=', kw['shop'])], limit=1)
+                    current_user = request.env['res.users'].sudo().search([('login', '=', kw['shop'])], limit=1)
 
-                        # generate password
-                        password_generate = ''.join(random.choice(string.ascii_letters) for i in range(20))
+                    # generate password
+                    password_generate = ''.join(random.choice(string.ascii_letters) for i in range(20))
 
-                        if not current_company:
-                            current_company = request.env['res.company'].sudo().create({
-                                'logo': False,
-                                'currency_id': 2,
-                                'sequence': 10,
-                                'name': kw['shop'],
-                                'street': False,
-                                'street2': False,
-                                'city': False,
-                                'state_id': False,
-                                'zip': False,
-                                'country_id': False,
-                                'phone': False,
-                                'email': False,
-                                'website': False,
-                                'vat': False,
-                                'company_registry': False,
-                                'parent_id': False
-                            })
+                    if not current_company:
+                        current_company = request.env['res.company'].sudo().create({
+                            'logo': False,
+                            'currency_id': 2,
+                            'sequence': 10,
+                            'name': kw['shop'],
+                            'street': False,
+                            'street2': False,
+                            'city': False,
+                            'state_id': False,
+                            'zip': False,
+                            'country_id': False,
+                            'phone': False,
+                            'email': False,
+                            'website': False,
+                            'vat': False,
+                            'company_registry': False,
+                            'parent_id': False
+                        })
 
-                        if not current_user:
-                            current_user = request.env['res.users'].sudo().create({
-                                'company_ids': [[6, False, [current_company.id]]],
-                                'company_id': current_company.id,
-                                'active': True,
-                                'lang': 'en_US',
-                                'tz': 'Europe/Brussels',
-                                'image_1920': False,
-                                '__last_update': False,
-                                'name': kw['shop'],
-                                'email': shopify_data["data"]["shop"]["email"],
-                                'login': kw['shop'],
-                                'password': password_generate,
-                                'action_id': False
-                            })
+                    if not current_user:
+                        current_user = request.env['res.users'].sudo().create({
+                            'company_ids': [[6, False, [current_company.id]]],
+                            'company_id': current_company.id,
+                            'active': True,
+                            'lang': 'en_US',
+                            'tz': 'Europe/Brussels',
+                            'image_1920': False,
+                            '__last_update': False,
+                            'name': kw['shop'],
+                            'email': shopify_data["data"]["shop"]["email"],
+                            'login': kw['shop'],
+                            'password': password_generate,
+                            'action_id': False
+                        })
 
-                        if not current_shopify_shop.admin:
-                            current_shopify_shop.admin = current_user.id
-                        if not current_shopify_shop.password:
-                            current_shopify_shop.password = password_generate
+                    if not current_shopify_shop.admin:
+                        current_shopify_shop.admin = current_user.id
+                    if not current_shopify_shop.password:
+                        current_shopify_shop.password = password_generate
 
-                        shop_app = request.env['shop.app.shopify'].sudo().search([("shop_id", '=', current_shopify_shop.id), ('app_id', '=', shopify_app.id)], limit=1)
-                        if not shop_app:
-                            request.env['shop.app.shopify'].sudo().create({
-                                "access_token": access_token,
-                                'shop_id': current_shopify_shop.id,
-                                'app_id': shopify_app.id,
-                                "status": True
-                            })
+                    products = shopify.Product.find()
+                    exist_products = request.env['shopify.product'].sudo().search([])
+                    list_product_ids = []
 
-                        products = shopify.Product.find()
-                        exist_products = request.env['shopify.product'].sudo().search([])
-                        list_product_ids = []
+                    if exist_products:
+                        for product in exist_products:
+                            if str(product.shopify_product_id) not in list_product_ids:
+                                list_product_ids.append(product.shopify_product_id)
 
-                        if exist_products:
-                            for product in exist_products:
-                                if str(product.shopify_product_id) not in list_product_ids:
-                                    list_product_ids.append(product.shopify_product_id)
-
-                        if products:
-                            for product in products:
-                                if str(product.id) not in list_product_ids:
-                                    request.env['shopify.product'].sudo().create({
-                                        'shopify_product_id': product.id,
-                                        'name': product.title,
-                                        'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
-                                        'shop_id': current_shopify_shop.id,
-                                        'url_img': product.attributes['images'][0].attributes['src'],
-                                        'price': float(product.variants[0].price),
-                                        "compare_at_price": product.variants[0].compare_at_price,
-                                        'qty': product.variants[0].inventory_quantity,
-                                        "variant_id": product.attributes['variants'][0].id
-                                    })
-                                else:
-                                    print(f'Product id "{product.id}" đã trong database!')
-                        return werkzeug.utils.redirect(f'{shopify_app.base_url}/bought_together')
+                    if products:
+                        for product in products:
+                            if str(product.id) not in list_product_ids:
+                                request.env['shopify.product'].sudo().create({
+                                    'shopify_product_id': product.id,
+                                    'name': product.title,
+                                    'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
+                                    'shop_id': current_shopify_shop.id,
+                                    'url_img': product.attributes['images'][0].attributes['src'],
+                                    'price': float(product.variants[0].price),
+                                    "compare_at_price": product.variants[0].compare_at_price,
+                                    'qty': product.variants[0].inventory_quantity,
+                                    "variant_id": product.attributes['variants'][0].id
+                                })
+                            else:
+                                print(f'Product id "{product.id}" đã trong database!')
+                    db = http.request.env.cr.dbname
+                    request.env.cr.commit()
+                    uid = request.session.authenticate(db, kw['shop'], current_shopify_shop.password)
+                    return werkzeug.utils.redirect('/bought_together')
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
