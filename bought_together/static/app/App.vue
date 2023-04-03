@@ -7,7 +7,7 @@
         </layout-sider>
         <layout>
             <layout-header>
-                <nav-header/>
+                <nav-header :user_img="user_img"/>
             </layout-header>
             <layout-content>
                 <nav-menu @changeTab="changeTab"
@@ -24,7 +24,7 @@
                 <installation @changeTab="changeTab"
                               :shop_url="shop_url"
                               v-if="currentTab=='Installation'"/>
-                <dashboard v-if='currentTab=="Dashboard"'/>
+                <dashboard :user="user" v-if='currentTab=="Dashboard"'/>
             </layout-content>
         </layout>
     </layout>
@@ -50,6 +50,8 @@ export default {
         }).then(res => {
             self.products = res.data.result.product_data
             self.shop_url = res.data.result.shop_url
+            self.user = res.data.result.shop_owner
+            self.user_img = res.data.result.user_avatar
         }).catch(error => {
             console.log(error)
         })
@@ -78,7 +80,8 @@ export default {
             list_recommendation: [],
             list_product_customization: [],
             list_excluded: [],
-            user: ''
+            user: '',
+            user_img: ''
         }
     },
     methods: {

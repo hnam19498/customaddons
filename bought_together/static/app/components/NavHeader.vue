@@ -1,9 +1,9 @@
 <template>
-    <div class="nav-bar" style="font-size: 30px;">
+    <div class="nav-bar" style="font-size: 30px">
         <div class="frame-50">
             <font-awesome-icon icon="fa-solid fa-circle-question"/>
             <font-awesome-icon icon="fa-regular fa-bell"/>
-            <img src="https://i.pinimg.com/736x/1b/13/ad/1b13ad4e67b8a75e38f3fc6628f7a970.jpg">
+            <img alt="user_img" :src="'data:image/jpg;base64,' + user_img">
         </div>
     </div>
 </template>
@@ -12,6 +12,9 @@ export default {
     name: 'compNavHeader',
     data() {
         return {}
+    },
+    props: {
+        user_img: String
     }
 }
 </script>

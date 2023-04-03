@@ -186,13 +186,7 @@ export default {
     },
     methods: {
         saveAddProducts() {
-            this.$emit(
-                'addProductToCustomization',
-                "Customization",
-                this.list_recommendation,
-                this.list_excluded,
-                this.enable_widget
-            )
+            this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget)
         },
         cancelAddProducts() {
             this.tickAllRecommendation = false
@@ -224,7 +218,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }
@@ -250,7 +244,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }
@@ -266,7 +260,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }
@@ -292,7 +286,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }
@@ -308,7 +302,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }
@@ -324,7 +318,7 @@ export default {
                 this.show_toast(
                     'open',
                     'You have reach the product limitation.',
-                    'Please untick any products from the list to continue selecting.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
                     3
                 )
             }

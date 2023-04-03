@@ -1,5 +1,5 @@
 <template>
-    <div id="welcome">WELCOME, NAM!</div>
+    <div id="welcome">WELCOME, {{ this.user }}!</div>
     <div id="table-product">
         <table>
             <tr class="table-col-name">
@@ -41,6 +41,9 @@ export default {
                 console.log(error)
             })
         }
+    },
+    props: {
+        user: String
     },
     mounted() {
         let self = this
