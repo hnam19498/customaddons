@@ -119,7 +119,7 @@ class ShopifyMain(http.Controller):
                     })
             return {
                 'product_data': product_data,
-                'shop_url': request.env.user.login,
+                'shop_url': current_shop.url,
                 "shop_owner": current_shop.shopify_owner,
                 'user_avatar': current_user.image_1920
             }

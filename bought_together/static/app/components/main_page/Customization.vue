@@ -8,7 +8,7 @@
         <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
     </div>
     <div style="display: flex; flex-direction: row; margin-top: 30px">
-        <div style="display:flex; flex-direction: column">
+        <div style="display:flex; flex-direction: column; margin-bottom: 15px">
             <div class="configuration">
                 <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
                 <span>General Configuration</span>
@@ -143,7 +143,7 @@
                             <div style="color: red; margin-left: 3px">${{ this.total_price }}</div>
                         </div>
                         <button :style="{ background: background_color, borderColor: border_color, color: text_color }"
-                                style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px">
+                                style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center">
                             {{ this.btn_text }}
                         </button>
                     </div>
@@ -217,10 +217,10 @@ export default {
             description_color: '#000000',
             border_color: '#000000',
             title_font_size: '',
-            text_color: '#000000',
+            text_color: '#fff',
             background_color: '#000000',
             description_font_size: '',
-            btn_text: '',
+            btn_text: 'Buy now',
             widget_title: "YOU MAY ALSO LIKE...",
             list_ids: [],
             total_price: 0,

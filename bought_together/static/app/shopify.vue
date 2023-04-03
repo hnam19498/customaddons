@@ -106,13 +106,11 @@ export default {
                 headers: {'Content-Type': 'application/json'},
                 body: JSON.stringify(formData)
             }).then(res => {
+                window.location.replace(window.location.origin + '/cart')
                 return res.json()
             }).catch(error => {
                 console.log(error)
             })
-            setTimeout(function () {
-                window.location.replace(window.location.origin + '/cart')
-            }, 1500)
         }
     }
 }

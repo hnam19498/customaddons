@@ -1,20 +1,22 @@
 <template>
-    <div class="installation-btn">
-        <button class="btn" id="btn-home" @click="redirectToDashboard">Home</button>
-        <button class="btn" id="btn-themes" @click="handleThemeCustomization">Go to Themes Customization</button>
-    </div>
-    <div id="congratulation">CONGRATULATION! YOU HAVE CREATED WIDGET SUCCESSFULLY!</div>
-    <div id="now">Now please follow these steps below to display it on your product pages</div>
-    <div id="content">
-        <p>1. Lorem ipsum is placeholder text commonly used in the graphic, print</p>
-        <p>2. and publishing industries for previewing layouts and visual mockups.</p>
-        <p>3. Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for
-            previewing layouts and visual mockups.</p>
-    </div>
-    <div style="width: 100%; display: flex; justify-content: center; margin-top: 60px">
-        <video controls height="60%" width="60%">
-            <source src="/bought_together/static/app/video/honkai.mp4" type="video/mp4">
-        </video>
+    <div style="margin-bottom: 15px">
+        <div class="installation-btn">
+            <button class="btn" id="btn-home" @click="redirectToDashboard">Home</button>
+            <button class="btn" id="btn-themes" @click="handleThemeCustomization">Go to Themes Customization</button>
+        </div>
+        <div id="congratulation">CONGRATULATION! YOU HAVE CREATED WIDGET SUCCESSFULLY!</div>
+        <div id="now">Now please follow these steps below to display it on your product pages</div>
+        <div id="content">
+            <p>1. Lorem ipsum is placeholder text commonly used in the graphic, print</p>
+            <p>2. and publishing industries for previewing layouts and visual mockups.</p>
+            <p>3. Lorem ipsum is placeholder text commonly used in the graphic, print, and publishing industries for
+                previewing layouts and visual mockups.</p>
+        </div>
+        <div style="width: 100%; display: flex; justify-content: center; margin-top: 60px">
+            <video controls height="60%" width="60%">
+                <source src="/bought_together/static/app/video/honkai.mp4" type="video/mp4">
+            </video>
+        </div>
     </div>
 </template>
 <script>
@@ -26,7 +28,7 @@ export default {
     props: {shop_url: String},
     methods: {
         handleThemeCustomization() {
-            window.open('https://' + this.shop_url + '/admin/themes/current/editor', '_blank')
+            window.open(this.shop_url + '/admin/themes/current/editor', '_blank')
         },
         redirectToDashboard() {
             this.$emit('changeTab', 'Dashboard')

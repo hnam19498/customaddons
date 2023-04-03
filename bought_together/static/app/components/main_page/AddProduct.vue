@@ -56,6 +56,7 @@
                             :key="product.id">
                             <td>
                                 <input :checked="list_recommendation.filter(e => e.id == product.id).length > 0"
+                                       :disabled="list_excluded.filter(e => e.id == product.id).length > 0"
                                        type="checkbox"
                                        :value="{
                                            id: product.id,
@@ -117,6 +118,7 @@
                         <tr class="table-row" v-for="product in filteredExcluded" :key="product.id">
                             <td>
                                 <input :checked="list_excluded.filter(e => e.id == product.id).length > 0"
+                                       :disabled="list_recommendation.filter(e => e.id == product.id).length > 0"
                                        @change="select_excluded"
                                        :value="{
                                            id: product.id,
