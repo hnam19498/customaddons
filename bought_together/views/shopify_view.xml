@@ -22,6 +22,7 @@
                             <field name="script_tag_url"/>
                         </group>
                         <button type="object" name="change_script_tag_url">Update script tag</button>
+                        <button type="object" name="change_ngrok_url">Update ngrok</button>
                     </div>
                 </xpath>
             </field>

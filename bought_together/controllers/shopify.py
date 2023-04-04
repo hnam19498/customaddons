@@ -88,14 +88,12 @@ class ShopifyMain(http.Controller):
 
             for product in kw['recommendation_products']:
                 list_recommendation_product_ids.append(
-                    request.env['shopify.product'].sudo().search(
-                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             for product in kw['excluded_products']:
                 list_excluded_product_ids.append(
-                    request.env['shopify.product'].sudo().search(
-                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
@@ -238,8 +236,7 @@ class ShopifyMain(http.Controller):
                             print(f"---{webhook.id}: {webhook.topic}")
 
                     existing_script_tags = shopify.ScriptTag.find()
-                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(
-                        datetime.datetime.now())
+                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
                     new_script_tag = ''
                     if existing_script_tags:
                         for script_tag in existing_script_tags:
@@ -298,8 +295,7 @@ class ShopifyMain(http.Controller):
                         })
 
                     current_shop = shopify.Shop.current()
-                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)],
-                                                                                     limit=1)
+                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
 
                     if current_shopify_shop:
                         current_shopify_shop.status = True

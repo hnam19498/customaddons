@@ -342,8 +342,7 @@ export default {
             })
         },
         filteredExcluded() {
-            return this.products.filter(product =>
-                product.name.toLowerCase().includes(this.search_excluded.toLowerCase()))
+            return this.products.filter(product => product.name.toLowerCase().includes(this.search_excluded.toLowerCase()))
         }
     }
 }

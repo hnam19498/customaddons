@@ -15,7 +15,7 @@
                 <td>{{ this.widget.widget_title }}</td>
                 <td>{{ this.widget.widget_description }}</td>
                 <td style="text-align: center">{{ this.products_included }}</td>
-                <td>${{ this.widget.total_price }}</td>
+                <td>${{ parseFloat(this.widget.total_price).toFixed(2) }}</td>
                 <td class="status">
                     <a-switch @change="changeWidgetStatus"
                               v-model:checked="this.widget.status"

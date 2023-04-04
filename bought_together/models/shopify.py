@@ -21,7 +21,7 @@ class ResConfigSettings(models.TransientModel):
 
                 old_shops = self.env['shop.shopify'].sudo().search([('is_update_script_tag', '=', False)], limit=10)
                 for shop in old_shops:
-                    new_session = shopify.Session(shop.url, self.api_version, token=shop.access_token)
+                    new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=self.api_version)
                     shopify.ShopifyResource.activate_session(new_session)
                     existing_script_tags = shopify.ScriptTag.find()
                     if existing_script_tags:
@@ -37,6 +37,41 @@ class ResConfigSettings(models.TransientModel):
                             "event": "onload",
                             "src": self.script_tag_url
                         })
+                    shop.is_update_script_tag = True
+        except Exception as e:
+            print(e)
+
+    def change_ngrok_url(self):
+        try:
+            shops = self.env['shop.shopify'].sudo().search([])
+            if shops:
+                for shop in shops:
+                    shop.is_update_ngrok = False
+
+                old_shops = self.env['shop.shopify'].sudo().search([('is_update_ngrok', '=', False)], limit=10)
+                for shop in old_shops:
+                    new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=self.api_version)
+                    shopify.ShopifyResource.activate_session(new_session)
+                    existing_webhooks = shopify.Webhook.find()
+
+                    if existing_webhooks:
+                        for webhook in existing_webhooks:
+                            webhook.destroy()
+
+                    webhook_products_create = shopify.Webhook()
+                    webhook_products_create.topic = "products/create"
+                    webhook_products_create.address = self.ngrok_url + "/webhook/products_create/" + shop.shopify_id
+                    webhook_products_create.format = "json"
+                    webhook_products_create.save()
+                    print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
+
+                    webhook_products_update = shopify.Webhook()
+                    webhook_products_update.topic = "products/update"
+                    webhook_products_update.address = self.ngrok_url + "/webhook/products_update/" + shop.shopify_id
+                    webhook_products_update.format = "json"
+                    webhook_products_update.save()
+                    print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+
                     shop.is_update_script_tag = True
         except Exception as e:
             print(e)
@@ -58,6 +93,7 @@ class Shop(models.Model):
     product_ids = fields.One2many("shopify.product", 'shop_id')
     admin = fields.Many2one('res.users')
     is_update_script_tag = fields.Boolean()
+    is_update_ngrok = fields.Boolean(default=True)
 
 
 class ShopifyProduct(models.Model):
