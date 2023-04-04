@@ -12,60 +12,70 @@ class ShopifyMain(http.Controller):
             current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
             exist_widget = request.env['shopify.widget'].sudo().search([('shop_id', '=', current_shop.id)], limit=1)
             exist_widget.sudo().write({'status': kw['widget_status']})
+            return {}
         except Exception as e:
-            print(e)
+            return {'error': e}
 
     @http.route('/bought_together/get_widget', type='json', auth='public', method=['POST'], csrf=False, cors="*")
     def get_widget(self, **kw):
         try:
             if not kw:
-                current_user = request.env.user
-                current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
+                if not request.env.user:
+                    return {'error': 'not login'}
+                else:
+                    current_user = request.env.user
+                    current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
             else:
                 current_shop = request.env["shop.shopify"].sudo().search([('url', '=', kw['shop_url'])])
 
             widget = request.env['shopify.widget'].sudo().search([('shop_id', '=', current_shop.id)], limit=1)
-            list_recommendation_shopify_product_ids = []
-            list_excluded_shopify_product_ids = []
-            recommendation_products = []
 
-            for product in widget.recommendation_product_ids:
-                recommendation_products.append({
-                    'img': product.url_img,
-                    "name": product.name,
-                    "variant_id": product.variant_id,
-                    'url': product.url,
-                    'price': product.price,
-                    "compare_at_price": product.compare_at_price,
-                })
-            for product in widget.excluded_product_ids:
-                list_excluded_shopify_product_ids.append(product.shopify_product_id)
+            if not widget:
+                return {}
+            else:
+                list_recommendation_shopify_product_ids = []
+                list_excluded_shopify_product_ids = []
+                recommendation_products = []
 
-            widget_data = {
-                "id": widget.id,
-                'widget_title': widget.widget_title,
-                'widget_description': widget.widget_description,
-                "total_price": widget.total_price,
-                "status": widget.status,
-                'title_color': widget.title_color,
-                "background_color": widget.background_color,
-                'description_font_size': widget.description_font_size,
-                'btn_text': widget.btn_text,
-                'total_compare_at_price': widget.total_compare_at_price,
-                "description_color": widget.description_color,
-                'border_color': widget.border_color,
-                "title_font_size": widget.title_font_size,
-                "text_color": widget.text_color,
-                'list_excluded_shopify_product_ids': list_excluded_shopify_product_ids,
-                "list_recommendation_shopify_product_ids": list_recommendation_shopify_product_ids,
-                "recommendation_products": recommendation_products
-            }
-            return {
-                'products_included': len(widget.recommendation_product_ids),
-                'widget_data': widget_data
-            }
+                for product in widget.recommendation_product_ids:
+                    recommendation_products.append({
+                        'img': product.url_img,
+                        "name": product.name,
+                        "variant_id": product.variant_id,
+                        'url': product.url,
+                        'price': product.price,
+                        "compare_at_price": product.compare_at_price,
+                    })
+
+                for product in widget.excluded_product_ids:
+                    list_excluded_shopify_product_ids.append(product.shopify_product_id)
+
+                widget_data = {
+                    "id": widget.id,
+                    'widget_title': widget.widget_title,
+                    'widget_description': widget.widget_description,
+                    "total_price": widget.total_price,
+                    "status": widget.status,
+                    'title_color': widget.title_color,
+                    "background_color": widget.background_color,
+                    'description_font_size': widget.description_font_size,
+                    'btn_text': widget.btn_text,
+                    'total_compare_at_price': widget.total_compare_at_price,
+                    "description_color": widget.description_color,
+                    'border_color': widget.border_color,
+                    "title_font_size": widget.title_font_size,
+                    "text_color": widget.text_color,
+                    'list_excluded_shopify_product_ids': list_excluded_shopify_product_ids,
+                    "list_recommendation_shopify_product_ids": list_recommendation_shopify_product_ids,
+                    "recommendation_products": recommendation_products
+                }
+
+                return {
+                    'products_included': len(widget.recommendation_product_ids),
+                    'widget_data': widget_data
+                }
         except Exception as e:
-            print(e)
+            return {'error': e}
 
     @http.route("/bought_together/save_widget", type='json', auth="user")
     def save_widget(self, **kw):
@@ -75,7 +85,6 @@ class ShopifyMain(http.Controller):
 
             list_excluded_product_ids = []
             list_recommendation_product_ids = []
-            exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
 
             for product in kw['recommendation_products']:
                 list_recommendation_product_ids.append(
@@ -87,30 +96,36 @@ class ShopifyMain(http.Controller):
                     request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
-            data = {
-                'excluded_product_ids': [(6, 0, list_excluded_product_ids)],
-                'recommendation_product_ids': [(6, 0, list_recommendation_product_ids)],
-                "widget_description": kw['widget_description'],
-                "total_compare_at_price": float(kw['total_compare_at_price']),
-                'title_color': kw['title_color'],
-                'background_color': kw['background_color'],
-                "description_font_size": kw["description_font_size"],
-                'btn_text': kw['btn_text'],
-                "widget_title": kw['widget_title'],
-                "total_price": float(kw['total_price']),
-                'description_color': kw['description_color'],
-                "border_color": kw['border_color'],
-                'title_font_size': kw['title_font_size'],
-                'text_color': kw['text_color'],
-                'status': True,
-                'shop_id': current_shop.id
-            }
-            if not exist_widget:
-                request.env['shopify.widget'].sudo().create(data)
-            else:
-                exist_widget.sudo().write(data)
+            exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
+
+            try:
+                data = {
+                    'excluded_product_ids': [(6, 0, list_excluded_product_ids)],
+                    'recommendation_product_ids': [(6, 0, list_recommendation_product_ids)],
+                    "widget_description": kw['widget_description'],
+                    "total_compare_at_price": float(kw['total_compare_at_price']),
+                    'title_color': kw['title_color'],
+                    'background_color': kw['background_color'],
+                    "description_font_size": kw["description_font_size"],
+                    'btn_text': kw['btn_text'],
+                    "widget_title": kw['widget_title'],
+                    "total_price": float(kw['total_price']),
+                    'description_color': kw['description_color'],
+                    "border_color": kw['border_color'],
+                    'title_font_size': kw['title_font_size'],
+                    'text_color': kw['text_color'],
+                    'status': True,
+                    'shop_id': current_shop.id
+                }
+                if not exist_widget:
+                    request.env['shopify.widget'].sudo().create(data)
+                else:
+                    exist_widget.sudo().write(data)
+            except Exception as error_data:
+                return {"error_data": error_data}
+            return {}
         except Exception as e:
-            print(e)
+            return {"error": e}
 
     @http.route('/bought_together/get_product', auth="user", type="json", csrf=False, cors="*", save_session=False)
     def get_product(self):
@@ -119,6 +134,7 @@ class ShopifyMain(http.Controller):
             current_user = request.env.user
             current_shop = request.env["shop.shopify"].sudo().search([('admin', '=', current_user.id)])
             products = request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id)])
+
             if products:
                 for product in products:
                     product_data.append({
@@ -136,7 +152,7 @@ class ShopifyMain(http.Controller):
                 'user_avatar': current_user.image_1920
             }
         except Exception as e:
-            print(e)
+            return {'error': e}
 
     @http.route("/bought_together/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopify_auth(self, **kw):
@@ -195,45 +211,45 @@ class ShopifyMain(http.Controller):
 
                 if access_token:
                     existing_webhooks = shopify.Webhook.find()
-                    for webhook in existing_webhooks:
-                        print(webhook.id, webhook.topic)
-                        shopify.Webhook.find(webhook.id).destroy()
+                    if not existing_webhooks:
+                        print("*******************")
 
-                    print("*******************")
-                    ngrok_url = 'https://bce9-116-97-240-10.ap.ngrok.io'
+                        ngrok_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.ngrok_url')
+                        if not ngrok_url:
+                            ngrok_url = 'https://bce9-116-97-240-10.ap.ngrok.io'
 
-                    webhook_order_create = shopify.Webhook()
-                    webhook_order_create.topic = "orders/create"
-                    webhook_order_create.address = ngrok_url + "/webhook/order_create/" + shopify_id
-                    webhook_order_create.format = "json"
-                    webhook_order_create.save()
-                    print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
+                        webhook_order_create = shopify.Webhook()
+                        webhook_order_create.topic = "orders/create"
+                        webhook_order_create.address = ngrok_url + "/webhook/order_create/" + shopify_id
+                        webhook_order_create.format = "json"
+                        webhook_order_create.save()
+                        print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
 
-                    webhook_order_updated = shopify.Webhook()
-                    webhook_order_updated.topic = "orders/updated"
-                    webhook_order_updated.address = ngrok_url + "/webhook/order_updated/" + shopify_id
-                    webhook_order_updated.format = "json"
-                    webhook_order_updated.save()
-                    print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
+                        webhook_order_updated = shopify.Webhook()
+                        webhook_order_updated.topic = "orders/updated"
+                        webhook_order_updated.address = ngrok_url + "/webhook/order_updated/" + shopify_id
+                        webhook_order_updated.format = "json"
+                        webhook_order_updated.save()
+                        print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
 
-                    webhook_products_create = shopify.Webhook()
-                    webhook_products_create.topic = "products/create"
-                    webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
-                    webhook_products_create.format = "json"
-                    webhook_products_create.save()
-                    print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
+                        webhook_products_create = shopify.Webhook()
+                        webhook_products_create.topic = "products/create"
+                        webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
+                        webhook_products_create.format = "json"
+                        webhook_products_create.save()
+                        print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
 
-                    webhook_products_update = shopify.Webhook()
-                    webhook_products_update.topic = "products/update"
-                    webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
-                    webhook_products_update.format = "json"
-                    webhook_products_update.save()
-                    print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+                        webhook_products_update = shopify.Webhook()
+                        webhook_products_update.topic = "products/update"
+                        webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
+                        webhook_products_update.format = "json"
+                        webhook_products_update.save()
+                        print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
-                    existing_script_tag = shopify.ScriptTag.find()
+                    existing_script_tags = shopify.ScriptTag.find()
                     new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
-                    if existing_script_tag:
-                        for script_tag in existing_script_tag:
+                    if existing_script_tags:
+                        for script_tag in existing_script_tags:
                             if script_tag.src != new_script_tag_url:
                                 shopify.ScriptTag.find(script_tag.id).destroy()
                                 shopify.ScriptTag.create({
@@ -333,17 +349,21 @@ class ShopifyMain(http.Controller):
                     if products:
                         for product in products:
                             if str(product.id) not in list_product_ids:
-                                request.env['shopify.product'].sudo().create({
-                                    'shopify_product_id': product.id,
-                                    'name': product.title,
-                                    'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
-                                    'shop_id': current_shopify_shop.id,
-                                    'url_img': product.attributes['images'][0].attributes['src'],
-                                    'price': float(product.variants[0].price),
-                                    "compare_at_price": product.variants[0].compare_at_price,
-                                    'qty': product.variants[0].inventory_quantity,
-                                    "variant_id": product.attributes['variants'][0].id
-                                })
+                                try:
+                                    request.env['shopify.product'].sudo().create({
+                                        'shopify_product_id': product.id,
+                                        'name': product.title,
+                                        'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
+                                        'shop_id': current_shopify_shop.id,
+                                        'url_img': product.attributes['images'][0].attributes['src'],
+                                        'price': float(product.variants[0].price),
+                                        "compare_at_price": product.variants[0].compare_at_price,
+                                        'qty': product.variants[0].inventory_quantity,
+                                        "variant_id": product.attributes['variants'][0].id
+                                    })
+                                except Exception as error_create_product:
+                                    print("error_create_product: " + str(error_create_product))
+                                    continue
                             else:
                                 print(f'Product id "{product.id}" đã trong database!')
                     db = http.request.env.cr.dbname

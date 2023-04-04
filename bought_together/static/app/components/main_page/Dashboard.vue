@@ -37,6 +37,10 @@ export default {
             axios.post('https://odoo.website/bought_together/change_status_widget', {
                 jsonrpc: "2.0",
                 params: {widget_status: self.widget.status}
+            }).then(res => {
+                if (res.data.result.error) {
+                    console.log(res.data.result.error)
+                }
             }).catch(error => {
                 console.log(error)
             })

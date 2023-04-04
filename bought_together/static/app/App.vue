@@ -48,10 +48,14 @@ export default {
             jsonrpc: "2.0",
             params: {}
         }).then(res => {
-            self.products = res.data.result.product_data
-            self.shop_url = res.data.result.shop_url
-            self.user = res.data.result.shop_owner
-            self.user_img = res.data.result.user_avatar
+            if (res.data.result.error) {
+                console.log(res.data.result.error)
+            } else {
+                self.products = res.data.result.product_data
+                self.shop_url = res.data.result.shop_url
+                self.user = res.data.result.shop_owner
+                self.user_img = res.data.result.user_avatar
+            }
         }).catch(error => {
             console.log(error)
         })

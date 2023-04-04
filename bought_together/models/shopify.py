@@ -1,3 +1,4 @@
+import shopify, datetime
 from odoo import api, models, fields
 
 
@@ -8,6 +9,37 @@ class ResConfigSettings(models.TransientModel):
     base_url = fields.Char('Base URL', config_parameter='bought_together.base_url')
     api_version = fields.Char('API version', config_parameter='bought_together.api_version')
     secret_key = fields.Char('Secret Key', config_parameter='bought_together.secret_key')
+    ngrok_url = fields.Char('Ngrok URL', config_parameter='bought_together.ngrok_url')
+    script_tag_url = fields.Char('Script tag URL', config_parameter='bought_together.script_tag_url')
+
+    def change_script_tag_url(self):
+        try:
+            shops = self.env['shop.shopify'].sudo().search([])
+            if shops:
+                for shop in shops:
+                    shop.is_update_script_tag = False
+
+                old_shops = self.env['shop.shopify'].sudo().search([('is_update_script_tag', '=', False)], limit=10)
+                for shop in old_shops:
+                    new_session = shopify.Session(shop.url, self.api_version, token=shop.access_token)
+                    shopify.ShopifyResource.activate_session(new_session)
+                    existing_script_tags = shopify.ScriptTag.find()
+                    if existing_script_tags:
+                        for script_tag in existing_script_tags:
+                            if script_tag.src != self.script_tag_url:
+                                shopify.ScriptTag.find(script_tag.id).destroy()
+                                shopify.ScriptTag.create({
+                                    "event": "onload",
+                                    "src": self.script_tag_url
+                                })
+                    else:
+                        shopify.ScriptTag.create({
+                            "event": "onload",
+                            "src": self.script_tag_url
+                        })
+                    shop.is_update_script_tag = True
+        except Exception as e:
+            print(e)
 
 
 class Shop(models.Model):
@@ -25,6 +57,7 @@ class Shop(models.Model):
     password = fields.Char()
     product_ids = fields.One2many("shopify.product", 'shop_id')
     admin = fields.Many2one('res.users')
+    is_update_script_tag = fields.Boolean(default=True)
 
 
 class ShopifyProduct(models.Model):

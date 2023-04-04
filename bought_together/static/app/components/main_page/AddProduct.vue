@@ -70,8 +70,8 @@
                             </td>
                             <td><img :alt="product.name" :src="product.url_img" style="width: 30px; height: 30px"></td>
                             <td>{{ product.name }}</td>
-                            <td>{{ product.price }}</td>
-                            <td>{{ product.compare_at_price }}</td>
+                            <td>{{ parseFloat(product.price).toFixed(2) }}</td>
+                            <td>{{ parseFloat(product.compare_at_price).toFixed(2) }}</td>
                             <td>{{ product.qty }}</td>
                         </tr>
                     </table>
@@ -131,8 +131,8 @@
                             </td>
                             <td><img :alt="product.name" :src='product.url_img' style="width: 30px; height: 30px"></td>
                             <td>{{ product.name }}</td>
-                            <td>{{ product.price }}</td>
-                            <td>{{ product.compare_at_price }}</td>
+                            <td>{{ parseFloat(product.price).toFixed(2) }}</td>
+                            <td>{{ parseFloat(product.compare_at_price).toFixed(2) }}</td>
                             <td>{{ product.qty }}</td>
                         </tr>
                     </table>

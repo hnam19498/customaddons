@@ -18,21 +18,13 @@
                             <field name="secret_key"/>
                             <field name="api_version"/>
                             <field name="base_url"/>
+                            <field name="ngrok_url"/>
+                            <field name="script_tag_url"/>
                         </group>
+                        <button type="object" name="change_script_tag_url">Update script tag</button>
                     </div>
                 </xpath>
             </field>
         </record>
-
-        <record id="action_shopify_odoo" model="ir.actions.act_window">
-            <field name="name">Shopify infor</field>
-            <field name="type">ir.actions.act_window</field>
-            <field name="res_model">shop.shopify</field>
-            <field name="view_mode">tree,form</field>
-        </record>
-
-        <menuitem id="menu_shopify_root"
-                  name="Shopify"
-                  sequence="0"/>
     </data>
 </odoo>

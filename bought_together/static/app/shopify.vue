@@ -28,7 +28,9 @@
             <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
                 <div style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                     <div style="color: black">Total:</div>
-                    <div style="color: red; margin-left: 3px">${{ this.widget.total_price }}</div>
+                    <div style="color: red; margin-left: 3px">
+                        ${{ parseFloat(this.widget.total_compare_at_price).toFixed(2) }}
+                    </div>
                 </div>
                 <button :style="{ background: widget.background_color, borderColor: widget.border_color, color: widget.text_color }"
                         style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center"
@@ -47,9 +49,9 @@
                        :checked="this.cart.includes(product.variant_id)"
                        disabled>
                 <div class="redirectToProduct" @click="redirectToProduct(product.url)">{{ product.name }}</div>
-                <span style="color: red">${{ product.price }}</span>
+                <span style="color: red">${{ parseFloat(product.price).toFixed(2) }}</span>
             </div>
-            <span id="total_compare_at_price">${{ this.widget.total_compare_at_price }}</span>
+            <span id="total_compare_at_price">${{ parseFloat(this.widget.total_compare_at_price).toFixed(2) }}</span>
         </div>
     </div>
 </template>
@@ -67,7 +69,11 @@ export default {
                 shop_url: window.location.origin
             }
         }).then(res => {
-            self.widget = res.data.result.widget_data
+            if (res.data.result.error) {
+                console.log(res.data.result.error)
+            } else {
+                self.widget = res.data.result.widget_data
+            }
         }).catch(error => {
             console.log(error)
         })

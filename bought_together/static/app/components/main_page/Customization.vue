@@ -140,7 +140,7 @@
                     <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
                         <div style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                             <div style="color: black">Total:</div>
-                            <div style="color: red; margin-left: 3px">${{ this.total_price }}</div>
+                            <div style="color: red; margin-left: 3px">${{ parseFloat(this.total_price).toFixed(2) }}</div>
                         </div>
                         <button :style="{ background: background_color, borderColor: border_color, color: text_color }"
                                 style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center">
@@ -158,9 +158,9 @@
                                disabled
                                :checked="this.list_ids.includes(product.id)">
                         <div>{{ product.name }}</div>
-                        <span style="color: red">${{ product.price }}</span>
+                        <span style="color: red">${{ parseFloat(product.price).toFixed(2) }}</span>
                     </div>
-                    <span id="total_compare_at_price">${{ this.total_compare_at_price }}</span>
+                    <span id="total_compare_at_price">${{ parseFloat(this.total_compare_at_price).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
@@ -217,7 +217,7 @@ export default {
             description_color: '#000000',
             border_color: '#000000',
             title_font_size: '',
-            text_color: '#fff',
+            text_color: '#ffffff',
             background_color: '#000000',
             description_font_size: '',
             btn_text: 'Buy now',
@@ -399,6 +399,7 @@ export default {
     height: 30px;
     border-radius: 50%;
     margin-left: 55px;
+    border: 1px solid black;
 }
 
 .input-color input {
