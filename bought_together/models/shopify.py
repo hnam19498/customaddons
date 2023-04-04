@@ -1,4 +1,4 @@
-import shopify, datetime
+import shopify
 from odoo import api, models, fields
 
 
@@ -57,7 +57,7 @@ class Shop(models.Model):
     password = fields.Char()
     product_ids = fields.One2many("shopify.product", 'shop_id')
     admin = fields.Many2one('res.users')
-    is_update_script_tag = fields.Boolean(default=True)
+    is_update_script_tag = fields.Boolean()
 
 
 class ShopifyProduct(models.Model):

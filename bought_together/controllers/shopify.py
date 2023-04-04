@@ -88,12 +88,14 @@ class ShopifyMain(http.Controller):
 
             for product in kw['recommendation_products']:
                 list_recommendation_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search(
+                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             for product in kw['excluded_products']:
                 list_excluded_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search(
+                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
@@ -211,26 +213,11 @@ class ShopifyMain(http.Controller):
 
                 if access_token:
                     existing_webhooks = shopify.Webhook.find()
+                    ngrok_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.ngrok_url')
+                    if not ngrok_url:
+                        ngrok_url = 'https://bab6-116-97-240-10.ap.ngrok.io'
                     if not existing_webhooks:
                         print("*******************")
-
-                        ngrok_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.ngrok_url')
-                        if not ngrok_url:
-                            ngrok_url = 'https://bce9-116-97-240-10.ap.ngrok.io'
-
-                        webhook_order_create = shopify.Webhook()
-                        webhook_order_create.topic = "orders/create"
-                        webhook_order_create.address = ngrok_url + "/webhook/order_create/" + shopify_id
-                        webhook_order_create.format = "json"
-                        webhook_order_create.save()
-                        print(f"{webhook_order_create.id}: {webhook_order_create.topic}")
-
-                        webhook_order_updated = shopify.Webhook()
-                        webhook_order_updated.topic = "orders/updated"
-                        webhook_order_updated.address = ngrok_url + "/webhook/order_updated/" + shopify_id
-                        webhook_order_updated.format = "json"
-                        webhook_order_updated.save()
-                        print(f"{webhook_order_updated.id}: {webhook_order_updated.topic}")
 
                         webhook_products_create = shopify.Webhook()
                         webhook_products_create.topic = "products/create"
@@ -245,19 +232,25 @@ class ShopifyMain(http.Controller):
                         webhook_products_update.format = "json"
                         webhook_products_update.save()
                         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+                    else:
+                        print('existing_webhooks:')
+                        for webhook in existing_webhooks:
+                            print(f"---{webhook.id}: {webhook.topic}")
 
                     existing_script_tags = shopify.ScriptTag.find()
-                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
+                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(
+                        datetime.datetime.now())
+                    new_script_tag = ''
                     if existing_script_tags:
                         for script_tag in existing_script_tags:
                             if script_tag.src != new_script_tag_url:
                                 shopify.ScriptTag.find(script_tag.id).destroy()
-                                shopify.ScriptTag.create({
+                                new_script_tag = shopify.ScriptTag.create({
                                     "event": "onload",
                                     "src": new_script_tag_url
                                 })
                     else:
-                        shopify.ScriptTag.create({
+                        new_script_tag = shopify.ScriptTag.create({
                             "event": "onload",
                             "src": new_script_tag_url
                         })
@@ -305,7 +298,8 @@ class ShopifyMain(http.Controller):
                         })
 
                     current_shop = shopify.Shop.current()
-                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
+                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)],
+                                                                                     limit=1)
 
                     if current_shopify_shop:
                         current_shopify_shop.status = True
@@ -336,6 +330,13 @@ class ShopifyMain(http.Controller):
                         current_shopify_shop.admin = current_user.id
                     if not current_shopify_shop.password:
                         current_shopify_shop.password = password_generate
+                    if not existing_script_tags:
+                        if not new_script_tag:
+                            current_shopify_shop.is_update_script_tag = False
+                        else:
+                            current_shopify_shop.is_update_script_tag = True
+                    else:
+                        current_shopify_shop.is_update_script_tag = True
 
                     products = shopify.Product.find()
                     exist_products = request.env['shopify.product'].sudo().search([])

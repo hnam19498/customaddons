@@ -29,7 +29,7 @@
                 <div style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
                     <div style="color: black">Total:</div>
                     <div style="color: red; margin-left: 3px">
-                        ${{ parseFloat(this.widget.total_compare_at_price).toFixed(2) }}
+                        ${{ parseFloat(this.widget.total_price).toFixed(2) }}
                     </div>
                 </div>
                 <button :style="{ background: widget.background_color, borderColor: widget.border_color, color: widget.text_color }"
@@ -63,7 +63,7 @@ export default {
     name: "shopify.vue",
     mounted() {
         let self = this
-        axios.post('https://odoo.website/bought_together/get_widget', {
+        axios.post('/apps/proxy/bought_together/get_widget', {
             jsonrpc: "2.0",
             params: {
                 shop_url: window.location.origin
