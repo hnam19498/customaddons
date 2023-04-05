@@ -1,5 +1,5 @@
 <template>
-    <div class="nav-bar" style="font-size: 30px">
+    <div class="nav-bar">
         <div class="frame-50">
             <font-awesome-icon icon="fa-solid fa-circle-question"/>
             <font-awesome-icon icon="fa-regular fa-bell"/>

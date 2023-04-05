@@ -72,7 +72,7 @@ class ResConfigSettings(models.TransientModel):
                     webhook_products_update.save()
                     print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
-                    shop.is_update_script_tag = True
+                    shop.is_update_ngrok = True
         except Exception as e:
             print(e)
 

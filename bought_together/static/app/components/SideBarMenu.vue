@@ -1,7 +1,7 @@
 <template>
     <div class="sidebar-menu">
         <div class="company-icon">
-            <img alt="LogoNestScale" class="black-circle" src="/bought_together/static/app/img/LogoNestScale.png">
+            <img alt="LogoNestScale" class="company-img" src="/bought_together/static/app/img/LogoNestScale.png">
             <p class="company-name">NestScale</p>
         </div>
         <div class="menu-item" v-for="tab in tabs" :key="tab">
@@ -49,7 +49,7 @@ export default {
     flex-grow: 0;
 }
 
-.black-circle {
+.company-img {
     width: 46px;
     height: 46px;
     border-radius: 50%;
