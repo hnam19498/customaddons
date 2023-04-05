@@ -138,7 +138,9 @@
                 </div>
             </div>
             <div v-if="!enable_widget" class="blur"/>
-            <div class="blur" v-if="loading"><a-spin size="large"/></div>
+            <div class="blur" v-if="loading">
+                <a-spin size="large"/>
+            </div>
         </div>
     </div>
     <div v-else>
@@ -197,7 +199,14 @@ export default {
                 )
             } else {
                 this.loading = true
-                this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget, this.loading)
+                this.$emit(
+                    'addProductToCustomization',
+                    "Customization",
+                    this.list_recommendation,
+                    this.list_excluded,
+                    this.enable_widget,
+                    this.loading
+                )
             }
         },
         cancelAddProducts() {

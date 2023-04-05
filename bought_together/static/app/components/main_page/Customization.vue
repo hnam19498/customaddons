@@ -9,7 +9,7 @@
             <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
         </div>
         <div style="display: flex; position: relative; flex-direction: row; margin-top: 30px">
-            <div class="loading" v-if="this.total_compare_at_price == 0 || this.real_loading">
+            <div class="loading" v-if="this.customization_loading">
                 <a-spin size="large"/>
             </div>
             <div style="display:flex; flex-direction: column; margin-bottom: 15px">
@@ -23,9 +23,7 @@
                     <div style="display: flex; flex-direction: column">
                         <div class="color">Title Color</div>
                         <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
-                            <div class="input-color">
-                                <input type="color" v-model="title_color">
-                            </div>
+                            <div class="input-color"><input type="color" v-model="title_color"></div>
                             <input v-model="title_color" type="text" class="text-color">
                         </div>
                     </div>
@@ -47,9 +45,7 @@
                     <div style="display: flex; flex-direction: column">
                         <div class="color">Description Color</div>
                         <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
-                            <div class="input-color">
-                                <input type="color" v-model="description_color">
-                            </div>
+                            <div class="input-color"><input type="color" v-model="description_color"></div>
                             <input type="text" class="text-color" v-model="description_color">
                         </div>
                     </div>
@@ -86,27 +82,21 @@
                 <input type="text" class="input-widget" v-model="btn_text">
                 <div class="color" style="margin-top: 30px">Text Color</div>
                 <div style="display: flex; flex-direction: row; margin-top: 20px">
-                    <div class="input-color">
-                        <input type="color" v-model="text_color">
-                    </div>
+                    <div class="input-color"><input type="color" v-model="text_color"></div>
                     <input type="text" v-model="text_color" class="text-color">
                 </div>
                 <div style="display: flex; flex-direction: row; margin-top: 10px">
                     <div style="display: flex; flex-direction: column">
                         <div class="color">Background Color</div>
                         <div style="display: flex; flex-direction: row; margin-top: 20px">
-                            <div class="input-color">
-                                <input type="color" v-model="background_color">
-                            </div>
+                            <div class="input-color"><input type="color" v-model="background_color"></div>
                             <input type="text" v-model="background_color" class="text-color">
                         </div>
                     </div>
                     <div style="display: flex; flex-direction: column">
                         <div id="border-color">Border Color</div>
                         <div style="display: flex; margin-top: 20px; flex-direction: row">
-                            <div class="input-color">
-                                <input type="color" v-model="border_color">
-                            </div>
+                            <div class="input-color"><input type="color" v-model="border_color"></div>
                             <input type="text" class="text-color" v-model="border_color">
                         </div>
                     </div>
@@ -163,7 +153,9 @@
                             <div>{{ product.name }}</div>
                             <span style="color: red">${{ parseFloat(product.price).toFixed(2) }}</span>
                         </div>
-                        <span id="total_compare_at_price">${{ parseFloat(this.total_compare_at_price).toFixed(2) }}</span>
+                        <span id="total_compare_at_price">
+                            ${{ parseFloat(this.total_compare_at_price).toFixed(2) }}
+                        </span>
                     </div>
                 </div>
             </div>
@@ -211,7 +203,16 @@ export default {
                     3
                 )
             } else {
-                self.real_loading = true
+                self.customization_loading = true
+                if (!self.title_font_size) {
+                    self.title_font_size = '15px'
+                }
+                if (!self.description_font_size) {
+                    self.description_font_size = '10px'
+                }
+                if (!self.btn_text) {
+                    self.btn_text = 'Buy'
+                }
                 axios.post('https://odoo.website/bought_together/save_widget', {
                     jsonrpc: "2.0",
                     params: {
@@ -231,7 +232,7 @@ export default {
                         total_compare_at_price: self.total_compare_at_price
                     }
                 }).then(() => {
-                    self.real_loading = false
+                    self.customization_loading = false
                     self.$emit('changeTab', 'Installation')
                 }).catch(error => {
                     console.log(error)
@@ -254,7 +255,7 @@ export default {
             list_ids: [],
             total_price: 0,
             total_compare_at_price: 0,
-            real_loading: this.loading
+            customization_loading: this.loading
         }
     },
     props: {
@@ -263,7 +264,7 @@ export default {
             type: Array,
             default: []
         },
-        loading:{
+        loading: {
             type: Boolean,
             default: true
         }
@@ -275,8 +276,8 @@ export default {
             this.total_price += product.price
             this.total_compare_at_price += product.compare_at_price
         }
-        if (this.total_compare_at_price) {
-            this.real_loading = false
+        if (this.total_compare_at_price > 0) {
+            this.customization_loading = false
         }
     },
     components: {CloseCircleFilled}
