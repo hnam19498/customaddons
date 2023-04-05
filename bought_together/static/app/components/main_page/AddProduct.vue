@@ -2,8 +2,7 @@
     <div v-if="products">
         <div class="setting-btn">
             <button class="btn-setting" id="btn-cancel" @click="cancelAddProducts">Cancel</button>
-            <button class="btn-setting" id="btn-save" @click="saveAddProducts">NEXT
-            </button>
+            <button class="btn-setting" id="btn-next" @click="nextToCustomization">NEXT</button>
         </div>
         <div id="setting_widget">
             <label id="enable_widget">Enable Widget</label>
@@ -138,7 +137,8 @@
                     </table>
                 </div>
             </div>
-            <div v-if="!enable_widget" class="blur"></div>
+            <div v-if="!enable_widget" class="blur"/>
+            <div class="blur" v-if="loading"><a-spin size="large"/></div>
         </div>
     </div>
     <div v-else>
@@ -182,11 +182,12 @@ export default {
             list_recommendation: [],
             list_excluded: [],
             search_excluded: '',
-            search_recommendation: ''
+            search_recommendation: '',
+            loading: false
         }
     },
     methods: {
-        saveAddProducts() {
+        nextToCustomization() {
             if (this.list_recommendation.length > 5 || this.list_recommendation.length == 0) {
                 this.show_toast(
                     'open',
@@ -195,7 +196,8 @@ export default {
                     3
                 )
             } else {
-                this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget)
+                this.loading = true
+                this.$emit('addProductToCustomization', "Customization", this.list_recommendation, this.list_excluded, this.enable_widget, this.loading)
             }
         },
         cancelAddProducts() {
@@ -449,7 +451,7 @@ svg {
     font-style: normal;
 }
 
-#btn-save {
+#btn-next {
     align-items: center;
     padding: 4px 12px;
     gap: 4px;
@@ -562,7 +564,8 @@ svg {
     height: 100%;
     z-index: 99;
     opacity: 0.5;
-    background-color: white
+    background-color: white;
+    justify-content: center;
 }
 
 .selected_products {

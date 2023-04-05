@@ -18,6 +18,7 @@
                              :products="products"
                              v-if="currentTab=='AddProduct'"/>
                 <customization @changeTab="changeTab"
+                               :loading="loading"
                                :list_recommendation="list_recommendation"
                                :list_excluded="list_excluded"
                                v-if="currentTab=='Customization'"/>
@@ -85,17 +86,19 @@ export default {
             list_product_customization: [],
             list_excluded: [],
             user: '',
-            user_img: ''
+            user_img: '',
+            loading: true
         }
     },
     methods: {
         changeTab(tab) {
             this.currentTab = tab
         },
-        addProductToCustomization(tab, list_recommendation, list_excluded, enable_widget) {
+        addProductToCustomization(tab, list_recommendation, list_excluded, enable_widget, loading) {
             this.list_recommendation = list_recommendation
             this.list_excluded = list_excluded
             this.currentTab = tab
+            this.loading = loading
             window.list_recommendation = list_recommendation
             window.list_excluded = list_excluded
             window.enable_widget = enable_widget

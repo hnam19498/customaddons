@@ -1,169 +1,170 @@
 <template>
-    <div class="setting-btn">
-        <button class="btn-setting" id="btn-cancel" @click="cancelCustomization">Cancel</button>
-        <button class="btn-setting" id="btn-save" @click="saveCustomization">SAVE</button>
-    </div>
-    <div id="setting_customization">
-        <label id="settings">Settings</label>
-        <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
-    </div>
-    <div style="display: flex; flex-direction: row; margin-top: 30px">
-        <div style="display:flex; flex-direction: column; margin-bottom: 15px">
-            <div class="configuration">
-                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
-                <span>General Configuration</span>
-            </div>
-            <div class="widget">Widget Title</div>
-            <input type="text" class="input-widget" v-model="widget_title">
-            <div style="display: flex; flex-direction: row; margin-top: 18px; align-items: center">
-                <div style="display: flex; flex-direction: column">
-                    <div class="color">
-                        Title Color
-                    </div>
-                    <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
-                        <div class="input-color">
-                            <input type="color" v-model="title_color">
-                        </div>
-                        <input v-model="title_color" type="text" class="text-color">
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: column; margin-left: 50px" class="select-font">
-                    <div class="font-size">Font Size</div>
-                    <select v-model="title_font_size">
-                        <option disabled value="">Please select one</option>
-                        <option value="10px">Extra Small</option>
-                        <option value="15px">Small</option>
-                        <option value="20px">Medium</option>
-                        <option value="25px">Large</option>
-                        <option value="30px">Extra Large</option>
-                    </select>
-                </div>
-            </div>
-            <div class="widget">Widget Description</div>
-            <input type="text" class="input-widget" v-model="widget_description">
-            <div style="display: flex; flex-direction: row; margin-top: 18px; align-items: center">
-                <div style="display: flex; flex-direction: column">
-                    <div class="color">Description Color</div>
-                    <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
-                        <div class="input-color">
-                            <input type="color" v-model="description_color">
-                        </div>
-                        <input type="text" class="text-color" v-model="description_color">
-                    </div>
-                </div>
-                <div style="display: flex; margin-left: 50px; flex-direction: column" class="select-font">
-                    <div class="font-size">Font Size</div>
-                    <select v-model="description_font_size">
-                        <option disabled value="">Please select one</option>
-                        <option value="10px">Extra Small</option>
-                        <option value="15px">Small</option>
-                        <option value="20px">Medium</option>
-                        <option value="25px">Large</option>
-                        <option value="30px">Extra Large</option>
-                    </select>
-                </div>
-            </div>
-            <div style="display: flex; flex-direction: row; margin-top: 30px">
-                <div style="display: flex; flex-direction: column">
-                    <div class="layout-style">Layout Style</div>
-                    <div style="display:flex; flex-direction: row" class="layout-select">
-                        <input type="radio" id="layout-style">
-                        <label for="layout-style">List</label>
-                    </div>
-                </div>
-                <div class="number-products" style="display: flex; flex-direction: column">
-                    <div>Number of products to show</div>
-                    <input type="number" min="1" max="5" value="3">
-                </div>
-            </div>
-            <div class="configuration" style="margin-top: 25px">
-                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
-                <span>Button Configuration</span>
-            </div>
-            <div class="widget">Button Text</div>
-            <input type="text" class="input-widget" v-model="btn_text">
-            <div class="color" style="margin-top: 30px">Text Color</div>
-            <div style="display: flex; flex-direction: row; margin-top: 20px">
-                <div class="input-color">
-                    <input type="color" v-model="text_color">
-                </div>
-                <input type="text" v-model="text_color" class="text-color">
-            </div>
-            <div style="display: flex; flex-direction: row; margin-top: 10px">
-                <div style="display: flex; flex-direction: column">
-                    <div class="color">Background Color</div>
-                    <div style="display: flex; flex-direction: row; margin-top: 20px">
-                        <div class="input-color">
-                            <input type="color" v-model="background_color">
-                        </div>
-                        <input type="text" v-model="background_color" class="text-color">
-                    </div>
-                </div>
-                <div style="display: flex; flex-direction: column">
-                    <div id="border-color">Border Color</div>
-                    <div style="display: flex; margin-top: 20px; flex-direction: row">
-                        <div class="input-color">
-                            <input type="color" v-model="border_color">
-                        </div>
-                        <input type="text" class="text-color" v-model="border_color">
-                    </div>
-                </div>
-            </div>
+    <div>
+        <div class="setting-btn">
+            <button class="btn-setting" id="btn-cancel" @click="cancelCustomization">Cancel</button>
+            <button class="btn-setting" id="btn-save" @click="saveCustomization">SAVE</button>
         </div>
-        <div style="display: flex; flex-direction: column; width: 100%">
-            <div class="configuration" style="margin-left: -50px">
-                <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
-                <span>Preview</span>
+        <div id="setting_customization">
+            <label id="settings">Settings</label>
+            <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
+        </div>
+        <div style="display: flex; position: relative; flex-direction: row; margin-top: 30px">
+            <div class="loading" v-if="this.total_compare_at_price == 0 || this.real_loading">
+                <a-spin size="large"/>
             </div>
-            <div id="preview">
-                <div :style="{ color: title_color, fontSize: title_font_size }"
-                     style="margin-top:32px; height: 24px; font-style: normal; font-weight: 700; line-height: 22px">
-                    {{ this.widget_title }}
+            <div style="display:flex; flex-direction: column; margin-bottom: 15px">
+                <div class="configuration">
+                    <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
+                    <span>General Configuration</span>
                 </div>
-                <div :style="{ color: description_color, fontSize: description_font_size }"
-                     style="margin-top: 14px; height: 25px; font-style: normal; font-weight: 400; line-height: 22px">
-                    {{ this.widget_description }}
+                <div class="widget">Widget Title</div>
+                <input type="text" class="input-widget" v-model="widget_title">
+                <div style="display: flex; flex-direction: row; margin-top: 18px; align-items: center">
+                    <div style="display: flex; flex-direction: column">
+                        <div class="color">Title Color</div>
+                        <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
+                            <div class="input-color">
+                                <input type="color" v-model="title_color">
+                            </div>
+                            <input v-model="title_color" type="text" class="text-color">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; margin-left: 50px" class="select-font">
+                        <div class="font-size">Font Size</div>
+                        <select v-model="title_font_size">
+                            <option disabled value="">Please select one</option>
+                            <option value="10px">Extra Small</option>
+                            <option value="15px">Small</option>
+                            <option value="20px">Medium</option>
+                            <option value="25px">Large</option>
+                            <option value="30px">Extra Large</option>
+                        </select>
+                    </div>
                 </div>
-                <div style="display: flex; flex-direction: row">
-                    <div style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
-                        <div :key="product.id"
+                <div class="widget">Widget Description</div>
+                <input type="text" class="input-widget" v-model="widget_description">
+                <div style="display: flex; flex-direction: row; margin-top: 18px; align-items: center">
+                    <div style="display: flex; flex-direction: column">
+                        <div class="color">Description Color</div>
+                        <div style="display: flex; margin-top: 20px; align-items: center; flex-direction: row">
+                            <div class="input-color">
+                                <input type="color" v-model="description_color">
+                            </div>
+                            <input type="text" class="text-color" v-model="description_color">
+                        </div>
+                    </div>
+                    <div style="display: flex; margin-left: 50px; flex-direction: column" class="select-font">
+                        <div class="font-size">Font Size</div>
+                        <select v-model="description_font_size">
+                            <option disabled value="">Please select one</option>
+                            <option value="10px">Extra Small</option>
+                            <option value="15px">Small</option>
+                            <option value="20px">Medium</option>
+                            <option value="25px">Large</option>
+                            <option value="30px">Extra Large</option>
+                        </select>
+                    </div>
+                </div>
+                <div style="display: flex; flex-direction: row; margin-top: 30px">
+                    <div style="display: flex; flex-direction: column">
+                        <div class="layout-style">Layout Style</div>
+                        <div style="display:flex; flex-direction: row" class="layout-select">
+                            <input type="radio" id="layout-style">
+                            <label for="layout-style">List</label>
+                        </div>
+                    </div>
+                    <div class="number-products" style="display: flex; flex-direction: column">
+                        <div>Number of products to show</div>
+                        <input type="number" min="1" max="5" :value="this.list_recommendation.length">
+                    </div>
+                </div>
+                <div class="configuration" style="margin-top: 25px">
+                    <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
+                    <span>Button Configuration</span>
+                </div>
+                <div class="widget">Button Text</div>
+                <input type="text" class="input-widget" v-model="btn_text">
+                <div class="color" style="margin-top: 30px">Text Color</div>
+                <div style="display: flex; flex-direction: row; margin-top: 20px">
+                    <div class="input-color">
+                        <input type="color" v-model="text_color">
+                    </div>
+                    <input type="text" v-model="text_color" class="text-color">
+                </div>
+                <div style="display: flex; flex-direction: row; margin-top: 10px">
+                    <div style="display: flex; flex-direction: column">
+                        <div class="color">Background Color</div>
+                        <div style="display: flex; flex-direction: row; margin-top: 20px">
+                            <div class="input-color">
+                                <input type="color" v-model="background_color">
+                            </div>
+                            <input type="text" v-model="background_color" class="text-color">
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column">
+                        <div id="border-color">Border Color</div>
+                        <div style="display: flex; margin-top: 20px; flex-direction: row">
+                            <div class="input-color">
+                                <input type="color" v-model="border_color">
+                            </div>
+                            <input type="text" class="text-color" v-model="border_color">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; flex-direction: column; width: 100%">
+                <div class="configuration" style="margin-left: -50px">
+                    <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
+                    <span>Preview</span>
+                </div>
+                <div id="preview">
+                    <div :style="{ color: title_color, fontSize: title_font_size }"
+                         style="margin-top:32px; height: 24px; font-style: normal; font-weight: 700; line-height: 22px">
+                        {{ this.widget_title }}
+                    </div>
+                    <div :style="{ color: description_color, fontSize: description_font_size }"
+                         style="margin-top: 14px; height: 25px; font-style: normal; font-weight: 400; line-height: 22px">
+                        {{ this.widget_description }}
+                    </div>
+                    <div style="display: flex; flex-direction: row">
+                        <div style="display: flex; flex-direction: row; margin-top: 50px; width: 100%; justify-content: center">
+                            <div :key="product.id"
+                                 v-for="product in this.list_recommendation"
+                                 style="display: flex; align-items: center">
+                                <img :src="product.img"
+                                     style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"
+                                     :alt="product.name">
+                                <div style="margin: 5px; font-weight: 600; font-size: 16px"
+                                     v-if="this.list_ids[this.list_ids.length - 1] != product.id">+
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
+                            <div style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
+                                <div style="color: black">Total:</div>
+                                <div style="color: red; margin-left: 3px">${{ parseFloat(this.total_price).toFixed(2) }}
+                                </div>
+                            </div>
+                            <button :style="{ background: background_color, borderColor: border_color, color: text_color }"
+                                    style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center">
+                                {{ this.btn_text }}
+                            </button>
+                        </div>
+                    </div>
+                    <div style="margin-top: 18px; margin-bottom: 17px">
+                        <div style="display: flex; flex-direction: row"
+                             class="item"
                              v-for="product in this.list_recommendation"
-                             style="display: flex; align-items: center">
-                            <img :src="product.img"
-                                 style="border: 1px solid #E2E2E2; border-radius: 5px; width: 65px; height: 65px"
-                                 :alt="product.name">
-                            <div style="margin: 5px; font-weight: 600; font-size: 16px"
-                                 v-if="this.list_ids[this.list_ids.length - 1] != product.id">+
-                            </div>
+                             :key="product.id">
+                            <input type="checkbox"
+                                   :value="product.id"
+                                   disabled
+                                   :checked="this.list_ids.includes(product.id)">
+                            <div>{{ product.name }}</div>
+                            <span style="color: red">${{ parseFloat(product.price).toFixed(2) }}</span>
                         </div>
+                        <span id="total_compare_at_price">${{ parseFloat(this.total_compare_at_price).toFixed(2) }}</span>
                     </div>
-                    <div style="display: flex; flex-direction: column; align-items: center; width: 50%; margin-left: auto">
-                        <div style="display: flex; flex-direction: row; margin-top: 60px; height: 18px; font-style: normal; font-weight: 600; font-size: 16px; line-height: 22px">
-                            <div style="color: black">Total:</div>
-                            <div style="color: red; margin-left: 3px">${{
-                                parseFloat(this.total_price).toFixed(2)
-                                }}
-                            </div>
-                        </div>
-                        <button :style="{ background: background_color, borderColor: border_color, color: text_color }"
-                                style="min-width: 70px; border-radius: 5px; height: 24px; margin-top: 10px; display: flex; align-items: center">
-                            {{ this.btn_text }}
-                        </button>
-                    </div>
-                </div>
-                <div style="margin-top: 18px; margin-bottom: 17px">
-                    <div style="display: flex; flex-direction: row"
-                         class="item"
-                         v-for="product in this.list_recommendation"
-                         :key="product.id">
-                        <input type="checkbox"
-                               :value="product.id"
-                               disabled
-                               :checked="this.list_ids.includes(product.id)">
-                        <div>{{ product.name }}</div>
-                        <span style="color: red">${{ parseFloat(product.price).toFixed(2) }}</span>
-                    </div>
-                    <span id="total_compare_at_price">${{ parseFloat(this.total_compare_at_price).toFixed(2) }}</span>
                 </div>
             </div>
         </div>
@@ -171,9 +172,23 @@
 </template>
 <script>
 import axios from "axios"
+import {CloseCircleFilled} from "@ant-design/icons-vue"
+import {notification} from 'ant-design-vue'
+import {h} from 'vue'
 
 export default {
     methods: {
+        show_toast: function (type, message, description, duration) {
+            notification[type]({
+                description: description,
+                message: message,
+                duration: duration,
+                class: 'error_popup',
+                closeIcon: e => {
+                    return (<CloseCircleFilled/>)
+                }
+            })
+        },
         cancelCustomization() {
             this.widget_description = 'Good deals only for you!'
             this.title_color = '#000000'
@@ -188,29 +203,40 @@ export default {
         },
         saveCustomization() {
             let self = this
-            axios.post('https://odoo.website/bought_together/save_widget', {
-                jsonrpc: "2.0",
-                params: {
-                    recommendation_products: self.list_recommendation,
-                    widget_description: self.widget_description,
-                    title_color: self.title_color,
-                    description_color: self.description_color,
-                    border_color: self.border_color,
-                    title_font_size: self.title_font_size,
-                    text_color: self.text_color,
-                    background_color: self.background_color,
-                    description_font_size: self.description_font_size,
-                    btn_text: self.btn_text,
-                    widget_title: self.widget_title,
-                    total_price: self.total_price,
-                    excluded_products: self.list_excluded,
-                    total_compare_at_price: self.total_compare_at_price
-                }
-            }).then(() => {
-                self.$emit('changeTab', 'Installation')
-            }).catch(error => {
-                console.log(error)
-            })
+            if (self.total_compare_at_price == 0) {
+                self.show_toast(
+                    'open',
+                    'Have no product in widget.',
+                    'Please select at least 1 product or up to 5 products from the list to continue.',
+                    3
+                )
+            } else {
+                self.real_loading = true
+                axios.post('https://odoo.website/bought_together/save_widget', {
+                    jsonrpc: "2.0",
+                    params: {
+                        recommendation_products: self.list_recommendation,
+                        widget_description: self.widget_description,
+                        title_color: self.title_color,
+                        description_color: self.description_color,
+                        border_color: self.border_color,
+                        title_font_size: self.title_font_size,
+                        text_color: self.text_color,
+                        background_color: self.background_color,
+                        description_font_size: self.description_font_size,
+                        btn_text: self.btn_text,
+                        widget_title: self.widget_title,
+                        total_price: self.total_price,
+                        excluded_products: self.list_excluded,
+                        total_compare_at_price: self.total_compare_at_price
+                    }
+                }).then(() => {
+                    self.real_loading = false
+                    self.$emit('changeTab', 'Installation')
+                }).catch(error => {
+                    console.log(error)
+                })
+            }
         }
     },
     data() {
@@ -227,7 +253,8 @@ export default {
             widget_title: "YOU MAY ALSO LIKE...",
             list_ids: [],
             total_price: 0,
-            total_compare_at_price: 0
+            total_compare_at_price: 0,
+            real_loading: this.loading
         }
     },
     props: {
@@ -235,6 +262,10 @@ export default {
         list_excluded: {
             type: Array,
             default: []
+        },
+        loading:{
+            type: Boolean,
+            default: true
         }
     },
     emits: ['changeTab'],
@@ -244,7 +275,11 @@ export default {
             this.total_price += product.price
             this.total_compare_at_price += product.compare_at_price
         }
-    }
+        if (this.total_compare_at_price) {
+            this.real_loading = false
+        }
+    },
+    components: {CloseCircleFilled}
 }
 </script>
 <style scoped>
@@ -534,5 +569,15 @@ export default {
     font-size: 12px;
     line-height: 22px;
     color: #848484;
+}
+
+.loading {
+    justify-content: center;
+    display: flex;
+    width: 100%;
+    opacity: 0.5;
+    height: 100%;
+    background-color: white;
+    position: absolute;
 }
 </style>
