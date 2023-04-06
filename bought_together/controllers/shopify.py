@@ -294,14 +294,14 @@ class ShopifyMain(http.Controller):
                             'image_1920': img_content
                         })
 
-                    current_shop = shopify.Shop.current()
-                    current_shopify_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
+                    current_shopify = shopify.Shop.current()
+                    current_shop = request.env["shop.shopify"].sudo().search([("shopify_id", "=", shopify_id)], limit=1)
 
-                    if current_shopify_shop:
-                        current_shopify_shop.status = True
-                        if not current_shopify_shop.shopify_owner:
-                            current_shopify_shop.shopify_owner = current_shop.attributes['shop_owner']
-                            current_shopify_shop.sudo().write({
+                    if current_shop:
+                        current_shop.status = True
+                        if not current_shop.shopify_owner:
+                            current_shop.shopify_owner = current_shopify.shop_owner
+                            current_shop.sudo().write({
                                 "access_token": access_token,
                                 "name": shopify_data["data"]["shop"]["name"],
                                 "email": shopify_data["data"]["shop"]["email"],
@@ -310,29 +310,29 @@ class ShopifyMain(http.Controller):
                                 "country": shopify_data["data"]["shop"]["billingAddress"]["country"]
                             })
                     else:
-                        current_shopify_shop = request.env["shop.shopify"].sudo().create({
+                        current_shop = request.env["shop.shopify"].sudo().create({
                             "shopify_id": shopify_id,
                             'access_token': access_token,
                             "name": shopify_data["data"]["shop"]["name"],
                             "email": shopify_data["data"]["shop"]["email"],
                             'status': True,
-                            "shopify_owner": current_shop.attributes['shop_owner'],
+                            "shopify_owner": current_shopify.shop_owner,
                             "currencyCode": shopify_data["data"]["shop"]["currencyCode"],
                             "url": shopify_data["data"]["shop"]["url"],
                             "country": shopify_data["data"]["shop"]["billingAddress"]["country"]
                         })
 
-                    if not current_shopify_shop.admin:
-                        current_shopify_shop.admin = current_user.id
-                    if not current_shopify_shop.password:
-                        current_shopify_shop.password = password_generate
+                    if not current_shop.admin:
+                        current_shop.admin = current_user.id
+                    if not current_shop.password:
+                        current_shop.password = password_generate
                     if not existing_script_tags:
                         if not new_script_tag:
-                            current_shopify_shop.is_update_script_tag = False
+                            current_shop.is_update_script_tag = False
                         else:
-                            current_shopify_shop.is_update_script_tag = True
+                            current_shop.is_update_script_tag = True
                     else:
-                        current_shopify_shop.is_update_script_tag = True
+                        current_shop.is_update_script_tag = True
 
                     products = shopify.Product.find()
                     exist_products = request.env['shopify.product'].sudo().search([])
@@ -350,13 +350,13 @@ class ShopifyMain(http.Controller):
                                     request.env['shopify.product'].sudo().create({
                                         'shopify_product_id': product.id,
                                         'name': product.title,
-                                        'url': "https://" + kw['shop'] + "/products/" + product.attributes['handle'],
-                                        'shop_id': current_shopify_shop.id,
-                                        'url_img': product.attributes['images'][0].attributes['src'],
+                                        'url': "https://" + kw['shop'] + "/products/" + product.handle,
+                                        'shop_id': current_shop.id,
+                                        'url_img': product.image.src,
                                         'price': float(product.variants[0].price),
                                         "compare_at_price": product.variants[0].compare_at_price,
                                         'qty': product.variants[0].inventory_quantity,
-                                        "variant_id": product.attributes['variants'][0].id
+                                        "variant_id": product.variants[0].id
                                     })
                                 except Exception as error_create_product:
                                     print("error_create_product: " + str(error_create_product))
@@ -365,7 +365,7 @@ class ShopifyMain(http.Controller):
                                 print(f'Product id "{product.id}" đã trong database!')
                     db = http.request.env.cr.dbname
                     request.env.cr.commit()
-                    request.session.authenticate(db, kw['shop'], current_shopify_shop.password)
+                    request.session.authenticate(db, kw['shop'], current_shop.password)
                     return werkzeug.utils.redirect('/bought_together')
         except Exception as e:
             print(e)
