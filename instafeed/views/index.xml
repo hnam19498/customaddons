@@ -1,0 +1,13 @@
+<odoo>
+    <data>
+        <template id="instafeed">
+            <html>
+                <head></head>
+                <body>
+                    <div id="app"/>
+                    <script src="/instafeed/static/js/index.js"/>
+                </body>
+            </html>
+        </template>
+    </data>
+</odoo>
