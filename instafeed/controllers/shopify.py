@@ -5,14 +5,14 @@ from odoo.modules import get_resource_path
 
 
 class ShopifyMain(http.Controller):
-    @http.route("/bought_together/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
+    @http.route("/instafeed/shopify_auth", auth="public", type="http", csrf=False, cors="*", save_session=False)
     def shopify_auth(self, **kw):
         try:
             if "shop" in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
-                base_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.base_url')
-                api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
+                api_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_key')
+                secret_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_secret_key')
+                base_url = request.env['ir.config_parameter'].sudo().get_param('instafeed.base_url')
+                api_version = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
 
                 shopify.Session.setup(api_key=api_key, secret=secret_key)
                 state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
@@ -36,9 +36,9 @@ class ShopifyMain(http.Controller):
     def shopify_callback(self, **kw):
         try:
             if 'shop' in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
-                api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
+                api_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_key')
+                secret_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_secret_key')
+                api_version = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
 
                 shopify.Session.setup(api_key=api_key, secret=secret_key)
                 session = shopify.Session(kw["shop"], api_version)
@@ -62,7 +62,7 @@ class ShopifyMain(http.Controller):
 
                 if access_token:
                     existing_webhooks = shopify.Webhook.find()
-                    ngrok_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.ngrok_url')
+                    ngrok_url = request.env['ir.config_parameter'].sudo().get_param('instafeed.ngrok_url')
                     if not ngrok_url:
                         ngrok_url = 'https://bab6-116-97-240-10.ap.ngrok.io'
                     if not existing_webhooks:
@@ -87,7 +87,7 @@ class ShopifyMain(http.Controller):
                             print(f"---{webhook.id}: {webhook.topic}")
 
                     existing_script_tags = shopify.ScriptTag.find()
-                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(
+                    new_script_tag_url = 'https://odoo.website/instafeed/static/js/shopify.js?v=' + str(
                         datetime.datetime.now())
                     new_script_tag = ''
                     if existing_script_tags:
@@ -129,7 +129,7 @@ class ShopifyMain(http.Controller):
                         })
 
                     if not current_user:
-                        img_path = get_resource_path('bought_together', 'static/app/img', 'HOF.jpg')
+                        img_path = get_resource_path('instafeed', 'static/images', 'HOF.jpg')
                         img_content = base64.b64encode(open(img_path, "rb").read())
                         current_user = request.env['res.users'].sudo().create({
                             'company_ids': [[6, False, [current_company.id]]],
@@ -218,7 +218,7 @@ class ShopifyMain(http.Controller):
                     db = http.request.env.cr.dbname
                     request.env.cr.commit()
                     request.session.authenticate(db, kw['shop'], current_shop.password)
-                    return werkzeug.utils.redirect('/bought_together')
+                    return werkzeug.utils.redirect('/instafeed')
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
