@@ -88,12 +88,14 @@ class ShopifyMain(http.Controller):
 
             for product in kw['recommendation_products']:
                 list_recommendation_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search(
+                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             for product in kw['excluded_products']:
                 list_excluded_product_ids.append(
-                    request.env['shopify.product'].sudo().search([("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
+                    request.env['shopify.product'].sudo().search(
+                        [("shop_id", '=', current_shop.id), ("shopify_product_id", '=', product['id'])]).id
                 )
 
             exist_widget = request.env['shopify.widget'].sudo().search([("shop_id", '=', current_shop.id)], limit=1)
@@ -158,12 +160,12 @@ class ShopifyMain(http.Controller):
     def shopify_auth(self, **kw):
         try:
             if "shop" in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
+                client_id = request.env['ir.config_parameter'].sudo().get_param('bought_together.client_id')
+                client_secret = request.env['ir.config_parameter'].sudo().get_param('bought_together.client_secret')
                 base_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.base_url')
                 api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
 
-                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                shopify.Session.setup(api_key=client_id, secret=client_secret)
                 state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
                 redirect_uri = f"{base_url}/auth/shopify/callback"
                 scopes = [
@@ -185,11 +187,11 @@ class ShopifyMain(http.Controller):
     def shopify_callback(self, **kw):
         try:
             if 'shop' in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('bought_together.secret_key')
+                client_id = request.env['ir.config_parameter'].sudo().get_param('bought_together.client_id')
+                client_secret = request.env['ir.config_parameter'].sudo().get_param('bought_together.client_secret')
                 api_version = request.env['ir.config_parameter'].sudo().get_param('bought_together.api_version')
 
-                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                shopify.Session.setup(api_key=client_id, secret=client_secret)
                 session = shopify.Session(kw["shop"], api_version)
                 access_token = session.request_token(kw)
                 shopify.ShopifyResource.activate_session(session)
@@ -231,12 +233,34 @@ class ShopifyMain(http.Controller):
                         webhook_products_update.save()
                         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
                     else:
-                        print('existing_webhooks:')
                         for webhook in existing_webhooks:
-                            print(f"---{webhook.id}: {webhook.topic}")
+                            if webhook.address != ngrok_url + "/webhook/products_create/" + shopify_id:
+                                webhook.destroy()
+
+                                webhook_products_create = shopify.Webhook()
+                                webhook_products_create.topic = "products/create"
+                                webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
+                                webhook_products_create.format = "json"
+                                webhook_products_create.save()
+                                print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
+                            else:
+                                print(f"{webhook.id}: {webhook.topic}")
+
+                            if webhook.address != ngrok_url + "/webhook/products_update/" + shopify_id:
+                                webhook.destroy()
+
+                                webhook_products_update = shopify.Webhook()
+                                webhook_products_update.topic = "products/update"
+                                webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
+                                webhook_products_update.format = "json"
+                                webhook_products_update.save()
+                                print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+                            else:
+                                print(f"{webhook.id}: {webhook.topic}")
 
                     existing_script_tags = shopify.ScriptTag.find()
-                    new_script_tag_url = 'https://odoo.website/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
+                    base_url = request.env['ir.config_parameter'].sudo().get_param('bought_together.base_url')
+                    new_script_tag_url = base_url + '/bought_together/static/js/shopify.js?v=' + str(datetime.datetime.now())
                     new_script_tag = ''
                     if existing_script_tags:
                         for script_tag in existing_script_tags:

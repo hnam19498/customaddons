@@ -14,8 +14,8 @@
                          data-key="Bought together">
                         <h2>Bought together Config</h2>
                         <group>
-                            <field name="api_key"/>
-                            <field name="secret_key"/>
+                            <field name="client_id"/>
+                            <field name="client_secret"/>
                             <field name="api_version"/>
                             <field name="base_url"/>
                             <field name="ngrok_url"/>

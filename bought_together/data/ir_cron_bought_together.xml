@@ -1,0 +1,26 @@
+<openerp>
+    <data>
+        <record id="ir_cron_change_ngrok" model="ir.cron" forcecreate="True">
+            <field name="name">Cron job change ngrok</field>
+            <field name="model_id" ref="model_shop_shopify"/>
+            <field name="state">code</field>
+            <field name="code">model.change_ngrok_url()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True"/>
+        </record>
+        <record id="ir_cron_change_script_tag_url" model="ir.cron" forcecreate="True">
+            <field name="name">Cron job change script tag</field>
+            <field name="model_id" ref="model_shop_shopify"/>
+            <field name="state">code</field>
+            <field name="code">model.change_script_tag_url()</field>
+            <field name="user_id" ref="base.user_root"/>
+            <field name="interval_number">1</field>
+            <field name="interval_type">minutes</field>
+            <field name="numbercall">-1</field>
+            <field name="doall" eval="True"/>
+        </record>
+    </data>
+</openerp>

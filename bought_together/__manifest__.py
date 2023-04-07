@@ -10,7 +10,8 @@
     "data": [
         'security/ir.model.access.csv',
         'views/index.xml',
-        "views/shopify_view.xml"
+        "views/shopify_view.xml",
+        'data/ir_cron_bought_together.xml'
     ],
     'assets': {
     },
