@@ -5,12 +5,12 @@ from odoo import api, models, fields
 class ShopifySettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
-    shopify_api_key = fields.Char('API Key', config_parameter='instafeed.shopify_api_key')
+    shopify_client_id = fields.Char('Shopify client ID', config_parameter='instafeed.shopify_client_id')
     base_url = fields.Char('Base URL', config_parameter='instafeed.base_url')
-    shopify_api_version = fields.Char('API version', config_parameter='instafeed.shopify_api_version')
-    shopify_secret_key = fields.Char('Secret Key', config_parameter='instafeed.shopify_secret_key')
+    shopify_api_version = fields.Char('Shopify API version', config_parameter='instafeed.shopify_api_version')
+    shopify_client_secret = fields.Char('Shopify client secret', config_parameter='instafeed.shopify_client_secret')
     ngrok_url = fields.Char('Ngrok URL', config_parameter='instafeed.ngrok_url')
-    shopify_script_tag_url = fields.Char('Script tag URL', config_parameter='instafeed.shopify_script_tag_url')
+    shopify_script_tag_url = fields.Char('Shopify script tag URL', config_parameter='instafeed.shopify_script_tag_url')
 
     def change_script_tag_url(self):
         try:

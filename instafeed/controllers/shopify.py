@@ -9,14 +9,14 @@ class ShopifyMain(http.Controller):
     def shopify_auth(self, **kw):
         try:
             if "shop" in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_secret_key')
+                shopify_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_client_id')
+                shopify_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_client_secret')
                 base_url = request.env['ir.config_parameter'].sudo().get_param('instafeed.base_url')
                 api_version = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
 
-                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                shopify.Session.setup(api_key=shopify_client_id, secret=shopify_client_secret)
                 state = binascii.b2a_hex(os.urandom(15)).decode("utf-8")
-                redirect_uri = f"{base_url}/auth/shopify/callback"
+                redirect_uri = f"{base_url}/instafeed/shopify/callback"
                 scopes = [
                     "read_products",
                     "read_orders",
@@ -32,15 +32,15 @@ class ShopifyMain(http.Controller):
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
 
-    @http.route("/auth/shopify/callback", auth="public", type="http", csrf=False, cors="*")
+    @http.route("/instafeed/shopify/callback", auth="public", type="http", csrf=False, cors="*")
     def shopify_callback(self, **kw):
         try:
             if 'shop' in kw:
-                api_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_key')
-                secret_key = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_secret_key')
+                shopify_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_client_id')
+                shopify_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_client_secret')
                 api_version = request.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
 
-                shopify.Session.setup(api_key=api_key, secret=secret_key)
+                shopify.Session.setup(api_key=shopify_client_id, secret=shopify_client_secret)
                 session = shopify.Session(kw["shop"], api_version)
                 access_token = session.request_token(kw)
                 shopify.ShopifyResource.activate_session(session)
@@ -87,8 +87,8 @@ class ShopifyMain(http.Controller):
                             print(f"---{webhook.id}: {webhook.topic}")
 
                     existing_script_tags = shopify.ScriptTag.find()
-                    new_script_tag_url = 'https://odoo.website/instafeed/static/js/shopify.js?v=' + str(
-                        datetime.datetime.now())
+                    base_url = request.env['ir.config_parameter'].sudo().get_param('instafeed.base_url')
+                    new_script_tag_url = base_url + '/instafeed/static/js/shopify.js?v=' + str(datetime.datetime.now())
                     new_script_tag = ''
                     if existing_script_tags:
                         for script_tag in existing_script_tags:

@@ -1,1 +1,1 @@
-from . import shopify, instagram
+from . import shopify, instagram, index, facebook

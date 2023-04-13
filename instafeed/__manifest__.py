@@ -7,7 +7,12 @@
     "version": "1.0",
     "depends": ["base", "sale", "web"],
     "demo": [],
-    "data": [],
+    "data": [
+        'security/ir.model.access.csv',
+        'views/settings.xml',
+        'views/index.xml',
+        'views/instagram_view.xml'
+    ],
     'assets': {},
     "license": "LGPL-3",
 }

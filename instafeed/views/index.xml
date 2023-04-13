@@ -5,6 +5,9 @@
                 <head></head>
                 <body>
                     <div id="app"/>
+                    <script>
+                        window.instafeed = <t t-raw="data"/>
+                    </script>
                     <script src="/instafeed/static/js/index.js"/>
                 </body>
             </html>

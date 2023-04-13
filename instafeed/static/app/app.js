@@ -6,6 +6,7 @@ import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
 import {fas} from '@fortawesome/free-solid-svg-icons'
 import {library} from '@fortawesome/fontawesome-svg-core'
 import {far} from '@fortawesome/free-regular-svg-icons'
+import {faInstagram, faFacebookF} from '@fortawesome/free-brands-svg-icons'
 
-library.add(fas, far)
+library.add(fas, far, faFacebookF, faInstagram)
 createApp(App).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount('#app')

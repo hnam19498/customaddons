@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+        <record id="fetch_instagram_view_form" model="ir.ui.view">
+            <field name="name">fetch.instagram.view.form</field>
+            <field name="model">instagram.user</field>
+            <field name="priority" eval="5"/>
+            <field name="arch" type="xml">
+                <form>
+                    <group>
+                        <field name="instagram_id"/>
+                        <field name="username"/>
+                        <field name="instagram_access_token"/>
+                        <field name="shop_shopify"/>
+                        <button type="object" name="get_topic_instagram">Fetch topic instagram</button>
+                    </group>
+                    <!--                    <group>-->
+                    <!--                        <group>-->
+                    <!--                            <field name="shopify_product_ids" nolabel="1">-->
+                    <!--                                <tree>-->
+                    <!--                                    <field name="shopify_product_id" string="ID"/>-->
+                    <!--                                    <field name="name"/>-->
+                    <!--                                    <field name="price"/>-->
+                    <!--                                </tree>-->
+                    <!--                            </field>-->
+                    <!--                        </group>-->
+                    <!--                        <group>-->
+                    <!--                            <field name="shopify_order_ids" nolabel="1">-->
+                    <!--                                <tree>-->
+                    <!--                                    <field name="shopify_order_id" string="ID"/>-->
+                    <!--                                    <field name="name"/>-->
+                    <!--                                    <field name="total_price"/>-->
+                    <!--                                </tree>-->
+                    <!--                            </field>-->
+                    <!--                        </group>-->
+                    <!--                    </group>-->
+                </form>
+            </field>
+        </record>
+
+        <record id="fetch_instagram_view_tree" model="ir.ui.view">
+            <field name="name">fetch.instagram.view.tree</field>
+            <field name="model">instagram.user</field>
+            <field name="arch" type="xml">
+                <tree>
+                    <field name="instagram_id"/>
+                    <field name="username"/>
+                    <field name="instagram_access_token"/>
+                    <field name="shop_shopify"/>
+                </tree>
+            </field>
+        </record>
+
+        <record id="action_fetch_instagram" model="ir.actions.act_window">
+            <field name="name">Fetch instagram</field>
+            <field name="type">ir.actions.act_window</field>
+            <field name="res_model">instagram.user</field>
+            <field name="view_mode">tree,form</field>
+        </record>
+
+        <menuitem id="menu_instafeed_root"
+                  name="Instafeed"
+                  sequence="0"/>
+
+        <menuitem id="menu_fetch_instagram"
+                  name="Fetch instagram"
+                  action="action_fetch_instagram"
+                  parent="menu_instafeed_root"
+                  sequence="0"/>
+
+    </data>
+</odoo>

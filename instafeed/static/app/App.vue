@@ -1,53 +1,48 @@
 <template>
     <layout>
         <layout-header>
-            <button id="instagram-connection">
-                <font-awesome-icon icon="fa-brands fa-instagram"/>
-                Connect with Instagram
-            </button>
-            <div id="published-status-success">
-                <span>
-                    Connected to <span>Username</span> with Instagram
-                </span>
-            </div>
+            <feed-header/>
         </layout-header>
         <layout-content>
-            <a-row type="flex" justify="center" align="top">
-                <a-col :span="6">
-                    <h2>FEED TITLE</h2>
-                </a-col>
-                <a-col :span="6">
-                    <h2>Preview</h2>
-                </a-col>
-            </a-row>
+            <feed-settings/>
         </layout-content>
     </layout>
 </template>
-
 <script>
 import axios from 'axios'
 import {Layout, LayoutHeader, LayoutContent} from "ant-design-vue"
+import FeedSettings from "./components/FeedSettings.vue"
+import FeedHeader from "./components/FeedHeader.vue"
+
 export default {
     name: "App",
     data() {
         return {}
     },
-    components:{
-        Layout, LayoutHeader, LayoutContent
+    components: {
+        Layout,
+        LayoutHeader,
+        LayoutContent,
+        FeedSettings,
+        FeedHeader
+    },
+    mounted() {
+        axios.post('https://odoo.website/instagram/get_posts', {
+            jsonrpc: "2.0",
+            params: {}
+        }).then(res => {
+            console.log(res)
+        }).catch(error => {
+            console.log(error)
+        })
     }
 }
 </script>
-
 <style scoped>
-#instagram-connection {
-    background: rgb(0 128 96);
-    border: .1rem solid transparent;
-    box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
-    border-radius: 5px;
-    font-weight: 400;
-}
-
-#published-status-success {
-    font-size: 13px;
+.ant-layout-header {
+    background: inherit !important;
+    padding: 0 0 !important;
+    height: fit-content !important;
+    line-height: normal !important;
 }
 </style>
