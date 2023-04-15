@@ -11,6 +11,7 @@
         'security/ir.model.access.csv',
         'views/settings.xml',
         'views/index.xml',
+        'views/shopify.xml',
         'views/instagram_view.xml'
     ],
     'assets': {},

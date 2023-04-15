@@ -14,26 +14,6 @@
                         <field name="shop_shopify"/>
                         <button type="object" name="get_topic_instagram">Fetch topic instagram</button>
                     </group>
-                    <!--                    <group>-->
-                    <!--                        <group>-->
-                    <!--                            <field name="shopify_product_ids" nolabel="1">-->
-                    <!--                                <tree>-->
-                    <!--                                    <field name="shopify_product_id" string="ID"/>-->
-                    <!--                                    <field name="name"/>-->
-                    <!--                                    <field name="price"/>-->
-                    <!--                                </tree>-->
-                    <!--                            </field>-->
-                    <!--                        </group>-->
-                    <!--                        <group>-->
-                    <!--                            <field name="shopify_order_ids" nolabel="1">-->
-                    <!--                                <tree>-->
-                    <!--                                    <field name="shopify_order_id" string="ID"/>-->
-                    <!--                                    <field name="name"/>-->
-                    <!--                                    <field name="total_price"/>-->
-                    <!--                                </tree>-->
-                    <!--                            </field>-->
-                    <!--                        </group>-->
-                    <!--                    </group>-->
                 </form>
             </field>
         </record>

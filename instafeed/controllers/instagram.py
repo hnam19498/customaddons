@@ -87,7 +87,10 @@ class Instagram(http.Controller):
                     "caption": post.caption,
                     'media_url': post.media_url,
                     'comments': post.comments,
-                    "children": post.children
+                    'post_id': post.post_id,
+                    "id": post.id,
+                    "media_type": post.media_type,
+                    'thumbnail_url': post.thumbnail_url
                 })
 
         return {'post_data': post_data}

@@ -1,5 +1,6 @@
 import shopify
-from odoo import api, models, fields
+from odoo import api, models, fields, _
+from odoo.exceptions import ValidationError
 
 
 class ShopifySettings(models.TransientModel):
@@ -94,6 +95,44 @@ class Shop(models.Model):
     admin = fields.Many2one('res.users')
     is_update_script_tag = fields.Boolean()
     is_update_ngrok = fields.Boolean(default=True)
+
+    def fetch_product(self):
+        try:
+            new_session = shopify.Session(self.url, self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version'), token=self.access_token)
+            shopify.ShopifyResource.activate_session(new_session)
+            products = shopify.Product.find()
+
+            exist_products = self.env['shopify.product'].sudo().search([('shop_id', '=', self.id)])
+            list_product_ids = []
+
+            if exist_products:
+                for product in exist_products:
+                    if str(product.shopify_product_id) not in list_product_ids:
+                        list_product_ids.append(product.shopify_product_id)
+
+            if products:
+                for product in products:
+                    if str(product.id) not in list_product_ids:
+                        try:
+                            self.env['shopify.product'].sudo().create({
+                                'shopify_product_id': product.id,
+                                'name': product.title,
+                                'url': self.url + "/products/" + product.handle,
+                                'shop_id': self.id,
+                                'price': float(product.variants[0].price),
+                                "compare_at_price": product.variants[0].compare_at_price,
+                                'qty': product.variants[0].inventory_quantity,
+                                "variant_id": product.variants[0].id,
+                                'url_img': product.image.src
+                            })
+                        except Exception as error_create_product:
+                            print("error_create_product: " + str(error_create_product))
+                            continue
+                    else:
+                        print(f'Product id "{product.id}" đã trong database!')
+
+        except Exception as e:
+            raise ValidationError(_(e))
 
 
 class ShopifyProduct(models.Model):

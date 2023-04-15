@@ -2,3 +2,4 @@ id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access.instagram.user,access_instagram_user,model_instagram_user,base.group_user,1,1,1,1
 access.facebook.user,access_facebook_user,model_facebook_user,base.group_user,1,1,1,1
 access.shop.shopify,access_shop_shopify,model_shop_shopify,base.group_user,1,1,1,1
+access.shopify.product,access_shopify_product,model_shopify_product,base.group_user,1,1,1,1
