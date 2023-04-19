@@ -222,3 +222,23 @@ class ShopifyMain(http.Controller):
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
+
+    @http.route('/shopify/get_product', type='json', auth="user")
+    def shopify_get_product(self, **kw):
+        current_user = request.env.user
+        current_shop = request.env['shop.shopify'].sudo().search([('admin', "=", current_user.id)])
+        products = request.env['shopify.product'].sudo().search([('shop_id', '=', current_shop.id)])
+        list_product = []
+        for product in products:
+            list_product.append({
+                'shopify_product_id': product.shopify_product_id,
+                "name": product.name,
+                'price': product.price,
+                'url': product.url,
+                "id": product.id,
+                "url_img": product.url_img,
+                "variant_id": product.variant_id,
+                'qty': product.qty,
+                "compare_at_price": product.compare_at_price
+            })
+        return {'list_product': list_product}

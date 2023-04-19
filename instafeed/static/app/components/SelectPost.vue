@@ -89,6 +89,12 @@ export default {
             tickAllPosts: false
         }
     },
+    mounted() {
+        if (window.selected_posts) {
+            this.enable_widget = true
+            this.selected_posts = window.selected_posts
+        }
+    },
     components: {
         Loading
     },
@@ -100,6 +106,7 @@ export default {
             console.log('cancel')
         },
         nextToFeedSettings() {
+            window.selected_posts = this.selected_posts
             this.$emit('SelectPostToFeedSettings', 'FeedSettings', this.selected_posts)
         },
         SelectAllPosts() {

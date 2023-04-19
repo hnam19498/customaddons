@@ -1,4 +1,4 @@
-import shopify, binascii, os, werkzeug, json, string, random, datetime, base64, requests
+import shopify, binascii, os, json, werkzeug, json, string, random, datetime, base64, requests
 from odoo import http, _
 from odoo.http import request
 
@@ -94,3 +94,36 @@ class Instagram(http.Controller):
                 })
 
         return {'post_data': post_data}
+
+    @http.route("/instafeed/save_feed", auth='user', type="json")
+    def instafeed_save_feed(self, **kw):
+        try:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)], limit=1)
+            if kw['list_tag']:
+                exist_feeds = request.env['instagram.feed'].sudo().search([])
+                if exist_feeds:
+                    for exist_feed in exist_feeds:
+                        count = 0
+                        for exist_line in json.loads(exist_feed.list_tag):
+                            for line in kw['list_tag']:
+                                if line['post_id'] == exist_line['post_id'] and line['product_id'] == exist_line['product_id']:
+                                    count += 1
+                        if count == len(json.loads(exist_feed.list_tag)):
+                            print(f'Feed {kw} đã tồn tại!')
+                else:
+                    request.env['instagram.feed'].sudo().create({
+                        'list_tag': json.dumps(kw['list_tag']),
+                        "feed_title": kw['feed_title'],
+                        "number_column": kw['number_column'],
+                        'on_post_click': kw['on_post_click'],
+                        'shop_id': current_shop.id
+                    })
+                    print('created')
+        except Exception as e:
+            print(e)
+
+    @http.route('/instafeed/get_feed', type='json', auth='public', method=['POST'], csrf=False, cors="*")
+    def instafeed_get_feed(self, *kw):
+        print(kw)
+

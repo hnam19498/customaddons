@@ -4,13 +4,12 @@
             <feed-header/>
         </layout-header>
         <layout-content>
-            <select-post
-                :posts="posts"
-                v-if="currentTab=='SelectPost'"
-                @SelectPostToFeedSettings="SelectPostToFeedSettings"/>
-            <feed-settings
-                :selected_posts="selected_posts"
-                v-if="currentTab=='FeedSettings'"/>
+            <select-post :posts="posts"
+                         v-if="currentTab=='SelectPost'"
+                         @SelectPostToFeedSettings="SelectPostToFeedSettings"/>
+            <feed-settings @changeTab="changeTab"
+                           :selected_posts="selected_posts"
+                           v-if="currentTab=='FeedSettings'"/>
         </layout-content>
     </layout>
 </template>
@@ -52,9 +51,13 @@ export default {
             console.log(error)
         })
     },
-    methods:{
-        SelectPostToFeedSettings(tab, selected_posts){
+    methods: {
+        SelectPostToFeedSettings(tab, selected_posts) {
             this.selected_posts = selected_posts
+            this.currentTab = tab
+        },
+        changeTab(tab) {
+            console.log(tab)
             this.currentTab = tab
         }
     }
@@ -80,5 +83,11 @@ main {
 <style>
 body {
     background-color: #f0f2f5 !important;
+}
+
+#vcDialogTitle1 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 24px;
 }
 </style>

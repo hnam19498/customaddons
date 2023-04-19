@@ -18,7 +18,7 @@
                         </div>
                         <div class="feed_setting" style="width: 60%">
                             <span class="label">ON POST CLICK</span>
-                            <select>
+                            <select v-model="on_post_click">
                                 <option value="open">Open popup / show product</option>
                                 <option value="instagram">Go to Instagram</option>
                                 <option value="nothing">Do nothing</option>
@@ -37,17 +37,28 @@
                         </div>
                         <div class="feed_setting" style="width: 50%">
                             <span class="label">CONFIGURATION</span>
-                            <select>
+                            <select v-model="configuration_select">
                                 <option value="auto">AUTO</option>
                                 <option value="manual">Manual</option>
                             </select>
                         </div>
                     </div>
-                    <div class="feed_setting" style="width: 100%">
+                    <div class="feed_setting" style="width: 100%; margin-top: 15px">
                         <span class="label">COLUMNS</span>
-                        <input type="number">
+                        <input :disabled="configuration_select=='auto'" v-model="number_column" min="1" max="6"
+                               type="number">
                     </div>
-                    <button id="btn_save" style="margin-top: 15px">Save feed</button>
+                    <button @click="save_feed" id="btn_save">Save feed</button>
+                    <div style="display: flex">
+                        <div style="width: 50%">
+                            <button style="width: 100%" id="btn_back" @click="backToSelectPost">
+                                <font-awesome-icon icon="fa-solid fa-arrow-left" style="color: white"/>
+                            </button>
+                        </div>
+                        <div style="width: 50%; margin-left: 10px">
+                            <button id="btn_cancel" @click="cancelFeed" style="width: 100%">Cancel</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -56,7 +67,9 @@
                 PREVIEW
             </div>
             <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed_title }}</h2>
-            <div class="posts" style="display: grid; text-align: center; grid-template-columns: repeat(3, 1fr)">
+            <div style="display: grid; text-align: center"
+                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`}"
+                 class="posts">
                 <div :key="post.id"
                      @mouseenter="post.hover_status = true"
                      @mouseleave="post.hover_status = false"
@@ -65,24 +78,103 @@
                      class="post">
                     <img v-if="post.media_type == 'IMAGE'"
                          :alt="post.caption"
-                         style="height: 200px; width: 200px; object-fit: cover"
+                         style="height: 150px; width: 150px; object-fit: cover"
                          :src="post.media_url">
                     <img v-if="post.media_type == 'VIDEO'"
                          :alt="post.caption"
-                         style="height: 200px; width: 200px; object-fit: cover"
+                         style="height: 150px; width: 150px; object-fit: cover"
                          :src="post.thumbnail_url">
                     <div v-if="post.hover_status"
-                         style="justify-content: center; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 20; width: 200px; height: 200px; position: absolute; opacity: 0.5; background: red"
-                         @click='openTagProduct(post.id)'/>
+                         class="post_hover"
+                         @click='openPost(post)'>
+                        <font-awesome-icon icon="fa-brands fa-instagram"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type=='IMAGE'"/>
+                        <font-awesome-icon icon="fa-solid fa-play"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type=='VIDEO'"/>
+                    </div>
                 </div>
             </div>
             <div style="color: #707070"><i><b>Tip:</b> Click on a post to start tagging products</i></div>
         </div>
+        <Modal style="width: 70%"
+               :footer="null"
+               v-model:visible="post_modal"
+               :maskClosable="false"
+               @cancel="selected_post={}">
+            <div style="display: flex">
+                <img v-if="selected_post.media_type=='IMAGE'"
+                     :src="selected_post.media_url"
+                     :alt="selected_post.caption"
+                     style="width: 50%; height: 50%">
+                <video height="400" autoplay v-if="selected_post.media_type=='VIDEO'">
+                    <source :src="selected_post.media_url">
+                </video>
+                <div style="width: 100%; display: flex; flex-direction: column">
+                    <div style="margin-left:20px; display: flex; background-color: white; align-items: center">
+                        <div style="display: flex; justify-content: center; align-items: center;border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
+                            <font-awesome-icon icon="fa-brands fa-instagram"
+                                               style="height:30px; width: 30px; color: black"/>
+                        </div>
+                        <div @click="redirectToInstagramUser"
+                             style="cursor: pointer; color: #000; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px">
+                            {{ instagram_user }}
+                        </div>
+                    </div>
+                    <div style="display: flex; justify-content: center; text-align: center">
+                        <button @click="tagModal(selected_post)" class="tag_product">Tag product</button>
+                    </div>
+                    <div style="margin-left: 10px">
+                        <div>{{ selected_post.caption }}</div>
+                        <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }} ❤️</div>
+                        <div v-if="comments" v-for="comment in comments">
+                            <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Modal>
+        <Modal style="width: 70%"
+               title="Thêm sản phẩm"
+               @cancel="cancelTab"
+               v-model:visible="tag_modal"
+               @ok="submitTab(this.current_list_tag)"
+               :maskClosable="false">
+            <a-input v-model:value="search" placeholder="Basic usage">
+                <template #prefix>
+                    <SearchOutlined/>
+                </template>
+            </a-input>
+            <table>
+                <tr v-for="product in list_product"
+                    :key="product.id"
+                    class="table-row"
+                    @click="tagProduct(selected_post, product)"
+                    style="width: 100%">
+                    <td>
+                        <input type="checkbox"
+                               :checked="list_tag.filter(e => e.product_id == product.id).length > 0 || current_list_tag.filter(e => e.product_id == product.id).length > 0"
+                               :disabled="list_tag.filter(e => e.product_id == product.id).length > 0"
+                               style="margin-left: 10px">
+                    </td>
+                    <td><img style="width: 50px; margin-left: 20px" :src="product.url_img" :alt="product.name"></td>
+                    <td style="width: 100%">
+                        <div style="margin-left: 20px">{{ product.name }}</div>
+                    </td>
+                </tr>
+            </table>
+        </Modal>
     </div>
 </template>
 <script>
+import {Modal} from 'ant-design-vue'
+import {SearchOutlined} from "@ant-design/icons-vue"
+import axios from "axios"
+
 export default {
     name: "FeedSettings",
+    components: {Modal, SearchOutlined},
     props: {
         selected_posts: {
             type: Array,
@@ -91,15 +183,120 @@ export default {
     },
     data() {
         return {
-            feed_title: '',
-
+            list_tag: [],
+            on_post_click: "open",
+            search: '',
+            feed_title: 'EDIT FEED TITLE',
+            post_modal: false,
+            selected_post: {},
+            instagram_user: '',
+            tag_modal: false,
+            comments: [],
+            list_product: [],
+            number_column: 3,
+            current_list_tag: [],
+            configuration_select: 'auto'
         }
     },
     methods: {
-        openTagProduct(post_id) {
-            console.log(post_id);
+        save_feed() {
+            let self = this
+            if (self.configuration_select == 'auto') {
+                self.number_column = 3
+            }
+            axios.post('https://odoo.website/instafeed/save_feed', {
+                jsonrpc: "2.0",
+                params: {
+                    list_tag: self.list_tag,
+                    feed_title: self.feed_title,
+                    number_column: self.number_column,
+                    on_post_click: self.on_post_click
+                }
+            }).then(res => {
+                window.location.href
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        cancelFeed() {
+            this.number_column = 3
+            this.feed_title = ''
+            this.post_modal = false
+            this.selected_post = {}
+            this.instagram_user = ''
+            this.current_list_tag = []
+            this.list_tag = []
+            this.tag_modal = false
+            this.list_product = []
+        },
+        cancelTab() {
+            let self = this
+            self.current_list_tag = []
+            self.tag_modal = false
+        },
+        submitTab(current_list_tag) {
+            let self = this
+            self.list_tag.push(...current_list_tag)
+            self.current_list_tag = []
+            self.tag_modal = false
+            self.post_modal = false
+        },
+        tagProduct(selected_post, product) {
+            let self = this
+            let count = 0
+            for (let line of self.current_list_tag) {
+                if (line.post_id == selected_post.id && line.product_id == product.id) {
+                    count += 1
+                }
+            }
+            if (count == 0) {
+                self.current_list_tag.push({post_id: selected_post.id, product_id: product.id})
+            }
+            console.log(self.current_list_tag)
+        },
+        backToSelectPost() {
+            this.feed_title = ''
+            this.post_modal = false
+            this.selected_post = {}
+            this.instagram_user = ''
+            this.number_column = 3
+            this.current_list_tag = []
+            this.list_tag = []
+            this.tag_modal = false
+            this.list_product = []
+            this.$emit('changeTab', 'SelectPost')
+        },
+        tagModal(selected_post) {
+            let self = this
+            self.tag_modal = true
+        },
+        openPost(post) {
+            let self = this
+            self.selected_post = post
+            self.post_modal = true
+            if (self.selected_post.comments) {
+                self.comments = JSON.parse(self.selected_post.comments)
+            } else {
+                self.comments = []
+            }
+        },
+        redirectToInstagramUser() {
+            window.open('https://www.instagram.com/' + this.instagram_user, '_blank')
         }
-    }
+    },
+    mounted() {
+        let self = this
+        self.instagram_user = window.instafeed.users.instagram_username
+        axios.post('https://odoo.website/shopify/get_product', {
+            jsonrpc: "2.0",
+            params: {}
+        }).then(res => {
+            self.list_product = res.data.result.list_product
+        }).catch(error => {
+            console.log(error)
+        })
+    },
+    watch: {}
 }
 </script>
 <style scoped>
@@ -147,7 +344,33 @@ export default {
     background: rgb(0 128 96);
     color: white;
     font-weight: 400;
+    margin-top: 15px;
+    cursor: pointer;
     height: 30px;
+    border-radius: 5px;
+    border: .1rem solid transparent;
+    box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
+    margin-bottom: 10px;
+}
+
+#btn_back {
+    background: rgb(59, 59, 59);
+    color: white;
+    font-weight: 400;
+    height: 30px;
+    cursor: pointer;
+    border-radius: 5px;
+    border: .1rem solid transparent;
+    box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
+    margin-bottom: 10px;
+}
+
+#btn_cancel {
+    background: red;
+    color: white;
+    font-weight: 400;
+    height: 30px;
+    cursor: pointer;
     border-radius: 5px;
     border: .1rem solid transparent;
     box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
@@ -190,6 +413,49 @@ export default {
 
 .post img:hover {
     opacity: 0.5;
+    cursor: pointer;
+}
+
+.post_hover {
+    cursor: pointer;
+    display: flex;
+    text-align: center;
+    align-items: center;
+    justify-content: center;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    width: 150px;
+    height: 150px;
+    position: absolute;
+    opacity: 0.5;
+    background: #151515
+}
+
+.tag_product {
+    color: white;
+    min-height: 35px;
+    min-width: 100px;
+    border-radius: 4px;
+    background: rgb(0 128 96);
+    cursor: pointer;
+    border: .1rem solid transparent;
+    box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
+    font-weight: 400;
+}
+
+.ant-input-affix-wrapper {
+    border-radius: 5px;
+}
+
+.table-row {
+    height: 3rem;
+    border-bottom: 1px groove #EFEFEF;
+    font-size: 14px;
+}
+
+tr {
     cursor: pointer;
 }
 </style>

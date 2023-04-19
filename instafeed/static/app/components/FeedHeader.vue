@@ -1,12 +1,13 @@
 <template>
     <div id="header">
-        <div style="display: flex">
+        <div id="auth" style="display: flex">
             <button @click="auth_instagram" type="button" id="instagram-connection">
-                <font-awesome-icon icon="fa-brands fa-instagram" style="margin-right: 5px; color: #ffffff"/>
+                <font-awesome-icon icon="fa-brands fa-instagram" style="margin-right: 5px; color: white"/>
                 Connect with Instagram
             </button>
-            <button @click="auth_facebook" type="button" id="facebook-connection">
-                <font-awesome-icon icon="fa-brands fa-facebook-f" style="margin-right: 10px; margin-left: 10px; color: white"/>
+            <button @click="login_facebook" type="button" id="facebook-connection">
+                <font-awesome-icon icon="fa-brands fa-facebook-f"
+                                   style="margin-right: 10px; margin-left: 10px; color: white"/>
                 Connect with Facebook
             </button>
         </div>
@@ -22,17 +23,46 @@
 </template>
 
 <script>
+import axios from "axios"
+
+window.fbAsyncInit = function () {
+    FB.init({
+        appId: '300578203867324',
+        channelURL: '',
+        status: true,
+        cookie: true,
+        oauth: true,
+        xfbml: false
+    })
+}
 export default {
     name: "FeedHeader",
     methods: {
         auth_instagram() {
             window.open('https://odoo.website/instafeed/auth', '_blank')
         },
-        auth_facebook() {
-            window.open('https://odoo.website/facebook/auth', '_blank')
+        login_facebook() {
+            axios.post('https://odoo.website/facebook/auth', {
+                jsonrpc: "2.0",
+                params: {}
+            }).then(res => {
+                FB.getLoginStatus(r => {
+                    FB.login(response => {
+                        if (response.authResponse) {
+                            window.location.href = 'instafeed'
+                        }
+                    }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
+                })
+            }).catch(error => {
+                console.log(error)
+            })
         }
     },
     mounted() {
+        let e = document.createElement('script');
+        e.async = true
+        e.src = document.location.protocol + '//connect.facebook.net/en_US/all.js'
+        document.getElementById('auth').appendChild(e)
         if (window.instafeed.users) {
             this.instagram_username = window.instafeed.users.instagram_username
             this.facebook_username = window.instafeed.users.facebook_username
@@ -90,23 +120,30 @@ export default {
 .published-status-success {
     font-size: 14px;
     color: #007B5C;
-    margin-top: 5px;
+    margin-left: 10px;
     font-weight: bold;
 }
 
 .login-facebook-success {
     font-size: 14px;
     color: #1c67e9;
-    margin-top: 5px;
+    margin-top: 10px;
     font-weight: bold;
+    margin-bottom: 5px;
+    margin-left: 10px;
 }
 
 #header {
     margin-right: 10px;
     margin-left: 10px;
     margin-top: 10px;
+    display: grid;
     border-radius: 5px;
     box-shadow: 0 0 0 1px rgba(63, 63, 68, .05), 0 1px 3px 0 rgba(63, 63, 68, .15);
     background: white;
+}
+
+#auth {
+    margin: 10px
 }
 </style>

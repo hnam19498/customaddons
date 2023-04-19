@@ -2,6 +2,16 @@ import datetime, requests, json
 from odoo import fields, api, models
 
 
+class InstaFeed(models.Model):
+    _name = "instagram.feed"
+
+    list_tag = fields.Char()
+    feed_title = fields.Char()
+    number_column = fields.Integer()
+    on_post_click = fields.Char()
+    shop_id = fields.Many2one('shop.shopify')
+
+
 class InstagramSettings(models.TransientModel):
     _inherit = 'res.config.settings'
 
@@ -16,6 +26,7 @@ class InstagramPost(models.Model):
     like_count = fields.Integer()
     caption = fields.Char()
     post_id = fields.Char()
+    link_to_post = fields.Char()
     media_type = fields.Char()
     media_url = fields.Char()
     thumbnail_url = fields.Char()
@@ -37,6 +48,7 @@ class InstagramUser(models.Model):
     widget_datas = fields.One2many('widget.data', 'instagram_user')
     shop_shopify = fields.Many2one('shop.shopify')
     facebook_user_id = fields.Many2one('facebook.user')
+    followers_count = fields.Integer()
 
     def get_topic_instagram(self):
         time_now = datetime.datetime.now()
@@ -47,29 +59,6 @@ class InstagramUser(models.Model):
                     'instagram_long_access_token': new_long_access_token.json()['access_token'],
                     'instagram_long_access_token_time_out': time_now + datetime.timedelta(seconds=new_long_access_token.json()['expires_in'])
                 })
-        # topics = requests.get('https://graph.instagram.com/me/media?fields=id,caption&access_token=' + self.instagram_long_access_token)
-        # if topics.ok:
-        #     for topic in topics.json()['data']:
-        #         topic_result = requests.get('https://graph.instagram.com/' + topic['id'] + "?fields=id,media_type,media_url,username,timestamp&access_token=" + self.instagram_long_access_token)
-        #         if topic_result.json()['media_type'] == "CAROUSEL_ALBUM":
-        #             print(f"--{topic_result.json()}")
-        #             topic_has_children = requests.get('https://graph.instagram.com/' + topic['id'] + "?fields=id,media_type,media_url,username,timestamp,children&access_token=" + self.instagram_long_access_token)
-        #             for child in topic_has_children.json()['children']['data']:
-        #                 topic_child = requests.get('https://graph.instagram.com/' + child['id'] + "?fields=id,media_type,media_url,username,timestamp&access_token=" + self.instagram_long_access_token)
-        #                 topic_child_data = {
-        #                     'id': topic_child.json()['id'],
-        #                     "media_type": topic_child.json()['media_type'],
-        #                     "media_url": topic_child.json()["media_url"]
-        #                 }
-        #                 print("++++", topic_child_data)
-        #
-        #         else:
-        #             topic_data = {
-        #                 'id': topic_result.json()['id'],
-        #                 "media_type": topic_result.json()['media_type'],
-        #                 "media_url": topic_result.json()["media_url"]
-        #             }
-        #             print('--', topic_data)
 
         page = requests.get('https://graph.facebook.com/me/accounts?access_token=' + self.facebook_user_id.access_token)
         if page.ok:
@@ -77,10 +66,11 @@ class InstagramUser(models.Model):
             instagram_business_account = requests.get("https://graph.facebook.com/" + page_id + "?fields=instagram_business_account&access_token=" + self.facebook_user_id.access_token)
             if instagram_business_account.ok:
                 instagram_business_account_id = instagram_business_account.json()['instagram_business_account']['id']
-                posts = requests.get('https://graph.facebook.com/' + instagram_business_account_id + "/media?access_token=" + self.facebook_user_id.access_token)
+                posts = requests.get('https://graph.facebook.com/' + instagram_business_account_id + "?fields=media,followers_count&access_token=" + self.facebook_user_id.access_token)
                 if posts.ok:
-                    for id in posts.json()['data']:
-                        post = requests.get('https://graph.facebook.com/' + id['id'] + '?fields=thumbnail_url,media_type,like_count,caption,media_url,comments{username,text},children&access_token=' + self.facebook_user_id.access_token)
+                    self.followers_count = posts.json()['followers_count']
+                    for id in posts.json()['media']['data']:
+                        post = requests.get('https://graph.facebook.com/' + id['id'] + '?fields=permalink,thumbnail_url,media_type,like_count,caption,media_url,comments{username,text},children&access_token=' + self.facebook_user_id.access_token)
                         if post.ok:
                             post_json = post.json()
                             exist_post = self.env['instagram.post'].sudo().search([('post_id', "=", post_json['id'])])
@@ -90,7 +80,8 @@ class InstagramUser(models.Model):
                                 "post_id": post_json['id'],
                                 "instagram_user": self.id,
                                 "like_count": post_json['like_count'],
-                                'media_type': post_json['media_type']
+                                'media_type': post_json['media_type'],
+                                "link_to_post": post_json['permalink']
                             }
 
                             if not exist_post:
@@ -100,6 +91,8 @@ class InstagramUser(models.Model):
 
                             if 'comments' in post_json:
                                 exist_post.comments = json.dumps(post_json['comments']['data'])
+                            else:
+                                exist_post.comments = ''
 
                             if 'thumbnail_url' in post_json:
                                 exist_post.thumbnail_url = post_json['thumbnail_url']
