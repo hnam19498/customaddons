@@ -58,13 +58,14 @@
                 </div>
             </div>
             <div v-if="!enable_widget" class="blur"/>
-            <!--            <div class="blur" v-if="loading">-->
-            <!--                <a-spin size="large"/>-->
-            <!--            </div>-->
         </div>
     </div>
 </template>
 <script>
+import {h} from 'vue'
+import {notification} from 'ant-design-vue'
+import {CloseCircleFilled} from "@ant-design/icons-vue"
+
 export default {
     data() {
         return {
@@ -82,15 +83,33 @@ export default {
     props: {
         posts: {type: Array, default: []}
     },
-    emits:['SelectPostToFeedSettings'],
+    emits: ['SelectPostToFeedSettings'],
     methods: {
+        show_toast: function (type, message, duration) {
+            notification[type]({
+                message: message,
+                duration: duration,
+                class: 'error_popup',
+                closeIcon: e => {
+                    return (<CloseCircleFilled/>)
+                }
+            })
+        },
         cancelSelectPost() {
             this.selected_posts = []
             this.tickAllPosts = false
         },
         nextToFeedSettings() {
-            window.selected_posts = this.selected_posts
-            this.$emit('SelectPostToFeedSettings', 'FeedSettings', this.selected_posts)
+            if (this.selected_posts.length == 0) {
+                this.show_toast(
+                    'open',
+                    'Please select at least 1 post from the list to continue.',
+                    3
+                )
+            } else {
+                window.selected_posts = this.selected_posts
+                this.$emit('SelectPostToFeedSettings', 'FeedSettings', this.selected_posts)
+            }
         },
         SelectAllPosts() {
             this.selected_posts = []

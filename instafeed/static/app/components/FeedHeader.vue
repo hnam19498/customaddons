@@ -20,6 +20,10 @@
                 <font-awesome-icon icon="fa-brands fa-instagram" style="margin-right: 5px; color: white; width: 25px"/>
                 Fetch post instagram
             </button>
+            <button id="dashboard" @click="changeToDashboard">
+                <font-awesome-icon icon="fa-solid fa-bars" style="color: black; margin-right: 10px"/>
+                Dashboard
+            </button>
         </div>
         <div class="published-status-success" v-if="instagram_username">
             <span>Connected to <span>{{ instagram_username }}</span> with Instagram | <span
@@ -50,6 +54,9 @@ export default {
     name: "FeedHeader",
     components: {Modal},
     methods: {
+        changeToDashboard() {
+            this.$emit('changeTab', "Dashboard")
+        },
         fetch_post_instagram() {
             let self = this
             self.$emit('fetch_post_loading', true)
@@ -110,7 +117,8 @@ export default {
     },
     emits: [
         'changeInstagramAccount',
-        "fetch_post_loading"
+        "fetch_post_loading",
+        "changeTab"
     ],
     mounted() {
         let e = document.createElement('script');
@@ -236,5 +244,21 @@ export default {
 
 #auth {
     margin: 10px
+}
+
+#dashboard {
+    background: #E2E2E2;
+    margin-left: auto;
+    border: .1rem solid transparent;
+    box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
+    border-radius: 5px;
+    font-weight: 400;
+    color: black;
+    cursor: pointer;
+    height: 40px;
+    width: fit-content;
+    display: flex;
+    align-items: center;
+    margin-right: 20px;
 }
 </style>

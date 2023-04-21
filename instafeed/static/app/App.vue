@@ -1,10 +1,11 @@
 <template>
     <layout style="position: relative">
         <div class="loading" v-if="fetch_status">
-            <a-spin size="large"/>
+            <a-spin size="large" style="margin-top: 250px"/>
         </div>
         <layout-header>
             <feed-header @changeInstagramAccount="changeInstagramAccount"
+                         @changeTab="changeTab"
                          @fetch_post_loading="fetch_post_loading"/>
         </layout-header>
         <layout-content>
@@ -14,6 +15,7 @@
             <feed-settings @changeTab="changeTab"
                            :selected_posts="selected_posts"
                            v-if="currentTab == 'FeedSettings'"/>
+            <dashboard v-if="currentTab == 'Dashboard'"/>
             <Modal style="width: 70%"
                    title="CHANGE THE INSTAGRAM ACCOUNT CONNECTED"
                    :footer="null"
@@ -37,6 +39,7 @@ import axios from 'axios'
 import {Layout, LayoutHeader, LayoutContent, Modal} from "ant-design-vue"
 import FeedSettings from "./components/FeedSettings.vue"
 import FeedHeader from "./components/FeedHeader.vue"
+import Dashboard from "./components/Dashboard.vue"
 import SelectPost from "./components/SelectPost.vue"
 import {SearchOutlined} from "@ant-design/icons-vue"
 
@@ -45,7 +48,6 @@ export default {
     data() {
         return {
             posts: [],
-            tabs: ['SelectPost', 'FeedSettings'],
             currentTab: "SelectPost",
             selected_posts: [],
             changeInstagram: false,
@@ -53,8 +55,10 @@ export default {
         }
     },
     components: {
-        SearchOutlined, Modal,
+        SearchOutlined,
+        Modal,
         Layout,
+        Dashboard,
         LayoutHeader,
         LayoutContent,
         FeedSettings,
@@ -77,7 +81,6 @@ export default {
             this.fetch_status = status
         },
         changeInstagramAccount(changeStatus) {
-            console.log(changeStatus)
             this.changeInstagram = changeStatus
         },
         SelectPostToFeedSettings(tab, selected_posts) {
@@ -85,7 +88,6 @@ export default {
             this.currentTab = tab
         },
         changeTab(tab) {
-            console.log(tab)
             this.currentTab = tab
         }
     }
@@ -97,8 +99,8 @@ export default {
     display: flex;
     width: 100%;
     opacity: 0.5;
-    height: 500px;
-    align-items: center;
+    z-index: 100;
+    height: 100%;
     background-color: white;
     position: absolute;
 }
@@ -122,5 +124,18 @@ main {
 <style>
 body {
     background-color: #f0f2f5 !important;
+}
+
+.error_popup {
+    border-radius: 5px !important;
+    border: 1px solid #cecece;
+}
+
+.error_popup a {
+    color: red;
+    height: 15px;
+    width: 15px;
+    margin-right: -14px;
+    margin-top: -9px;
 }
 </style>

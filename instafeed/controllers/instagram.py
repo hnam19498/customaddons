@@ -16,8 +16,10 @@ class Instagram(http.Controller):
     def instafeed_oauth(self, **kw):
         if 'code' in kw:
             instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_app_id')
-            instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_redirect_uri')
-            instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_client_secret')
+            instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param(
+                'instafeed.instagram_redirect_uri')
+            instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param(
+                'instafeed.instagram_client_secret')
 
             oauth_data = {
                 'grant_type': "authorization_code",
@@ -29,20 +31,29 @@ class Instagram(http.Controller):
 
             header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-            instafeed_oauth = requests.post('https://api.instagram.com/oauth/access_token', headers=header, data=oauth_data)
+            instafeed_oauth = requests.post('https://api.instagram.com/oauth/access_token', headers=header,
+                                            data=oauth_data)
             oauth = instafeed_oauth.json()
 
             if instafeed_oauth.ok:
-                instagram_user_result = requests.get('https://graph.instagram.com/' + str(oauth['user_id']) + '?fields=id,username&access_token=' + oauth['access_token'])
+                instagram_user_result = requests.get(
+                    'https://graph.instagram.com/' + str(oauth['user_id']) + '?fields=id,username&access_token=' +
+                    oauth['access_token'])
 
                 if instagram_user_result.ok:
                     instagram_user = instagram_user_result.json()
 
                     current_user = request.env.user
                     current_shopify = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)])
-                    instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_client_secret')
+                    instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param(
+                        'instafeed.instagram_client_secret')
 
-                    long_access_token = requests.get('https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=' + instagram_client_secret + f'&access_token={oauth["access_token"]}')
+                    long_access_token = requests.get(
+                        'https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=' + instagram_client_secret + f'&access_token={oauth["access_token"]}')
+                    exist_instagram_user = request.env['instagram.user'].sudo().search(
+                        [('instagram_id', '=', instagram_user['id'])], limit=1)
+                    exist_facebook_user = request.env['facebook.user'].sudo().search(
+                        [('shop_shopify', '=', current_shopify.id)], limit=1)
 
                     if long_access_token.ok:
                         user_data = {
@@ -53,33 +64,32 @@ class Instagram(http.Controller):
                             'shop_shopify': current_shopify.id,
                             "instagram_access_token_time_out": datetime.datetime.now() + datetime.timedelta(hours=1),
                             'instagram_long_access_token': long_access_token.json()['access_token'],
-                            'instagram_long_access_token_time_out': datetime.datetime.now() + datetime.timedelta(seconds=long_access_token.json()['expires_in'])
+                            'instagram_long_access_token_time_out': datetime.datetime.now() + datetime.timedelta(
+                                seconds=long_access_token.json()['expires_in'])
                         }
 
-                    exist_instagram_user = request.env['instagram.user'].sudo().search([('instagram_id', '=', instagram_user['id'])], limit=1)
-                    exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
-
-                    if not exist_instagram_user:
-                        if not exist_facebook_user:
-                            request.env['instagram.user'].sudo().create(user_data)
+                        if not exist_instagram_user:
+                            if not exist_facebook_user:
+                                request.env['instagram.user'].sudo().create(user_data)
+                            else:
+                                new_instagram_user = request.env['instagram.user'].sudo().create(user_data)
+                                new_instagram_user.facebook_user_id = exist_facebook_user.id
+                                exist_facebook_user.instagram_user_id = new_instagram_user.id
                         else:
-                            new_instagram_user = request.env['instagram.user'].sudo().create(user_data)
-                            new_instagram_user.facebook_user_id = exist_facebook_user.id
-                            exist_facebook_user.instagram_user_id = new_instagram_user.id
-                    else:
-                        if not exist_facebook_user:
-                            exist_instagram_user.sudo().write(user_data)
-                        else:
-                            exist_instagram_user.sudo().write(user_data)
-                            exist_instagram_user.facebook_user_id = exist_facebook_user.id
-                            exist_facebook_user.instagram_user_id = exist_instagram_user.id
+                            if not exist_facebook_user:
+                                exist_instagram_user.sudo().write(user_data)
+                            else:
+                                exist_instagram_user.sudo().write(user_data)
+                                exist_instagram_user.facebook_user_id = exist_facebook_user.id
+                                exist_facebook_user.instagram_user_id = exist_instagram_user.id
 
                     return werkzeug.utils.redirect('https://odoo.website/instafeed')
 
     @http.route('/instagram/get_posts', auth='user', type="json")
     def instafeed_get_posts(self, **kw):
         try:
-            current_instagram_user = request.env['instagram.user'].sudo().search([('username', "=", kw['instagram_username'])])
+            current_instagram_user = request.env['instagram.user'].sudo().search(
+                [('username', "=", kw['instagram_username'])])
             posts = request.env['instagram.post'].sudo().search([('instagram_user', '=', current_instagram_user.id)])
             post_data = []
             if posts:
@@ -111,7 +121,8 @@ class Instagram(http.Controller):
                 'on_post_click': kw['on_post_click'],
                 'shop_id': current_shop.id,
                 "feed_layout": kw['feed_layout'],
-                "selected_posts": json.dumps(kw['selected_posts'])
+                "selected_posts": json.dumps(kw['selected_posts']),
+                "enable_status": True
             })
             return {"success": 'created'}
         except Exception as e:
@@ -120,10 +131,10 @@ class Instagram(http.Controller):
     @http.route('/instafeed/get_feed', type='json', auth='public', method=['POST'], csrf=False, cors="*")
     def instafeed_get_feed(self, **kw):
         try:
-            if 'shop_url' in kw:
-                current_shop = request.env['shop.shopify'].sudo().search([('url', '=', kw['shop_url'])], limit=1)
+            list_feed = []
+            if request.env.user:
+                current_shop = request.env['shop.shopify'].sudo().search([('admin', '=', request.env.user.id)], limit=1)
                 feeds = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id)])
-                list_feed = []
                 current_instagram_user = request.env['instagram.user'].sudo().search([("shop_shopify", '=', current_shop.id)], limit=1)
                 if feeds:
                     for feed in feeds:
@@ -133,6 +144,7 @@ class Instagram(http.Controller):
                                 "feed_title": feed.feed_title,
                                 'number_column': feed.number_column,
                                 "on_post_click": feed.on_post_click,
+                                'enable_status': feed.enable_status,
                                 "feed_layout": feed.feed_layout,
                                 "selected_posts": json.loads(feed.selected_posts),
                                 'id': feed.id
@@ -142,6 +154,7 @@ class Instagram(http.Controller):
                                 'list_tag': feed.list_tag,
                                 'id': feed.id,
                                 "feed_title": feed.feed_title,
+                                "enable_status": feed.enable_status,
                                 'number_column': feed.number_column,
                                 "on_post_click": feed.on_post_click,
                                 "feed_layout": feed.feed_layout,
@@ -149,9 +162,43 @@ class Instagram(http.Controller):
                             })
                 return {
                     'list_feed': list_feed,
+                    'shop_owner': current_shop.shopify_owner,
                     "instagram_user": current_instagram_user.username
                 }
-
+            if 'shop_url' in kw:
+                current_shop = request.env['shop.shopify'].sudo().search([('url', '=', kw['shop_url'])], limit=1)
+                feeds = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id)])
+                current_instagram_user = request.env['instagram.user'].sudo().search([("shop_shopify", '=', current_shop.id)], limit=1)
+                if feeds:
+                    for feed in feeds:
+                        if feed.enable_status:
+                            if feed.selected_posts:
+                                list_feed.append({
+                                    'list_tag': feed.list_tag,
+                                    "feed_title": feed.feed_title,
+                                    'number_column': feed.number_column,
+                                    "on_post_click": feed.on_post_click,
+                                    'enable_status': feed.enable_status,
+                                    "feed_layout": feed.feed_layout,
+                                    "selected_posts": json.loads(feed.selected_posts),
+                                    'id': feed.id
+                                })
+                            else:
+                                list_feed.append({
+                                    'list_tag': feed.list_tag,
+                                    'id': feed.id,
+                                    "feed_title": feed.feed_title,
+                                    "enable_status": feed.enable_status,
+                                    'number_column': feed.number_column,
+                                    "on_post_click": feed.on_post_click,
+                                    "feed_layout": feed.feed_layout,
+                                    "selected_posts": []
+                                })
+                return {
+                    'list_feed': list_feed,
+                    'shop_owner': current_shop.shopify_owner,
+                    "instagram_user": current_instagram_user.username
+                }
         except Exception as e:
             return {"error": e}
 
@@ -164,4 +211,18 @@ class Instagram(http.Controller):
                 current_instagram_user.get_topic_instagram()
                 return {"fetch_post_instagram_success": 'Fetch post instagram success!'}
         except Exception as e:
-            return{'fetch_post_instagram_error': e}
+            return {'fetch_post_instagram_error': e}
+
+    @http.route('/instafeed/change_status_feed', auth='user', type='json')
+    def instafeed_enable_feed(self, **kw):
+        try:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([("admin", '=', current_user.id)], limit=1)
+            current_feed = request.env['instagram.feed'].sudo().search([('shop_id', '=', current_shop.id), ("id", "=", kw['feed_id'])], limit=1)
+            current_feed.enable_status = kw['status']
+            if current_feed.enable_status:
+                return {'change_status_feed': f"Turn on feed id = {current_feed.id} success!"}
+            else:
+                return {'change_status_feed': f"Feed id = {current_feed.id} was disabled!"}
+        except Exception as e:
+            return {"error_enable_feed": e}
