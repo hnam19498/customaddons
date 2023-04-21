@@ -186,35 +186,35 @@ class ShopifyMain(http.Controller):
                     else:
                         current_shop.is_update_script_tag = True
 
-                    products = shopify.Product.find()
-                    exist_products = request.env['shopify.product'].sudo().search([])
-                    list_product_ids = []
-
-                    if exist_products:
-                        for product in exist_products:
-                            if str(product.shopify_product_id) not in list_product_ids:
-                                list_product_ids.append(product.shopify_product_id)
-
-                    if products:
-                        for product in products:
-                            if str(product.id) not in list_product_ids:
-                                try:
-                                    request.env['shopify.product'].sudo().create({
-                                        'shopify_product_id': product.id,
-                                        'name': product.title,
-                                        'url': "https://" + kw['shop'] + "/products/" + product.handle,
-                                        'shop_id': current_shop.id,
-                                        'url_img': product.image.src,
-                                        'price': float(product.variants[0].price),
-                                        "compare_at_price": product.variants[0].compare_at_price,
-                                        'qty': product.variants[0].inventory_quantity,
-                                        "variant_id": product.variants[0].id
-                                    })
-                                except Exception as error_create_product:
-                                    print("error_create_product: " + str(error_create_product))
-                                    continue
-                            else:
-                                print(f'Product id "{product.id}" đã trong database!')
+                    # products = shopify.Product.find()
+                    # exist_products = request.env['shopify.product'].sudo().search([])
+                    # list_product_ids = []
+                    #
+                    # if exist_products:
+                    #     for product in exist_products:
+                    #         if str(product.shopify_product_id) not in list_product_ids:
+                    #             list_product_ids.append(product.shopify_product_id)
+                    #
+                    # if products:
+                    #     for product in products:
+                    #         if str(product.id) not in list_product_ids:
+                    #             try:
+                    #                 request.env['shopify.product'].sudo().create({
+                    #                     'shopify_product_id': product.id,
+                    #                     'name': product.title,
+                    #                     'url': "https://" + kw['shop'] + "/products/" + product.handle,
+                    #                     'shop_id': current_shop.id,
+                    #                     'url_img': product.image.src,
+                    #                     'price': float(product.variants[0].price),
+                    #                     "compare_at_price": product.variants[0].compare_at_price,
+                    #                     'qty': product.variants[0].inventory_quantity,
+                    #                     "variant_id": product.variants[0].id
+                    #                 })
+                    #             except Exception as error_create_product:
+                    #                 print("error_create_product: " + str(error_create_product))
+                    #                 continue
+                    #         else:
+                    #             print(f'Product id "{product.id}" đã trong database!')
                     db = http.request.env.cr.dbname
                     request.env.cr.commit()
                     request.session.authenticate(db, kw['shop'], current_shop.password)
@@ -242,3 +242,13 @@ class ShopifyMain(http.Controller):
                 "compare_at_price": product.compare_at_price
             })
         return {'list_product': list_product}
+
+    @http.route('/shopify/fetch_product', auth='user', type='json')
+    def fetch_product_shopify(self):
+        try:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([("admin", '=', current_user.id)], limit=1)
+            current_shop.fetch_product()
+            return {"fetch_product_shopify_success": "Fetch product shopify success!"}
+        except Exception as e:
+            return {"fetch_product_shopify_error": e}

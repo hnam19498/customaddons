@@ -78,52 +78,90 @@ class Instagram(http.Controller):
 
     @http.route('/instagram/get_posts', auth='user', type="json")
     def instafeed_get_posts(self, **kw):
-        posts = request.env['instagram.post'].sudo().search([])
-        post_data = []
-        if posts:
-            for post in posts:
-                post_data.append({
-                    'like_count': post.like_count,
-                    "caption": post.caption,
-                    'media_url': post.media_url,
-                    'comments': post.comments,
-                    'post_id': post.post_id,
-                    "id": post.id,
-                    "media_type": post.media_type,
-                    'thumbnail_url': post.thumbnail_url
-                })
-
-        return {'post_data': post_data}
+        try:
+            current_instagram_user = request.env['instagram.user'].sudo().search([('username', "=", kw['instagram_username'])])
+            posts = request.env['instagram.post'].sudo().search([('instagram_user', '=', current_instagram_user.id)])
+            post_data = []
+            if posts:
+                for post in posts:
+                    post_data.append({
+                        'like_count': post.like_count,
+                        "caption": post.caption,
+                        'media_url': post.media_url,
+                        'comments': post.comments,
+                        'post_id': post.post_id,
+                        "id": post.id,
+                        'link_to_post': post.link_to_post,
+                        "media_type": post.media_type,
+                        'thumbnail_url': post.thumbnail_url
+                    })
+            return {'post_data': post_data}
+        except Exception as e:
+            return {"error": e}
 
     @http.route("/instafeed/save_feed", auth='user', type="json")
     def instafeed_save_feed(self, **kw):
         try:
             current_user = request.env.user
             current_shop = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)], limit=1)
-            if kw['list_tag']:
-                exist_feeds = request.env['instagram.feed'].sudo().search([])
-                if exist_feeds:
-                    for exist_feed in exist_feeds:
-                        count = 0
-                        for exist_line in json.loads(exist_feed.list_tag):
-                            for line in kw['list_tag']:
-                                if line['post_id'] == exist_line['post_id'] and line['product_id'] == exist_line['product_id']:
-                                    count += 1
-                        if count == len(json.loads(exist_feed.list_tag)):
-                            print(f'Feed {kw} đã tồn tại!')
-                else:
-                    request.env['instagram.feed'].sudo().create({
-                        'list_tag': json.dumps(kw['list_tag']),
-                        "feed_title": kw['feed_title'],
-                        "number_column": kw['number_column'],
-                        'on_post_click': kw['on_post_click'],
-                        'shop_id': current_shop.id
-                    })
-                    print('created')
+            request.env['instagram.feed'].sudo().create({
+                'list_tag': json.dumps(kw['list_tag']),
+                "feed_title": kw['feed_title'],
+                "number_column": kw['number_column'],
+                'on_post_click': kw['on_post_click'],
+                'shop_id': current_shop.id,
+                "feed_layout": kw['feed_layout'],
+                "selected_posts": json.dumps(kw['selected_posts'])
+            })
+            return {"success": 'created'}
         except Exception as e:
-            print(e)
+            return {"error": e}
 
     @http.route('/instafeed/get_feed', type='json', auth='public', method=['POST'], csrf=False, cors="*")
-    def instafeed_get_feed(self, *kw):
-        print(kw)
+    def instafeed_get_feed(self, **kw):
+        try:
+            if 'shop_url' in kw:
+                current_shop = request.env['shop.shopify'].sudo().search([('url', '=', kw['shop_url'])], limit=1)
+                feeds = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id)])
+                list_feed = []
+                current_instagram_user = request.env['instagram.user'].sudo().search([("shop_shopify", '=', current_shop.id)], limit=1)
+                if feeds:
+                    for feed in feeds:
+                        if feed.selected_posts:
+                            list_feed.append({
+                                'list_tag': feed.list_tag,
+                                "feed_title": feed.feed_title,
+                                'number_column': feed.number_column,
+                                "on_post_click": feed.on_post_click,
+                                "feed_layout": feed.feed_layout,
+                                "selected_posts": json.loads(feed.selected_posts),
+                                'id': feed.id
+                            })
+                        else:
+                            list_feed.append({
+                                'list_tag': feed.list_tag,
+                                'id': feed.id,
+                                "feed_title": feed.feed_title,
+                                'number_column': feed.number_column,
+                                "on_post_click": feed.on_post_click,
+                                "feed_layout": feed.feed_layout,
+                                "selected_posts": []
+                            })
+                return {
+                    'list_feed': list_feed,
+                    "instagram_user": current_instagram_user.username
+                }
 
+        except Exception as e:
+            return {"error": e}
+
+    @http.route('/instafeed/fetch_post', type="json", auth="user")
+    def fetch_post_instagram(self, **kw):
+        try:
+            current_user = request.env.user
+            if current_user:
+                current_instagram_user = request.env['instagram.user'].sudo().search([("username", '=', kw['instagram_username'])], limit=1)
+                current_instagram_user.get_topic_instagram()
+                return {"fetch_post_instagram_success": 'Fetch post instagram success!'}
+        except Exception as e:
+            return{'fetch_post_instagram_error': e}

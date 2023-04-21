@@ -8,6 +8,7 @@
         "build_shopify": "webpack --env NODE_ENV=development --config ./webpack.config.shopify.dev.js"
     },
     "dependencies": {
+        "vue3-carousel": "^0.2.16",
         "@ant-design/icons-vue": "^6.1.0",
         "@fortawesome/fontawesome-svg-core": "^6.2.1",
         "@fortawesome/free-brands-svg-icons": "^6.4.0",

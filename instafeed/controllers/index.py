@@ -10,16 +10,20 @@ class BoughtTogether(http.Controller):
         instagram_user = request.env['instagram.user'].sudo().search([('shop_shopify', "=", current_shopify.id)], limit=1)
         facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', "=", current_shopify.id)])
         if not instagram_user:
-            instagram_user.username = ''
+            instagram_username = ''
+        else:
+            instagram_username = instagram_user.username
         if not facebook_user:
-            facebook_user.username = ''
+            facebook_username = ''
+        else:
+            facebook_username = facebook_user.username
 
         return request.render(
             'instafeed.instafeed', {
                 'data': {
                     'users': {
-                        'instagram_username': instagram_user.username,
-                        'facebook_username': facebook_user.username
+                        'instagram_username': instagram_username,
+                        'facebook_username': facebook_username
                     }
                 }
             }

@@ -1,5 +1,5 @@
 import {createApp} from 'vue/dist/vue.esm-bundler'
-import App from './App.vue'
+import Shopify from './Shopify.vue'
 import 'ant-design-vue/dist/antd.css'
 import Antd from 'ant-design-vue'
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome"
@@ -9,4 +9,4 @@ import {far} from '@fortawesome/free-regular-svg-icons'
 import {faInstagram, faFacebookF} from '@fortawesome/free-brands-svg-icons'
 
 library.add(fas, far, faFacebookF, faInstagram)
-createApp(App).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount('#app')
+createApp(Shopify).component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount('#test_app')

@@ -28,7 +28,7 @@
                     <div style="display: flex; justify-content: space-between; margin-top: 15px">
                         <div class="feed_setting" style="width: 50%; margin-right: 10px">
                             <span class="label">LAYOUT</span>
-                            <select>
+                            <select v-model="feed_layout">
                                 <option value="grid_squares">Grid - Squares</option>
                                 <option value="grid_tiles">Grid - Tiles</option>
                                 <option value="slider_squares">Slider - Squares</option>
@@ -45,8 +45,13 @@
                     </div>
                     <div class="feed_setting" style="width: 100%; margin-top: 15px">
                         <span class="label">COLUMNS</span>
-                        <input :disabled="configuration_select=='auto'" v-model="number_column" min="1" max="6"
+                        <input v-model="number_column"
+                               min="1" max="6"
+                               v-if="configuration_select=='manual'"
                                type="number">
+                        <input value="AUTO"
+                               v-if="configuration_select=='auto'"
+                               disabled>
                     </div>
                     <button @click="save_feed" id="btn_save">Save feed</button>
                     <div style="display: flex">
@@ -67,36 +72,86 @@
                 PREVIEW
             </div>
             <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed_title }}</h2>
+            <Carousel style="margin-left: 10px; margin-right: 10px"
+                      :items-to-show="number_column"
+                      :wrap-around="true"
+                      v-if="feed_layout.includes('slider')">
+                <Slide v-for="post in selected_posts" :key="post.id">
+                    <div class="carousel__item" @click='openPost(post)'>
+                        <img v-if="post.media_type == 'IMAGE' && feed_layout == 'slider_squares'"
+                             :alt="post.caption"
+                             style="height: 150px; width: 150px; object-fit: cover"
+                             :src="post.media_url">
+                        <img v-if="post.media_type == 'VIDEO' && feed_layout == 'slider_squares'"
+                             :alt="post.caption"
+                             style="height: 150px; width: 150px; object-fit: cover"
+                             :src="post.thumbnail_url">
+                        <img v-if="post.media_type == 'IMAGE' && feed_layout == 'slider_tiles'"
+                             :alt="post.caption"
+                             style="height: 250px; width: 150px; object-fit: cover"
+                             :src="post.media_url">
+                        <img v-if="post.media_type == 'VIDEO' && feed_layout == 'slider_tiles'"
+                             :alt="post.caption"
+                             style="height: 250px; width: 150px; object-fit: cover"
+                             :src="post.thumbnail_url">
+                    </div>
+                </Slide>
+                <template #addons>
+                    <Navigation/>
+                </template>
+            </Carousel>
             <div style="display: grid; text-align: center"
-                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`}"
-                 class="posts">
+                 v-if="feed_layout.includes('grid')"
+                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`}">
                 <div :key="post.id"
                      @mouseenter="post.hover_status = true"
                      @mouseleave="post.hover_status = false"
                      v-for="post in selected_posts"
                      style="position: relative; margin-bottom: 15px"
                      class="post">
-                    <img v-if="post.media_type == 'IMAGE'"
+                    <img v-if="post.media_type == 'IMAGE' && feed_layout == 'grid_squares'"
                          :alt="post.caption"
                          style="height: 150px; width: 150px; object-fit: cover"
                          :src="post.media_url">
-                    <img v-if="post.media_type == 'VIDEO'"
+                    <img v-if="post.media_type == 'VIDEO' && feed_layout == 'grid_squares'"
                          :alt="post.caption"
                          style="height: 150px; width: 150px; object-fit: cover"
                          :src="post.thumbnail_url">
-                    <div v-if="post.hover_status"
+                    <img v-if="post.media_type == 'IMAGE' && feed_layout == 'grid_tiles'"
+                         :alt="post.caption"
+                         style="height: 250px; width: 150px; object-fit: cover"
+                         :src="post.media_url">
+                    <img v-if="post.media_type == 'VIDEO' && feed_layout == 'grid_tiles'"
+                         :alt="post.caption"
+                         style="height: 250px; width: 150px; object-fit: cover"
+                         :src="post.thumbnail_url">
+                    <div v-if="post.hover_status && feed_layout == 'grid_squares'"
                          class="post_hover"
+                         style="height: 150px; width: 150px"
                          @click='openPost(post)'>
                         <font-awesome-icon icon="fa-brands fa-instagram"
                                            style="color: white; height: 30px; width: 30px"
-                                           v-if="post.media_type=='IMAGE'"/>
+                                           v-if="post.media_type == 'IMAGE'"/>
                         <font-awesome-icon icon="fa-solid fa-play"
                                            style="color: white; height: 30px; width: 30px"
-                                           v-if="post.media_type=='VIDEO'"/>
+                                           v-if="post.media_type == 'VIDEO'"/>
+                    </div>
+                    <div v-if="post.hover_status && feed_layout == 'grid_tiles'"
+                         class="post_hover"
+                         style="height: 250px; width: 150px"
+                         @click='openPost(post)'>
+                        <font-awesome-icon icon="fa-brands fa-instagram"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'IMAGE'"/>
+                        <font-awesome-icon icon="fa-solid fa-play"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'VIDEO'"/>
                     </div>
                 </div>
             </div>
-            <div style="color: #707070"><i><b>Tip:</b> Click on a post to start tagging products</i></div>
+            <div style="color: #707070; margin-left: 10px">
+                <i><b>Tip:</b> Click on a post to start tagging products</i>
+            </div>
         </div>
         <Modal style="width: 70%"
                :footer="null"
@@ -123,7 +178,7 @@
                         </div>
                     </div>
                     <div style="display: flex; justify-content: center; text-align: center">
-                        <button @click="tagModal(selected_post)" class="tag_product">Tag product</button>
+                        <button @click="tag_modal = true" class="tag_product">Tag product</button>
                     </div>
                     <div style="margin-left: 10px">
                         <div>{{ selected_post.caption }}</div>
@@ -147,7 +202,7 @@
                 </template>
             </a-input>
             <table>
-                <tr v-for="product in list_product"
+                <tr v-for="product in list_product_filter"
                     :key="product.id"
                     class="table-row"
                     @click="tagProduct(selected_post, product)"
@@ -169,12 +224,23 @@
 </template>
 <script>
 import {Modal} from 'ant-design-vue'
+import {Carousel, Navigation, Slide} from 'vue3-carousel'
+import 'vue3-carousel/dist/carousel.css'
 import {SearchOutlined} from "@ant-design/icons-vue"
 import axios from "axios"
+import {LeftCircleOutlined, RightCircleOutlined} from '@ant-design/icons-vue'
 
 export default {
     name: "FeedSettings",
-    components: {Modal, SearchOutlined},
+    components: {
+        Modal,
+        Carousel,
+        Navigation,
+        Slide,
+        SearchOutlined,
+        LeftCircleOutlined,
+        RightCircleOutlined
+    },
     props: {
         selected_posts: {
             type: Array,
@@ -186,6 +252,7 @@ export default {
             list_tag: [],
             on_post_click: "open",
             search: '',
+            feed_layout: 'grid_squares',
             feed_title: 'EDIT FEED TITLE',
             post_modal: false,
             selected_post: {},
@@ -210,10 +277,16 @@ export default {
                     list_tag: self.list_tag,
                     feed_title: self.feed_title,
                     number_column: self.number_column,
-                    on_post_click: self.on_post_click
+                    on_post_click: self.on_post_click,
+                    feed_layout: self.feed_layout,
+                    selected_posts: self.selected_posts
                 }
             }).then(res => {
-                window.location.href
+                if (res.data.result.success) {
+                    alert("Saved!")
+                } else {
+                    alert(res.data.result.error)
+                }
             }).catch(error => {
                 console.log(error)
             })
@@ -221,6 +294,7 @@ export default {
         cancelFeed() {
             this.number_column = 3
             this.feed_title = ''
+            this.search = ''
             this.post_modal = false
             this.selected_post = {}
             this.instagram_user = ''
@@ -233,12 +307,14 @@ export default {
             let self = this
             self.current_list_tag = []
             self.tag_modal = false
+            self.search = ''
         },
         submitTab(current_list_tag) {
             let self = this
             self.list_tag.push(...current_list_tag)
             self.current_list_tag = []
             self.tag_modal = false
+            self.search = ""
             self.post_modal = false
         },
         tagProduct(selected_post, product) {
@@ -252,7 +328,6 @@ export default {
             if (count == 0) {
                 self.current_list_tag.push({post_id: selected_post.id, product_id: product.id})
             }
-            console.log(self.current_list_tag)
         },
         backToSelectPost() {
             this.feed_title = ''
@@ -262,28 +337,33 @@ export default {
             this.number_column = 3
             this.current_list_tag = []
             this.list_tag = []
+            this.search = ""
             this.tag_modal = false
             this.list_product = []
             this.$emit('changeTab', 'SelectPost')
         },
-        tagModal(selected_post) {
-            let self = this
-            self.tag_modal = true
-        },
         openPost(post) {
             let self = this
-            self.selected_post = post
-            self.post_modal = true
-            if (self.selected_post.comments) {
-                self.comments = JSON.parse(self.selected_post.comments)
-            } else {
-                self.comments = []
+            if (self.on_post_click == 'open') {
+                self.selected_post = post
+                self.search = ''
+                self.post_modal = true
+                if (self.selected_post.comments) {
+                    self.comments = JSON.parse(self.selected_post.comments)
+                } else {
+                    self.comments = []
+                }
             }
+            if (self.on_post_click == 'instagram') {
+                window.open(post.link_to_post, '_blank')
+            }
+
         },
         redirectToInstagramUser() {
             window.open('https://www.instagram.com/' + this.instagram_user, '_blank')
         }
     },
+    emits: ['changeTab'],
     mounted() {
         let self = this
         self.instagram_user = window.instafeed.users.instagram_username
@@ -296,7 +376,13 @@ export default {
             console.log(error)
         })
     },
-    watch: {}
+    computed: {
+        list_product_filter() {
+            let self = this
+            return self.list_product.filter(product => product.name.toLowerCase().includes(self.search.toLowerCase())
+            )
+        }
+    }
 }
 </script>
 <style scoped>
@@ -305,7 +391,7 @@ export default {
     margin-top: 10px;
     border-radius: 5px;
     border: 1px solid #E2E2E2;
-    width: 100%;
+    width: 73%;
     margin-right: 10px;
 }
 
@@ -377,36 +463,6 @@ export default {
     margin-bottom: 10px;
 }
 
-.ant-carousel :deep(.slick-slide) {
-    text-align: center;
-    height: 160px;
-    line-height: 160px;
-    background: #364d79;
-    overflow: hidden;
-}
-
-.ant-carousel :deep(.slick-arrow.custom-slick-arrow) {
-    width: 25px;
-    height: 25px;
-    font-size: 25px;
-    color: #fff;
-    background-color: rgba(31, 45, 61, 0.11);
-    opacity: 0.3;
-    z-index: 1;
-}
-
-.ant-carousel :deep(.custom-slick-arrow:before) {
-    display: none;
-}
-
-.ant-carousel :deep(.custom-slick-arrow:hover) {
-    opacity: 0.5;
-}
-
-.ant-carousel :deep(.slick-slide h3) {
-    color: #fff;
-}
-
 .post {
     position: relative;
 }
@@ -426,8 +482,6 @@ export default {
     left: 50%;
     transform: translate(-50%, -50%);
     z-index: 20;
-    width: 150px;
-    height: 150px;
     position: absolute;
     opacity: 0.5;
     background: #151515
@@ -457,5 +511,15 @@ export default {
 
 tr {
     cursor: pointer;
+}
+
+.carousel__item {
+    min-height: 150px;
+    width: 100%;
+    background-color: white;
+    display: flex;
+    cursor: pointer;
+    justify-content: center;
+    align-items: center;
 }
 </style>

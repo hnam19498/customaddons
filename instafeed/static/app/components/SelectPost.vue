@@ -37,20 +37,9 @@
                             <td>Like</td>
                             <td>Caption</td>
                         </tr>
-                        <tr class="table-row" v-for="post in posts" :key="post.id">
+                        <tr class="table-row" v-for="post in posts" :key="post.id" @click="select_post(post)">
                             <td>
                                 <input :checked="selected_posts.filter(e => e.id == post.id).length > 0"
-                                       @change="select_post"
-                                       :value="{
-                                           id: post.id,
-                                           media_url: post.media_url,
-                                           comments: post.comments,
-                                           post_id: post.post_id,
-                                           like_count: post.like_count,
-                                           caption: post.caption,
-                                           media_type: post.media_type,
-                                           thumbnail_url: post.thumbnail_url
-                                       }"
                                        type="checkbox">
                             </td>
                             <td v-if="post.media_type=='VIDEO'">
@@ -74,13 +63,8 @@
             <!--            </div>-->
         </div>
     </div>
-    <div v-else>
-        <loading/>
-    </div>
 </template>
 <script>
-import Loading from "./Loading.vue"
-
 export default {
     data() {
         return {
@@ -95,15 +79,14 @@ export default {
             this.selected_posts = window.selected_posts
         }
     },
-    components: {
-        Loading
-    },
     props: {
         posts: {type: Array, default: []}
     },
+    emits:['SelectPostToFeedSettings'],
     methods: {
         cancelSelectPost() {
-            console.log('cancel')
+            this.selected_posts = []
+            this.tickAllPosts = false
         },
         nextToFeedSettings() {
             window.selected_posts = this.selected_posts
@@ -119,6 +102,7 @@ export default {
                         comments: post.comments,
                         post_id: post.post_id,
                         like_count: post.like_count,
+                        link_to_post: post.link_to_post,
                         caption: post.caption,
                         media_type: post.media_type,
                         thumbnail_url: post.thumbnail_url
@@ -129,11 +113,31 @@ export default {
                 this.selected_posts = []
             }
         },
-        select_post(ob) {
-            if (!ob.target.checked) {
-                this.selected_posts = this.selected_posts.filter(e => e.id != ob.target._value.id)
+        select_post(post) {
+            let self = this
+            let count = 0
+            let post_index
+            let post_data = {
+                id: post.id,
+                media_url: post.media_url,
+                comments: post.comments,
+                post_id: post.post_id,
+                like_count: post.like_count,
+                caption: post.caption,
+                media_type: post.media_type,
+                thumbnail_url: post.thumbnail_url,
+                link_to_post: post.link_to_post
+            }
+            for (let i = 0; i < self.selected_posts.length; i++) {
+                if (post_data.id == self.selected_posts[i].id) {
+                    count += 1
+                    post_index = i
+                }
+            }
+            if (count == 0) {
+                self.selected_posts.push(post_data)
             } else {
-                this.selected_posts.push(ob.target._value)
+                self.selected_posts.splice(post_index, 1)
             }
             this.tickAllPosts = this.selected_posts.length == this.posts.length
         },
