@@ -165,7 +165,6 @@ export default {
                 shop_url: window.location.origin
             }
         }).then(res => {
-            console.log(res)
             if (res.data.result.list_feed) {
                 self.list_feed = res.data.result.list_feed
             }
