@@ -6,6 +6,7 @@ from odoo.http import request
 class Facebook(http.Controller):
     @http.route('/facebook/auth', auth='user')
     def facebook_auth(self, **kw):
+        print(kw)
         facebook_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_id')
         facebook_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_redirect_uri')
 
@@ -16,6 +17,7 @@ class Facebook(http.Controller):
     @http.route('/facebook/oauth', auth="user")
     def facebook_oauth(self, **kw):
         if 'code' in kw:
+            print(kw)
             facebook_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_id')
             facebook_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_redirect_uri')
             facebook_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_secret')
@@ -51,4 +53,5 @@ class Facebook(http.Controller):
                             exist_facebook_user.sudo().write(facebook_user_data)
                             exist_facebook_user.instagram_user_id = exist_instagram_user.id
                             exist_instagram_user.facebook_user_id = exist_facebook_user.id
+
                     return werkzeug.utils.redirect('https://odoo.website/instafeed')

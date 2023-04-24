@@ -14,68 +14,16 @@ class ShopifySettings(models.TransientModel):
     shopify_script_tag_url = fields.Char('Shopify script tag URL', config_parameter='instafeed.shopify_script_tag_url')
 
     def change_script_tag_url(self):
-        try:
-            shops = self.env['shop.shopify'].sudo().search([])
-            if shops:
-                for shop in shops:
-                    shop.is_update_script_tag = False
-
-                old_shops = self.env['shop.shopify'].sudo().search([('is_update_script_tag', '=', False)], limit=10)
-                for shop in old_shops:
-                    new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=self.shopify_api_version)
-                    shopify.ShopifyResource.activate_session(new_session)
-                    existing_script_tags = shopify.ScriptTag.find()
-                    if existing_script_tags:
-                        for script_tag in existing_script_tags:
-                            if script_tag.src != self.shopify_script_tag_url:
-                                shopify.ScriptTag.find(script_tag.id).destroy()
-                                shopify.ScriptTag.create({
-                                    "event": "onload",
-                                    "src": self.shopify_script_tag_url
-                                })
-                    else:
-                        shopify.ScriptTag.create({
-                            "event": "onload",
-                            "src": self.shopify_script_tag_url
-                        })
-                    shop.is_update_script_tag = True
-        except Exception as e:
-            print(e)
+        shops = self.env['shop.shopify'].sudo().search([])
+        if shops:
+            for shop in shops:
+                shop.is_update_script_tag = False
 
     def change_ngrok_url(self):
-        try:
-            shops = self.env['shop.shopify'].sudo().search([])
-            if shops:
-                for shop in shops:
-                    shop.is_update_ngrok = False
-
-                old_shops = self.env['shop.shopify'].sudo().search([('is_update_ngrok', '=', False)], limit=10)
-                for shop in old_shops:
-                    new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=self.shopify_api_version)
-                    shopify.ShopifyResource.activate_session(new_session)
-                    existing_webhooks = shopify.Webhook.find()
-
-                    if existing_webhooks:
-                        for webhook in existing_webhooks:
-                            webhook.destroy()
-
-                    webhook_products_create = shopify.Webhook()
-                    webhook_products_create.topic = "products/create"
-                    webhook_products_create.address = self.ngrok_url + "/webhook/products_create/" + shop.shopify_id
-                    webhook_products_create.format = "json"
-                    webhook_products_create.save()
-                    print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
-
-                    webhook_products_update = shopify.Webhook()
-                    webhook_products_update.topic = "products/update"
-                    webhook_products_update.address = self.ngrok_url + "/webhook/products_update/" + shop.shopify_id
-                    webhook_products_update.format = "json"
-                    webhook_products_update.save()
-                    print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
-
-                    shop.is_update_ngrok = True
-        except Exception as e:
-            print(e)
+        shops = self.env['shop.shopify'].sudo().search([])
+        if shops:
+            for shop in shops:
+                shop.is_update_ngrok = False
 
 
 class Shop(models.Model):
@@ -96,9 +44,66 @@ class Shop(models.Model):
     is_update_script_tag = fields.Boolean()
     is_update_ngrok = fields.Boolean(default=True)
 
+    def change_script_tag_url(self):
+        try:
+            old_shops = self.env['shop.shopify'].sudo().search([('is_update_script_tag', '=', False)], limit=10)
+            shopify_api_version = self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
+            for shop in old_shops:
+                new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=shopify_api_version)
+                shopify.ShopifyResource.activate_session(new_session)
+                existing_script_tags = shopify.ScriptTag.find()
+                if existing_script_tags:
+                    for script_tag in existing_script_tags:
+                        if script_tag.src != self.shopify_script_tag_url:
+                            shopify.ScriptTag.find(script_tag.id).destroy()
+                            shopify.ScriptTag.create({
+                                "event": "onload",
+                                "src": self.shopify_script_tag_url
+                            })
+                else:
+                    shopify.ScriptTag.create({
+                        "event": "onload",
+                        "src": self.shopify_script_tag_url
+                    })
+                shop.is_update_script_tag = True
+        except Exception as e:
+            print(e)
+
+    def change_ngrok_url(self):
+        try:
+            old_shops = self.env['shop.shopify'].sudo().search([('is_update_ngrok', '=', False)], limit=10)
+            shopify_api_version = self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
+            for shop in old_shops:
+                new_session = shopify.Session(token=shop.access_token, shop_url=shop.url, version=shopify_api_version)
+                shopify.ShopifyResource.activate_session(new_session)
+                existing_webhooks = shopify.Webhook.find()
+
+                if existing_webhooks:
+                    for webhook in existing_webhooks:
+                        webhook.destroy()
+
+                webhook_products_create = shopify.Webhook()
+                webhook_products_create.topic = "products/create"
+                webhook_products_create.address = self.ngrok_url + "/webhook/products_create/" + shop.shopify_id
+                webhook_products_create.format = "json"
+                webhook_products_create.save()
+                print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
+
+                webhook_products_update = shopify.Webhook()
+                webhook_products_update.topic = "products/update"
+                webhook_products_update.address = self.ngrok_url + "/webhook/products_update/" + shop.shopify_id
+                webhook_products_update.format = "json"
+                webhook_products_update.save()
+                print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
+
+                shop.is_update_ngrok = True
+        except Exception as e:
+            print(e)
+
     def fetch_product(self):
         try:
-            new_session = shopify.Session(self.url, self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version'), token=self.access_token)
+            new_session = shopify.Session(self.url, self.env['ir.config_parameter'].sudo().get_param(
+                'instafeed.shopify_api_version'), token=self.access_token)
             shopify.ShopifyResource.activate_session(new_session)
             products = shopify.Product.find()
 

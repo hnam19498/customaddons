@@ -159,11 +159,11 @@
                :maskClosable="false"
                @cancel="selected_post={}">
             <div style="display: flex">
-                <img v-if="selected_post.media_type=='IMAGE'"
+                <img v-if="selected_post.media_type == 'IMAGE'"
                      :src="selected_post.media_url"
                      :alt="selected_post.caption"
                      style="width: 50%; height: 50%">
-                <video height="400" autoplay v-if="selected_post.media_type=='VIDEO'">
+                <video height="400" autoplay v-if="selected_post.media_type == 'VIDEO'">
                     <source :src="selected_post.media_url">
                 </video>
                 <div style="width: 100%; display: flex; flex-direction: column">
@@ -182,7 +182,10 @@
                     </div>
                     <div style="margin-left: 10px">
                         <div>{{ selected_post.caption }}</div>
-                        <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }} ❤️</div>
+                        <div style="border-bottom: 1px solid #dcdcdc">
+                            {{ selected_post.like_count }}
+                            <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black" />
+                        </div>
                         <div v-if="comments" v-for="comment in comments">
                             <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
                         </div>
@@ -223,16 +226,18 @@
     </div>
 </template>
 <script>
-import {Modal} from 'ant-design-vue'
+import {Modal, notification} from 'ant-design-vue'
 import {Carousel, Navigation, Slide} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
 import {SearchOutlined} from "@ant-design/icons-vue"
 import axios from "axios"
-import {LeftCircleOutlined, RightCircleOutlined} from '@ant-design/icons-vue'
+import {h} from 'vue'
+import {LeftCircleOutlined, RightCircleOutlined, CloseCircleFilled} from '@ant-design/icons-vue'
 
 export default {
     name: "FeedSettings",
     components: {
+        CloseCircleFilled,
         Modal,
         Carousel,
         Navigation,
@@ -266,30 +271,49 @@ export default {
         }
     },
     methods: {
+        show_toast: function (type, message, duration) {
+            notification[type]({
+                message: message,
+                duration: duration,
+                class: 'error_popup',
+                closeIcon: e => {
+                    return (<CloseCircleFilled/>)
+                }
+            })
+        },
         save_feed() {
             let self = this
-            if (self.configuration_select == 'auto') {
-                self.number_column = 3
+            if (self.selected_posts.length == 0) {
+                console.log(self.selected_posts)
+                this.show_toast(
+                    'open',
+                    'Please select at least 1 post at SelectPost before continue.',
+                    3
+                )
+            } else {
+                if (self.configuration_select == 'auto') {
+                    self.number_column = 3
+                }
+                axios.post('https://odoo.website/instafeed/save_feed', {
+                    jsonrpc: "2.0",
+                    params: {
+                        list_tag: self.list_tag,
+                        feed_title: self.feed_title,
+                        number_column: self.number_column,
+                        on_post_click: self.on_post_click,
+                        feed_layout: self.feed_layout,
+                        selected_posts: self.selected_posts
+                    }
+                }).then(res => {
+                    if (res.data.result.success) {
+                        alert("Saved!")
+                    } else {
+                        alert(res.data.result.error)
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
             }
-            axios.post('https://odoo.website/instafeed/save_feed', {
-                jsonrpc: "2.0",
-                params: {
-                    list_tag: self.list_tag,
-                    feed_title: self.feed_title,
-                    number_column: self.number_column,
-                    on_post_click: self.on_post_click,
-                    feed_layout: self.feed_layout,
-                    selected_posts: self.selected_posts
-                }
-            }).then(res => {
-                if (res.data.result.success) {
-                    alert("Saved!")
-                } else {
-                    alert(res.data.result.error)
-                }
-            }).catch(error => {
-                console.log(error)
-            })
         },
         cancelFeed() {
             this.number_column = 3

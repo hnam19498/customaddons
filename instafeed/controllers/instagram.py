@@ -8,7 +8,6 @@ class Instagram(http.Controller):
     def instafeed_auth(self, **kw):
         instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_app_id')
         instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_redirect_uri')
-
         url = 'https://api.instagram.com/oauth/authorize?client_id=' + instagram_app_id + '&redirect_uri=' + instagram_redirect_uri + '&scope=user_profile,user_media&response_type=code'
         return werkzeug.utils.redirect(url)
 
@@ -16,10 +15,8 @@ class Instagram(http.Controller):
     def instafeed_oauth(self, **kw):
         if 'code' in kw:
             instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_app_id')
-            instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param(
-                'instafeed.instagram_redirect_uri')
-            instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param(
-                'instafeed.instagram_client_secret')
+            instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_redirect_uri')
+            instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_client_secret')
 
             oauth_data = {
                 'grant_type': "authorization_code",
@@ -31,29 +28,23 @@ class Instagram(http.Controller):
 
             header = {'Content-Type': 'application/x-www-form-urlencoded'}
 
-            instafeed_oauth = requests.post('https://api.instagram.com/oauth/access_token', headers=header,
-                                            data=oauth_data)
+            instafeed_oauth = requests.post('https://api.instagram.com/oauth/access_token', headers=header, data=oauth_data)
             oauth = instafeed_oauth.json()
 
             if instafeed_oauth.ok:
                 instagram_user_result = requests.get(
-                    'https://graph.instagram.com/' + str(oauth['user_id']) + '?fields=id,username&access_token=' +
-                    oauth['access_token'])
+                    'https://graph.instagram.com/' + str(oauth['user_id']) + '?fields=id,username&access_token=' + oauth['access_token'])
 
                 if instagram_user_result.ok:
                     instagram_user = instagram_user_result.json()
-
                     current_user = request.env.user
                     current_shopify = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)])
-                    instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param(
-                        'instafeed.instagram_client_secret')
+                    instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_client_secret')
 
-                    long_access_token = requests.get(
-                        'https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=' + instagram_client_secret + f'&access_token={oauth["access_token"]}')
-                    exist_instagram_user = request.env['instagram.user'].sudo().search(
-                        [('instagram_id', '=', instagram_user['id'])], limit=1)
-                    exist_facebook_user = request.env['facebook.user'].sudo().search(
-                        [('shop_shopify', '=', current_shopify.id)], limit=1)
+                    long_access_token = requests.get('https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=' + instagram_client_secret + f'&access_token={oauth["access_token"]}')
+
+                    exist_instagram_user = request.env['instagram.user'].sudo().search([('instagram_id', '=', instagram_user['id'])], limit=1)
+                    exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
 
                     if long_access_token.ok:
                         user_data = {
@@ -64,8 +55,7 @@ class Instagram(http.Controller):
                             'shop_shopify': current_shopify.id,
                             "instagram_access_token_time_out": datetime.datetime.now() + datetime.timedelta(hours=1),
                             'instagram_long_access_token': long_access_token.json()['access_token'],
-                            'instagram_long_access_token_time_out': datetime.datetime.now() + datetime.timedelta(
-                                seconds=long_access_token.json()['expires_in'])
+                            'instagram_long_access_token_time_out': datetime.datetime.now() + datetime.timedelta(seconds=long_access_token.json()['expires_in'])
                         }
 
                         if not exist_instagram_user:
@@ -88,8 +78,7 @@ class Instagram(http.Controller):
     @http.route('/instagram/get_posts', auth='user', type="json")
     def instafeed_get_posts(self, **kw):
         try:
-            current_instagram_user = request.env['instagram.user'].sudo().search(
-                [('username', "=", kw['instagram_username'])])
+            current_instagram_user = request.env['instagram.user'].sudo().search([('username', "=", kw['instagram_username'])])
             posts = request.env['instagram.post'].sudo().search([('instagram_user', '=', current_instagram_user.id)])
             post_data = []
             if posts:

@@ -12,7 +12,6 @@ class InstaFeed(models.Model):
     feed_layout = fields.Char()
     enable_status = fields.Boolean()
     selected_posts = fields.Char()
-    list_product = fields.Char()
     shop_id = fields.Many2one('shop.shopify')
 
 

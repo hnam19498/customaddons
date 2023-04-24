@@ -105,8 +105,10 @@
                 <div style="margin-left: 10px">
                     <div>{{ selected_post.caption }}</div>
                     <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }} ❤️</div>
-                    <div v-if="comments" v-for="comment in comments">
-                        <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                    <div v-if="comments">
+                        <div :key="comment.id" v-for="comment in comments">
+                            <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                        </div>
                     </div>
                 </div>
             </div>

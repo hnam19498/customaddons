@@ -20,18 +20,28 @@
                 <font-awesome-icon icon="fa-brands fa-instagram" style="margin-right: 5px; color: white; width: 25px"/>
                 Fetch post instagram
             </button>
-            <button id="dashboard" @click="changeToDashboard">
-                <font-awesome-icon icon="fa-solid fa-bars" style="color: black; margin-right: 10px"/>
-                Dashboard
-            </button>
+            <div style="margin-left: auto">
+                <a-dropdown block="true">
+                    <template #overlay>
+                        <a-menu @click="handleMenuClick">
+                            <a-menu-item value="SelectPost">SelectPost</a-menu-item>
+                            <a-menu-item value="FeedSettings">FeedSettings</a-menu-item>
+                            <a-menu-item value="Dashboard">Dashboard</a-menu-item>
+                        </a-menu>
+                    </template>
+                    <a-button>
+                        MENU
+                        <DownOutlined/>
+                    </a-button>
+                </a-dropdown>
+            </div>
         </div>
         <div class="published-status-success" v-if="instagram_username">
             <span>Connected to <span>{{ instagram_username }}</span> with Instagram | <span
                     style="color: #1890ff; cursor: pointer" @click="changeInstagram">Change account</span></span>
         </div>
         <div class="login-facebook-success" v-if="facebook_username">
-            <span>Connected to <span>{{ facebook_username }}</span> with Facebook | <a
-                    href="#">Change account</a></span>
+            <span>Connected to <span>{{ facebook_username }}</span> with Facebook</span>
         </div>
     </div>
 </template>
@@ -39,6 +49,7 @@
 <script>
 import axios from "axios"
 import {Modal} from "ant-design-vue"
+import {DownOutlined} from "@ant-design/icons-vue"
 
 window.fbAsyncInit = function () {
     FB.init({
@@ -52,10 +63,10 @@ window.fbAsyncInit = function () {
 }
 export default {
     name: "FeedHeader",
-    components: {Modal},
+    components: {Modal, DownOutlined},
     methods: {
-        changeToDashboard() {
-            this.$emit('changeTab', "Dashboard")
+        handleMenuClick(e) {
+            this.$emit('changeTab', e.item.value)
         },
         fetch_post_instagram() {
             let self = this
@@ -80,20 +91,12 @@ export default {
         auth_instagram() {
             window.open('https://odoo.website/instafeed/auth', '_blank')
         },
-        login_facebook() {
-            axios.post('https://odoo.website/facebook/auth', {
-                jsonrpc: "2.0",
-                params: {}
-            }).then(res => {
-                FB.getLoginStatus(r => {
-                    FB.login(response => {
-                        if (response.authResponse) {
-                            window.location.href = 'instafeed'
-                        }
-                    }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
-                })
-            }).catch(error => {
-                console.log(error)
+        async login_facebook() {
+            await window.open('https://odoo.website/facebook/auth', "_blank")
+            FB.getLoginStatus(r => {
+                FB.login(response => {
+                    console.log(response)
+                }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
             })
         },
         changeInstagram() {
