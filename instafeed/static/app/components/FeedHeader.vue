@@ -95,7 +95,6 @@ export default {
             await window.open('https://odoo.website/facebook/auth', "_blank")
             FB.getLoginStatus(r => {
                 FB.login(response => {
-                    console.log(response)
                 }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
             })
         },

@@ -1,4 +1,4 @@
-import shopify, binascii, os, json, werkzeug, json, string, random, datetime, base64, requests
+import werkzeug, json, datetime, requests
 from odoo import http, _
 from odoo.http import request
 
@@ -8,8 +8,7 @@ class Instagram(http.Controller):
     def instafeed_auth(self, **kw):
         instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_app_id')
         instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_redirect_uri')
-        url = 'https://api.instagram.com/oauth/authorize?client_id=' + instagram_app_id + '&redirect_uri=' + instagram_redirect_uri + '&scope=user_profile,user_media&response_type=code'
-        return werkzeug.utils.redirect(url)
+        return werkzeug.utils.redirect(f'https://api.instagram.com/oauth/authorize?client_id={instagram_app_id}&redirect_uri={instagram_redirect_uri}&scope=user_profile,user_media&response_type=code')
 
     @http.route('/instafeed/oauth', auth='user')
     def instafeed_oauth(self, **kw):
@@ -32,8 +31,7 @@ class Instagram(http.Controller):
             oauth = instafeed_oauth.json()
 
             if instafeed_oauth.ok:
-                instagram_user_result = requests.get(
-                    'https://graph.instagram.com/' + str(oauth['user_id']) + '?fields=id,username&access_token=' + oauth['access_token'])
+                instagram_user_result = requests.get(f"https://graph.instagram.com/{str(oauth['user_id'])}?fields=id,username&access_token={oauth['access_token']}")
 
                 if instagram_user_result.ok:
                     instagram_user = instagram_user_result.json()
@@ -41,7 +39,7 @@ class Instagram(http.Controller):
                     current_shopify = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)])
                     instagram_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_client_secret')
 
-                    long_access_token = requests.get('https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret=' + instagram_client_secret + f'&access_token={oauth["access_token"]}')
+                    long_access_token = requests.get(f'https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret={instagram_client_secret}&access_token={oauth["access_token"]}')
 
                     exist_instagram_user = request.env['instagram.user'].sudo().search([('instagram_id', '=', instagram_user['id'])], limit=1)
                     exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)

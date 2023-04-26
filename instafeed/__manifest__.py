@@ -9,6 +9,7 @@
     "demo": [],
     "data": [
         'security/ir.model.access.csv',
+        "data/ir_cron_instafeed.xml",
         'views/settings.xml',
         'views/index.xml',
         'views/shopify.xml',

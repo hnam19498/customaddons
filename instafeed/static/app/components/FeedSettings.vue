@@ -184,10 +184,12 @@
                         <div>{{ selected_post.caption }}</div>
                         <div style="border-bottom: 1px solid #dcdcdc">
                             {{ selected_post.like_count }}
-                            <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black" />
+                            <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black"/>
                         </div>
-                        <div v-if="comments" v-for="comment in comments">
-                            <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                        <div v-if="comments">
+                            <div :key="comment.id" v-for="comment in comments">
+                                <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -284,7 +286,6 @@ export default {
         save_feed() {
             let self = this
             if (self.selected_posts.length == 0) {
-                console.log(self.selected_posts)
                 this.show_toast(
                     'open',
                     'Please select at least 1 post at SelectPost before continue.',
@@ -403,8 +404,7 @@ export default {
     computed: {
         list_product_filter() {
             let self = this
-            return self.list_product.filter(product => product.name.toLowerCase().includes(self.search.toLowerCase())
-            )
+            return self.list_product.filter(product => product.name.toLowerCase().includes(self.search.toLowerCase()))
         }
     }
 }

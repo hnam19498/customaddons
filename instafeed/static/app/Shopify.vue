@@ -1,7 +1,7 @@
 <template>
     <div :key="feed.id" id="preview" v-for="feed in list_feed">
         <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed.feed_title }}</h2>
-        <Carousel style="margin-left: 10px; margin-right: 10px"
+        <Carousel style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
                   :items-to-show="feed.number_column"
                   v-if="feed.feed_layout.includes('slider')"
                   :wrap-around="true">
@@ -82,13 +82,13 @@
     <Modal :footer="null"
            v-model:visible="post_modal"
            :maskClosable="false"
-           @cancel="selected_post={}">
+           @cancel="selected_post = {}; selected_feed = {}">
         <div style="display: flex">
-            <img v-if="selected_post.media_type=='IMAGE'"
+            <img v-if="selected_post.media_type == 'IMAGE'"
                  :src="selected_post.media_url"
                  :alt="selected_post.caption"
                  style="width: 50%; height: 50%">
-            <video height="400" autoplay v-if="selected_post.media_type=='VIDEO'">
+            <video height="400" autoplay v-if="selected_post.media_type == 'VIDEO'">
                 <source :src="selected_post.media_url">
             </video>
             <div style="width: 100%; display: flex; flex-direction: column">
@@ -98,13 +98,23 @@
                                            style="height:30px; width: 30px; color: black"/>
                     </div>
                     <div @click="redirectToInstagramUser"
-                         style="cursor: pointer; color: #000; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px">
+                         style="cursor: pointer; color: black; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px">
                         {{ instagram_user }}
                     </div>
                 </div>
                 <div style="margin-left: 10px">
                     <div>{{ selected_post.caption }}</div>
-                    <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }} ❤️</div>
+                    <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }}
+                        <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black"/>
+                    </div>
+                    <div v-if="selected_feed.on_post_click == 'open'">
+                        <div v-for="line in JSON.parse(selected_feed.list_tag)" style="display: flex; justify-content: center">
+                            <button class="shop_now" v-if="line.post_id == selected_post.id"
+                                    @click="openProduct(line.product_id)">
+                                Shop now
+                            </button>
+                        </div>
+                    </div>
                     <div v-if="comments">
                         <div :key="comment.id" v-for="comment in comments">
                             <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
@@ -115,7 +125,6 @@
         </div>
     </Modal>
 </template>
-
 <script>
 import axios from 'axios'
 import {Carousel, Navigation, Slide} from "vue3-carousel"
@@ -136,10 +145,24 @@ export default {
             selected_post: {},
             post_modal: false,
             comments: [],
-            instagram_user: ''
+            instagram_user: '',
+            selected_feed: {}
         }
     },
     methods: {
+        openProduct(product_id) {
+            axios.post('https://odoo.website/shopify/get_product', {
+                jsonrpc: "2.0",
+                params: {
+                    product_id: product_id,
+                    shop_url: window.location.origin
+                }
+            }).then(res => {
+                window.location.href = res.data.result.kw_product.url
+            }).catch(error => {
+                console.log(error)
+            })
+        },
         redirectToInstagramUser() {
             window.open("https://www.instagram.com/" + this.instagram_user, '_blank')
         },
@@ -148,6 +171,7 @@ export default {
             if (feed.on_post_click == 'open') {
                 self.selected_post = post
                 self.post_modal = true
+                self.selected_feed = feed
                 if (self.selected_post.comments) {
                     self.comments = JSON.parse(self.selected_post.comments)
                 } else {
@@ -173,14 +197,12 @@ export default {
             if (res.data.result.instagram_user) {
                 self.instagram_user = res.data.result.instagram_user
             }
-            console.log(self.list_feed)
         }).catch(error => {
             console.log(error)
         })
     }
 }
 </script>
-
 <style scoped>
 #preview {
     margin-left: 10px;
@@ -189,6 +211,19 @@ export default {
     border: 1px solid #E2E2E2;
     width: 100%;
     margin-right: 10px;
+}
+
+.shop_now {
+    background: #51baf7;
+    color: white;
+    line-height: 30px;
+    font-weight: 700;
+    border-radius: 3px;
+    border: 0;
+    text-align: center;
+    width: 150px;
+    text-transform: uppercase;
+    cursor: pointer;
 }
 
 .post_hover {
@@ -204,10 +239,6 @@ export default {
     position: absolute;
     opacity: 0.5;
     background: #151515
-}
-
-.post {
-    position: relative;
 }
 
 .post img:hover {

@@ -6,25 +6,21 @@ from odoo.http import request
 class Facebook(http.Controller):
     @http.route('/facebook/auth', auth='user')
     def facebook_auth(self, **kw):
-        print(kw)
         facebook_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_id')
         facebook_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_redirect_uri')
 
-        url = f'https://www.facebook.com/v16.0/dialog/oauth?client_id={facebook_client_id}&redirect_uri={facebook_redirect_uri}'
-
-        return werkzeug.utils.redirect(url)
+        return werkzeug.utils.redirect(f'https://www.facebook.com/v16.0/dialog/oauth?client_id={facebook_client_id}&redirect_uri={facebook_redirect_uri}')
 
     @http.route('/facebook/oauth', auth="user")
     def facebook_oauth(self, **kw):
         if 'code' in kw:
-            print(kw)
             facebook_client_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_id')
             facebook_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_redirect_uri')
             facebook_client_secret = request.env['ir.config_parameter'].sudo().get_param('instafeed.facebook_client_secret')
 
             facebook_token = requests.get(f'https://graph.facebook.com/v16.0/oauth/access_token?client_id={facebook_client_id}&redirect_uri={facebook_redirect_uri}&client_secret={facebook_client_secret}&code={kw["code"]}')
             if facebook_token.ok:
-                facebook_data = requests.get('https://graph.facebook.com/debug_token?input_token=' + facebook_token.json()["access_token"] + "&access_token=" + facebook_token.json()["access_token"])
+                facebook_data = requests.get(f'https://graph.facebook.com/debug_token?input_token={facebook_token.json()["access_token"]}&access_token={facebook_token.json()["access_token"]}')
                 if facebook_data.ok:
                     current_user = request.env.user
                     current_shopify = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)])
@@ -32,7 +28,7 @@ class Facebook(http.Controller):
                         'access_token': facebook_token.json()['access_token'],
                         "code": kw['code'],
                         'facebook_user_id': facebook_data.json()['data']['user_id'],
-                        "username": requests.get('https://graph.facebook.com/' + facebook_data.json()['data']['user_id'] +'?access_token=' + facebook_token.json()['access_token']).json()['name'],
+                        "username": requests.get(f"https://graph.facebook.com/{facebook_data.json()['data']['user_id']}?access_token={facebook_token.json()['access_token']}").json()['name'],
                         'shop_shopify': current_shopify.id
                     }
 

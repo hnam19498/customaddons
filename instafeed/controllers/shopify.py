@@ -70,14 +70,14 @@ class ShopifyMain(http.Controller):
 
                         webhook_products_create = shopify.Webhook()
                         webhook_products_create.topic = "products/create"
-                        webhook_products_create.address = ngrok_url + "/webhook/products_create/" + shopify_id
+                        webhook_products_create.address = f"{ngrok_url}/webhook/products_create/{shopify_id}"
                         webhook_products_create.format = "json"
                         webhook_products_create.save()
                         print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
 
                         webhook_products_update = shopify.Webhook()
                         webhook_products_update.topic = "products/update"
-                        webhook_products_update.address = ngrok_url + "/webhook/products_update/" + shopify_id
+                        webhook_products_update.address = f"{ngrok_url}/webhook/products_update/{shopify_id}"
                         webhook_products_update.format = "json"
                         webhook_products_update.save()
                         print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
@@ -88,7 +88,7 @@ class ShopifyMain(http.Controller):
 
                     existing_script_tags = shopify.ScriptTag.find()
                     base_url = request.env['ir.config_parameter'].sudo().get_param('instafeed.base_url')
-                    new_script_tag_url = base_url + '/instafeed/static/js/shopify.js?v=' + str(datetime.datetime.now())
+                    new_script_tag_url = f'{base_url}/instafeed/static/js/shopify.js?v={str(datetime.datetime.now())}'
                     new_script_tag = ''
                     if existing_script_tags:
                         for script_tag in existing_script_tags:
@@ -186,51 +186,38 @@ class ShopifyMain(http.Controller):
                     else:
                         current_shop.is_update_script_tag = True
 
-                    # products = shopify.Product.find()
-                    # exist_products = request.env['shopify.product'].sudo().search([])
-                    # list_product_ids = []
-                    #
-                    # if exist_products:
-                    #     for product in exist_products:
-                    #         if str(product.shopify_product_id) not in list_product_ids:
-                    #             list_product_ids.append(product.shopify_product_id)
-                    #
-                    # if products:
-                    #     for product in products:
-                    #         if str(product.id) not in list_product_ids:
-                    #             try:
-                    #                 request.env['shopify.product'].sudo().create({
-                    #                     'shopify_product_id': product.id,
-                    #                     'name': product.title,
-                    #                     'url': "https://" + kw['shop'] + "/products/" + product.handle,
-                    #                     'shop_id': current_shop.id,
-                    #                     'url_img': product.image.src,
-                    #                     'price': float(product.variants[0].price),
-                    #                     "compare_at_price": product.variants[0].compare_at_price,
-                    #                     'qty': product.variants[0].inventory_quantity,
-                    #                     "variant_id": product.variants[0].id
-                    #                 })
-                    #             except Exception as error_create_product:
-                    #                 print("error_create_product: " + str(error_create_product))
-                    #                 continue
-                    #         else:
-                    #             print(f'Product id "{product.id}" đã trong database!')
                     db = http.request.env.cr.dbname
                     request.env.cr.commit()
                     request.session.authenticate(db, kw['shop'], current_shop.password)
-                    return werkzeug.utils.redirect('/instafeed')
+                    return werkzeug.utils.redirect('https://odoo.website/instafeed')
         except Exception as e:
             print(e)
             return werkzeug.utils.redirect('https://shopify.com/')
 
-    @http.route('/shopify/get_product', type='json', auth="user")
+    @http.route('/shopify/get_product', type='json', auth="public", method=['POST'], csrf=False, cors="*")
     def shopify_get_product(self, **kw):
-        current_user = request.env.user
-        current_shop = request.env['shop.shopify'].sudo().search([('admin', "=", current_user.id)])
-        products = request.env['shopify.product'].sudo().search([('shop_id', '=', current_shop.id)])
-        list_product = []
-        for product in products:
-            list_product.append({
+        if not kw:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([('admin', "=", current_user.id)])
+            products = request.env['shopify.product'].sudo().search([('shop_id', '=', current_shop.id)])
+            list_product = []
+            for product in products:
+                list_product.append({
+                    'shopify_product_id': product.shopify_product_id,
+                    "name": product.name,
+                    'price': product.price,
+                    'url': product.url,
+                    "id": product.id,
+                    "url_img": product.url_img,
+                    "variant_id": product.variant_id,
+                    'qty': product.qty,
+                    "compare_at_price": product.compare_at_price
+                })
+            return {'list_product': list_product}
+        else:
+            current_shop = request.env['shop.shopify'].sudo().search([("url", '=', kw['shop_url'])], limit=1)
+            product = request.env['shopify.product'].sudo().search([('shop_id', '=', current_shop.id), ('id', '=', kw['product_id'])], limit=1)
+            kw_product = {
                 'shopify_product_id': product.shopify_product_id,
                 "name": product.name,
                 'price': product.price,
@@ -240,8 +227,9 @@ class ShopifyMain(http.Controller):
                 "variant_id": product.variant_id,
                 'qty': product.qty,
                 "compare_at_price": product.compare_at_price
-            })
-        return {'list_product': list_product}
+            }
+
+            return {'kw_product': kw_product}
 
     @http.route('/shopify/fetch_product', auth='user', type='json')
     def fetch_product_shopify(self):

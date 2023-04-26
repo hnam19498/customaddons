@@ -56,24 +56,24 @@ class InstagramUser(models.Model):
     def get_topic_instagram(self):
         time_now = datetime.datetime.now()
         if self.instagram_long_access_token_time_out >= time_now:
-            new_long_access_token = requests.get('https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=' + self.instagram_long_access_token)
+            new_long_access_token = requests.get(f'https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token={self.instagram_long_access_token}')
             if new_long_access_token.ok:
                 self.sudo().write({
                     'instagram_long_access_token': new_long_access_token.json()['access_token'],
                     'instagram_long_access_token_time_out': time_now + datetime.timedelta(seconds=new_long_access_token.json()['expires_in'])
                 })
 
-        page = requests.get('https://graph.facebook.com/me/accounts?access_token=' + self.facebook_user_id.access_token)
+        page = requests.get(f'https://graph.facebook.com/me/accounts?access_token={self.facebook_user_id.access_token}')
         if page.ok:
             page_id = page.json()['data'][0]['id']
-            instagram_business_account = requests.get("https://graph.facebook.com/" + page_id + "?fields=instagram_business_account&access_token=" + self.facebook_user_id.access_token)
+            instagram_business_account = requests.get(f"https://graph.facebook.com/{page_id}?fields=instagram_business_account&access_token={self.facebook_user_id.access_token}")
             if instagram_business_account.ok:
                 instagram_business_account_id = instagram_business_account.json()['instagram_business_account']['id']
-                posts = requests.get('https://graph.facebook.com/' + instagram_business_account_id + "?fields=media,followers_count&access_token=" + self.facebook_user_id.access_token)
+                posts = requests.get(f'https://graph.facebook.com/{instagram_business_account_id}?fields=media,followers_count&access_token={self.facebook_user_id.access_token}')
                 if posts.ok:
                     self.followers_count = posts.json()['followers_count']
-                    for id in posts.json()['media']['data']:
-                        post = requests.get('https://graph.facebook.com/' + id['id'] + '?fields=permalink,thumbnail_url,media_type,like_count,caption,media_url,comments{username,text},children&access_token=' + self.facebook_user_id.access_token)
+                    for post_id in posts.json()['media']['data']:
+                        post = requests.get('https://graph.facebook.com/' + post_id['id'] + '?fields=permalink,thumbnail_url,media_type,like_count,caption,media_url,comments{username,text},children&access_token=' + self.facebook_user_id.access_token)
                         if post.ok:
                             post_json = post.json()
                             exist_post = self.env['instagram.post'].sudo().search([('post_id', "=", post_json['id'])])
@@ -103,7 +103,7 @@ class InstagramUser(models.Model):
                                 exist_post.thumbnail_url = ''
 
                             if 'children' in post_json:
-                                first_child = requests.get("https://graph.facebook.com/" + post_json['children']['data'][0]['id'] + '?fields=media_type,thumbnail_url,media_url&access_token=' + self.facebook_user_id.access_token)
+                                first_child = requests.get(f"https://graph.facebook.com/{post_json['children']['data'][0]['id']}?fields=media_type,thumbnail_url,media_url&access_token={self.facebook_user_id.access_token}")
                                 if first_child.ok:
                                     exist_post.media_type = first_child.json()['media_type']
                                     exist_post.media_url = first_child.json()['media_url']

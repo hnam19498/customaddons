@@ -35,7 +35,6 @@
         </table>
     </div>
 </template>
-
 <script>
 import axios from "axios"
 
@@ -74,7 +73,6 @@ export default {
             jsonrpc: "2.0",
             params: {}
         }).then(res => {
-            console.log(res)
             self.shop_owner = res.data.result.shop_owner
             self.list_feed = res.data.result.list_feed
         }).catch(error => {
@@ -83,7 +81,6 @@ export default {
     }
 }
 </script>
-
 <style scoped>
 #welcome {
     color: black;

@@ -46,6 +46,7 @@ class Shop(models.Model):
 
     def change_script_tag_url(self):
         try:
+            print("start cron job change_script_tag!")
             old_shops = self.env['shop.shopify'].sudo().search([('is_update_script_tag', '=', False)], limit=10)
             shopify_api_version = self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
             for shop in old_shops:
@@ -66,11 +67,13 @@ class Shop(models.Model):
                         "src": self.shopify_script_tag_url
                     })
                 shop.is_update_script_tag = True
+            print("end cron job change_script_tag!")
         except Exception as e:
             print(e)
 
     def change_ngrok_url(self):
         try:
+            print("start cron job change_ngrok!")
             old_shops = self.env['shop.shopify'].sudo().search([('is_update_ngrok', '=', False)], limit=10)
             shopify_api_version = self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version')
             for shop in old_shops:
@@ -97,6 +100,7 @@ class Shop(models.Model):
                 print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
 
                 shop.is_update_ngrok = True
+            print("end cron job change_ngrok!")
         except Exception as e:
             print(e)
 
