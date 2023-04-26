@@ -6,7 +6,9 @@
                   v-if="feed.feed_layout.includes('slider')"
                   :wrap-around="true">
             <Slide v-for="post in feed.selected_posts" :key="post.id">
-                <div class="carousel__item" @click='openPost(feed, post)'>
+                <div class="carousel__item" @click='openPost(feed, post)'
+                     @mouseenter="post.hover_status = false"
+                     @mouseleave="post.hover_status = true">
                     <img v-if="post.media_type == 'IMAGE' && feed.feed_layout == 'slider_squares'"
                          :alt="post.caption"
                          style="height: 150px; width: 150px; object-fit: cover"
@@ -92,10 +94,10 @@
                 <source :src="selected_post.media_url">
             </video>
             <div style="width: 100%; display: flex; flex-direction: column">
-                <div style="margin-left:20px; display: flex; background-color: white; align-items: center">
-                    <div style="display: flex; justify-content: center; align-items: center;border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
+                <div style="margin-left: 20px; display: flex; background-color: white; align-items: center">
+                    <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
                         <font-awesome-icon icon="fa-brands fa-instagram"
-                                           style="height:30px; width: 30px; color: black"/>
+                                           style="height: 30px; width: 30px; color: black"/>
                     </div>
                     <div @click="redirectToInstagramUser"
                          style="cursor: pointer; color: black; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px">
@@ -108,8 +110,10 @@
                         <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black"/>
                     </div>
                     <div v-if="selected_feed.on_post_click == 'open'">
-                        <div v-for="line in JSON.parse(selected_feed.list_tag)" style="display: flex; justify-content: center">
-                            <button class="shop_now" v-if="line.post_id == selected_post.id"
+                        <div v-for="line in JSON.parse(selected_feed.list_tag)"
+                             style="display: flex; justify-content: center">
+                            <button class="shop_now"
+                                    v-if="line.post_id == selected_post.id"
                                     @click="openProduct(line.product_id)">
                                 Shop now
                             </button>
@@ -170,8 +174,8 @@ export default {
             let self = this
             if (feed.on_post_click == 'open') {
                 self.selected_post = post
-                self.post_modal = true
                 self.selected_feed = feed
+                self.post_modal = true
                 if (self.selected_post.comments) {
                     self.comments = JSON.parse(self.selected_post.comments)
                 } else {
@@ -257,19 +261,11 @@ export default {
 }
 </style>
 <style>
-.carousel__prev {
+.carousel__prev, .carousel__next {
     border: 1px solid #EFEFEF;
     height: 25px;
     width: 25px;
     background: #EFEFEF;
-    border-radius: 50%;
-}
-
-.carousel__next {
-    border: 1px solid #EFEFEF;
-    background: #EFEFEF;
-    height: 25px;
-    width: 25px;
     border-radius: 50%;
 }
 </style>

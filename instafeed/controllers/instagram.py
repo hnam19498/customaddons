@@ -85,6 +85,7 @@ class Instagram(http.Controller):
                         'like_count': post.like_count,
                         "caption": post.caption,
                         'media_url': post.media_url,
+                        'hover_status': post.hover_status,
                         'comments': post.comments,
                         'post_id': post.post_id,
                         "id": post.id,
@@ -153,6 +154,8 @@ class Instagram(http.Controller):
                         'shop_owner': current_shop.shopify_owner,
                         "instagram_user": current_instagram_user.username
                     }
+                else:
+                    return {'error': 'not login'}
             else:
                 current_shop = request.env['shop.shopify'].sudo().search([('url', '=', kw['shop_url'])], limit=1)
                 feeds = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id)])

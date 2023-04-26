@@ -48,7 +48,6 @@ export default {
     },
     methods: {
         changeFeedStatus(feed_id, status) {
-            let self = this
             axios.post("https://odoo.website/instafeed/change_status_feed", {
                 jsonrpc: "2.0",
                 params: {
@@ -117,7 +116,7 @@ table {
     height: 3rem;
     border-bottom: 1px groove #EFEFEF;
     border-top: 1px groove #EFEFEF;
-    color: rgba(0, 0, 0);
+    color: black;
     font-weight: 700;
     font-size: 14px;
 }

@@ -38,7 +38,7 @@
         </div>
         <div class="published-status-success" v-if="instagram_username">
             <span>Connected to <span>{{ instagram_username }}</span> with Instagram | <span
-                    style="color: #1890ff; cursor: pointer" @click="changeInstagram">Change account</span></span>
+                    style="color: #1890ff; cursor: pointer" @click="changeInstagram">Change import {SearchOutlined} from "@ant-design/icons-vue"account</span></span>
         </div>
         <div class="login-facebook-success" v-if="facebook_username">
             <span>Connected to <span>{{ facebook_username }}</span> with Facebook</span>

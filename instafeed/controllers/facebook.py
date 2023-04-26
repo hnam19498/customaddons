@@ -1,4 +1,4 @@
-import shopify, binascii, os, werkzeug, json, string, random, datetime, base64, requests
+import werkzeug, requests
 from odoo import http, _
 from odoo.http import request
 

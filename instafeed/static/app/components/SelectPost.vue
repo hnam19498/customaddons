@@ -116,6 +116,7 @@ export default {
             if (this.tickAllPosts == true) {
                 for (let post of this.posts) {
                     let data = {
+                        hover_status: post.hover_status,
                         id: post.id,
                         media_url: post.media_url,
                         comments: post.comments,
@@ -145,7 +146,8 @@ export default {
                 caption: post.caption,
                 media_type: post.media_type,
                 thumbnail_url: post.thumbnail_url,
-                link_to_post: post.link_to_post
+                link_to_post: post.link_to_post,
+                hover_status: post.hover_status
             }
             for (let i = 0; i < self.selected_posts.length; i++) {
                 if (post_data.id == self.selected_posts[i].id) {

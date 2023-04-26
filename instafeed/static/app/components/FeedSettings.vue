@@ -47,10 +47,10 @@
                         <span class="label">COLUMNS</span>
                         <input v-model="number_column"
                                min="1" max="6"
-                               v-if="configuration_select=='manual'"
+                               v-if="configuration_select == 'manual'"
                                type="number">
                         <input value="AUTO"
-                               v-if="configuration_select=='auto'"
+                               v-if="configuration_select == 'auto'"
                                disabled>
                     </div>
                     <button @click="save_feed" id="btn_save">Save feed</button>
@@ -157,7 +157,7 @@
                :footer="null"
                v-model:visible="post_modal"
                :maskClosable="false"
-               @cancel="selected_post={}">
+               @cancel="selected_post = {}">
             <div style="display: flex">
                 <img v-if="selected_post.media_type == 'IMAGE'"
                      :src="selected_post.media_url"
@@ -231,10 +231,9 @@
 import {Modal, notification} from 'ant-design-vue'
 import {Carousel, Navigation, Slide} from 'vue3-carousel'
 import 'vue3-carousel/dist/carousel.css'
-import {SearchOutlined} from "@ant-design/icons-vue"
 import axios from "axios"
 import {h} from 'vue'
-import {LeftCircleOutlined, RightCircleOutlined, CloseCircleFilled} from '@ant-design/icons-vue'
+import {LeftCircleOutlined, RightCircleOutlined, CloseCircleFilled, SearchOutlined} from '@ant-design/icons-vue'
 
 export default {
     name: "FeedSettings",
@@ -292,33 +291,43 @@ export default {
                     3
                 )
             } else {
-                if (self.configuration_select == 'auto') {
-                    self.number_column = 3
+                if (self.on_post_click == "open") {
+                    if (self.list_tag.length == 0) {
+                        this.show_toast(
+                            'open',
+                            'Please tag product before!',
+                            3
+                        )
+                    }
+                } else {
+                    if (self.configuration_select == 'auto') {
+                        self.number_column = 3
+                    }
+                    axios.post('https://odoo.website/instafeed/save_feed', {
+                        jsonrpc: "2.0",
+                        params: {
+                            list_tag: self.list_tag,
+                            feed_title: self.feed_title,
+                            number_column: self.number_column,
+                            on_post_click: self.on_post_click,
+                            feed_layout: self.feed_layout,
+                            selected_posts: self.selected_posts
+                        }
+                    }).then(res => {
+                        if (res.data.result.success) {
+                            alert("Saved!")
+                        } else {
+                            alert(res.data.result.error)
+                        }
+                    }).catch(error => {
+                        console.log(error)
+                    })
                 }
-                axios.post('https://odoo.website/instafeed/save_feed', {
-                    jsonrpc: "2.0",
-                    params: {
-                        list_tag: self.list_tag,
-                        feed_title: self.feed_title,
-                        number_column: self.number_column,
-                        on_post_click: self.on_post_click,
-                        feed_layout: self.feed_layout,
-                        selected_posts: self.selected_posts
-                    }
-                }).then(res => {
-                    if (res.data.result.success) {
-                        alert("Saved!")
-                    } else {
-                        alert(res.data.result.error)
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
             }
         },
         cancelFeed() {
             this.number_column = 3
-            this.feed_title = ''
+            this.feed_title = 'EDIT FEED TITLE'
             this.search = ''
             this.post_modal = false
             this.selected_post = {}
