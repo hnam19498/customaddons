@@ -37,9 +37,13 @@
 </template>
 <script>
 import axios from "axios"
+import {h} from 'vue'
+import {notification} from 'ant-design-vue'
+import {CloseCircleFilled} from "@ant-design/icons-vue"
 
 export default {
     name: "Dashboard",
+    components: {CloseCircleFilled, notification},
     data() {
         return {
             shop_owner: '',
@@ -47,7 +51,18 @@ export default {
         }
     },
     methods: {
+        show_toast: function (type, message, duration) {
+            notification[type]({
+                message: message,
+                duration: duration,
+                class: 'error_popup',
+                closeIcon: e => {
+                    return (<CloseCircleFilled/>)
+                }
+            })
+        },
         changeFeedStatus(feed_id, status) {
+            let self = this
             axios.post("https://odoo.website/instafeed/change_status_feed", {
                 jsonrpc: "2.0",
                 params: {
@@ -56,10 +71,10 @@ export default {
                 }
             }).then(res => {
                 if (res.data.result.change_status_feed) {
-                    alert(res.data.result.change_status_feed)
+                    self.show_toast('open', res.data.result.change_status_feed, 3)
                 }
                 if (res.data.result.error_enable_feed) {
-                    alert(res.data.result.error_enable_feed)
+                    self.show_toast('open', res.data.result.error_enable_feed, 3)
                 }
             }).catch(error => {
                 console.log(error)

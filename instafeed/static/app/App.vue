@@ -41,7 +41,6 @@ import FeedSettings from "./components/FeedSettings.vue"
 import FeedHeader from "./components/FeedHeader.vue"
 import Dashboard from "./components/Dashboard.vue"
 import SelectPost from "./components/SelectPost.vue"
-import {SearchOutlined} from "@ant-design/icons-vue"
 
 export default {
     name: "App",
@@ -55,7 +54,6 @@ export default {
         }
     },
     components: {
-        SearchOutlined,
         Modal,
         Layout,
         Dashboard,

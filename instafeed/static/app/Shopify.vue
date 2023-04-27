@@ -6,9 +6,7 @@
                   v-if="feed.feed_layout.includes('slider')"
                   :wrap-around="true">
             <Slide v-for="post in feed.selected_posts" :key="post.id">
-                <div class="carousel__item" @click='openPost(feed, post)'
-                     @mouseenter="post.hover_status = false"
-                     @mouseleave="post.hover_status = true">
+                <div class="carousel__item" @click='openPost(feed, post)'>
                     <img v-if="post.media_type == 'IMAGE' && feed.feed_layout == 'slider_squares'"
                          :alt="post.caption"
                          style="height: 150px; width: 150px; object-fit: cover"
@@ -150,7 +148,8 @@ export default {
             post_modal: false,
             comments: [],
             instagram_user: '',
-            selected_feed: {}
+            selected_feed: {},
+            feed_id: ''
         }
     },
     methods: {
@@ -189,18 +188,15 @@ export default {
     },
     mounted() {
         let self = this
+        self.feed_id = self.$.attrs.data.feed_id
         axios.post('https://odoo.website/instafeed/get_feed', {
-            jsonrpc: "2.0",
+            jsonrpc: '2.0',
             params: {
+                feed_id: self.feed_id,
                 shop_url: window.location.origin
             }
         }).then(res => {
-            if (res.data.result.list_feed) {
-                self.list_feed = res.data.result.list_feed
-            }
-            if (res.data.result.instagram_user) {
-                self.instagram_user = res.data.result.instagram_user
-            }
+            self.list_feed = res.data.result.list_feed
         }).catch(error => {
             console.log(error)
         })

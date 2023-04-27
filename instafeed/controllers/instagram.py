@@ -158,33 +158,32 @@ class Instagram(http.Controller):
                     return {'error': 'not login'}
             else:
                 current_shop = request.env['shop.shopify'].sudo().search([('url', '=', kw['shop_url'])], limit=1)
-                feeds = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id)])
+                feed = request.env['instagram.feed'].sudo().search([('shop_id', "=", current_shop.id), ("id", '=', kw['feed_id'])], limit=1)
                 current_instagram_user = request.env['instagram.user'].sudo().search([("shop_shopify", '=', current_shop.id)], limit=1)
-                if feeds:
-                    for feed in feeds:
-                        if feed.enable_status:
-                            if feed.selected_posts:
-                                list_feed.append({
-                                    'list_tag': feed.list_tag,
-                                    "feed_title": feed.feed_title,
-                                    'number_column': feed.number_column,
-                                    "on_post_click": feed.on_post_click,
-                                    'enable_status': feed.enable_status,
-                                    "feed_layout": feed.feed_layout,
-                                    "selected_posts": json.loads(feed.selected_posts),
-                                    'id': feed.id
-                                })
-                            else:
-                                list_feed.append({
-                                    'list_tag': feed.list_tag,
-                                    'id': feed.id,
-                                    "feed_title": feed.feed_title,
-                                    "enable_status": feed.enable_status,
-                                    'number_column': feed.number_column,
-                                    "on_post_click": feed.on_post_click,
-                                    "feed_layout": feed.feed_layout,
-                                    "selected_posts": []
-                                })
+                if feed:
+                    if feed.enable_status:
+                        if feed.selected_posts:
+                            list_feed.append({
+                                'list_tag': feed.list_tag,
+                                "feed_title": feed.feed_title,
+                                'number_column': feed.number_column,
+                                "on_post_click": feed.on_post_click,
+                                'enable_status': feed.enable_status,
+                                "feed_layout": feed.feed_layout,
+                                "selected_posts": json.loads(feed.selected_posts),
+                                'id': feed.id
+                            })
+                        else:
+                            list_feed.append({
+                                'list_tag': feed.list_tag,
+                                'id': feed.id,
+                                "feed_title": feed.feed_title,
+                                "enable_status": feed.enable_status,
+                                'number_column': feed.number_column,
+                                "on_post_click": feed.on_post_click,
+                                "feed_layout": feed.feed_layout,
+                                "selected_posts": []
+                            })
                 return {
                     'list_feed': list_feed,
                     'shop_owner': current_shop.shopify_owner,
