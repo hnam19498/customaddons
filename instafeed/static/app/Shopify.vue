@@ -135,12 +135,7 @@ import 'vue3-carousel/dist/carousel.css'
 
 export default {
     name: "Shopify",
-    components: {
-        Carousel,
-        Modal,
-        Navigation,
-        Slide
-    },
+    components: {Carousel, Modal, Navigation, Slide},
     data() {
         return {
             list_feed: [],
@@ -196,7 +191,12 @@ export default {
                 shop_url: window.location.origin
             }
         }).then(res => {
-            self.list_feed = res.data.result.list_feed
+            if (res.data.result.list_feed) {
+                self.list_feed = res.data.result.list_feed
+            }
+            if (res.data.result.instagram_user) {
+                self.instagram_user = res.data.result.instagram_user
+            }
         }).catch(error => {
             console.log(error)
         })
