@@ -2,8 +2,8 @@
     <div v-if="posts" style="background: white; margin-top: 15px; margin-bottom: 15px">
         <div>
             <div class="setting-btn">
-                <button class="btn-setting" id="btn-cancel" @click="cancelSelectPost">Cancel</button>
-                <button class="btn-setting" id="btn-next" @click="nextToFeedSettings">NEXT</button>
+                <button id="btn-cancel" @click="cancelSelectPost">Cancel</button>
+                <button id="btn-next" @click="nextToFeedSettings">NEXT</button>
             </div>
             <div id="setting_widget">
                 <label id="enable_widget">Enable Widget</label>
@@ -42,12 +42,12 @@
                                 <input :checked="selected_posts.filter(e => e.id == post.id).length > 0"
                                        type="checkbox">
                             </td>
-                            <td v-if="post.media_type=='VIDEO'">
+                            <td v-if="post.media_type == 'VIDEO'">
                                 <video controls width="200" height="200" style="object-fit: cover">
                                     <source :src="post.media_url">
                                 </video>
                             </td>
-                            <td v-if="post.media_type=='IMAGE'">
+                            <td v-if="post.media_type == 'IMAGE'">
                                 <img :alt="post.caption" :src="post.media_url"
                                      style="width: 200px; height: 200px; object-fit: cover">
                             </td>
@@ -85,7 +85,7 @@ export default {
     },
     emits: ['SelectPostToFeedSettings'],
     methods: {
-        show_toast: function (type, message, duration) {
+        show_toast: (type, message, duration) => {
             notification[type]({
                 message: message,
                 duration: duration,
