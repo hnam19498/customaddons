@@ -272,7 +272,7 @@ export default {
         }
     },
     methods: {
-        show_toast: function (type, message, duration) {
+        show_toast: (type, message, duration) => {
             notification[type]({
                 message: message,
                 duration: duration,
@@ -285,19 +285,11 @@ export default {
         save_feed() {
             let self = this
             if (self.selected_posts.length == 0) {
-                this.show_toast(
-                    'open',
-                    'Please select at least 1 post at SelectPost before continue.',
-                    3
-                )
+                this.show_toast('open', 'Please select at least 1 post at SelectPost before continue.', 3)
             } else {
                 if (self.on_post_click == "open") {
                     if (self.list_tag.length == 0) {
-                        this.show_toast(
-                            'open',
-                            'Please tag product before!',
-                            3
-                        )
+                        this.show_toast('open', 'Please tag product before!', 3)
                     }
                 } else {
                     if (self.configuration_select == 'auto') {

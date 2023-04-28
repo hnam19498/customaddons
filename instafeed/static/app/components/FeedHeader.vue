@@ -50,7 +50,7 @@ import axios from "axios"
 import {Modal} from "ant-design-vue"
 import {DownOutlined} from "@ant-design/icons-vue"
 
-window.fbAsyncInit = function () {
+window.fbAsyncInit = () => {
     FB.init({
         appId: '300578203867324',
         channelURL: '',
@@ -72,9 +72,7 @@ export default {
             self.$emit('fetch_post_loading', true)
             axios.post('https://odoo.website/instafeed/fetch_post', {
                 jsonrpc: "2.0",
-                params: {
-                    instagram_username: self.instagram_username
-                }
+                params: {instagram_username: self.instagram_username}
             }).then(res => {
                 if (res.data.result.fetch_post_instagram_success) {
                     alert(res.data.result.fetch_post_instagram_success)
@@ -92,8 +90,8 @@ export default {
         },
         async login_facebook() {
             await window.open('https://odoo.website/facebook/auth', "_blank")
-            FB.getLoginStatus(r => {
-                FB.login(response => {
+            FB.getLoginStatus(() => {
+                FB.login(() => {
                 }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
             })
         },
@@ -116,11 +114,7 @@ export default {
             })
         }
     },
-    emits: [
-        'changeInstagramAccount',
-        "fetch_post_loading",
-        "changeTab"
-    ],
+    emits: ['changeInstagramAccount', "fetch_post_loading", "changeTab"],
     mounted() {
         let e = document.createElement('script');
         e.async = true

@@ -101,11 +101,7 @@ export default {
         },
         nextToFeedSettings() {
             if (this.selected_posts.length == 0) {
-                this.show_toast(
-                    'open',
-                    'Please select at least 1 post from the list to continue.',
-                    3
-                )
+                this.show_toast('open', 'Please select at least 1 post from the list to continue.', 3)
             } else {
                 window.selected_posts = this.selected_posts
                 this.$emit('SelectPostToFeedSettings', 'FeedSettings', this.selected_posts)

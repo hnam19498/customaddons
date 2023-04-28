@@ -51,7 +51,7 @@ export default {
         }
     },
     methods: {
-        show_toast: function (type, message, duration) {
+        show_toast: (type, message, duration) => {
             notification[type]({
                 message: message,
                 duration: duration,

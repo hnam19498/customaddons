@@ -261,7 +261,7 @@ export default {
     },
     methods: {
         openProduct(product_id) {
-            axios.post('https://odoo.website/shopify/get_product', {
+            axios.post('/apps/lmao/shopify/get_product', {
                 jsonrpc: "2.0",
                 params: {
                     product_id: product_id,
@@ -296,7 +296,7 @@ export default {
     mounted() {
         let self = this
         self.feed_id = self.$.attrs.data.feed_id
-        axios.post('https://odoo.website/instafeed/get_feed', {
+        axios.post('/apps/lmao/instafeed/get_feed', {
             jsonrpc: '2.0',
             params: {
                 feed_id: self.feed_id,
