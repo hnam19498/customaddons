@@ -1,1 +1,1 @@
-from . import instagram, shopify, widget_data, facebook
+from . import instagram, shopify, facebook

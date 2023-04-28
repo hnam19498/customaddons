@@ -48,7 +48,6 @@ class InstagramUser(models.Model):
     instagram_long_access_token = fields.Char()
     instagram_access_token_time_out = fields.Datetime()
     instagram_long_access_token_time_out = fields.Datetime()
-    widget_datas = fields.One2many('widget.data', 'instagram_user')
     shop_shopify = fields.Many2one('shop.shopify')
     facebook_user_id = fields.Many2one('facebook.user')
     followers_count = fields.Integer()

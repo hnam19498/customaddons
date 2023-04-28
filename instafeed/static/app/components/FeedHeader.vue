@@ -45,7 +45,6 @@
         </div>
     </div>
 </template>
-
 <script>
 import axios from "axios"
 import {Modal} from "ant-design-vue"
@@ -146,7 +145,6 @@ export default {
     }
 }
 </script>
-
 <style scoped>
 #instagram-connection {
     background: rgb(0 128 96);

@@ -198,7 +198,7 @@
             <img v-if="selected_post.media_type == 'IMAGE'"
                  :src="selected_post.media_url"
                  :alt="selected_post.caption"
-                 style="width: 85%">
+                 style="width: 90%">
             <video height="400" autoplay v-if="selected_post.media_type == 'VIDEO'">
                 <source :src="selected_post.media_url">
             </video>

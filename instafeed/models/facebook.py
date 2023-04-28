@@ -18,11 +18,3 @@ class FacebookUser(models.Model):
     shop_shopify = fields.Many2one('shop.shopify')
     facebook_user_id = fields.Char()
     instagram_user_id = fields.Many2one('instagram.user')
-
-
-class FacebookPage(models.Model):
-    _name = 'facebook.page'
-
-    page_id = fields.Char()
-    name = fields.Char()
-    instagram_user_id = fields.Many2one('instagram.user')
