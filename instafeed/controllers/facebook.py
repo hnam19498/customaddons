@@ -33,7 +33,7 @@ class Facebook(http.Controller):
                     }
 
                     exist_instagram_user = request.env['instagram.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
-                    exist_facebook_user = request.env['facebook.user'].sudo().search([('facebook_user_id', '=', facebook_data.json()['data']['user_id'])], limit=1)
+                    exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
 
                     if not exist_instagram_user:
                         if not exist_facebook_user:
