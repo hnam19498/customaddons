@@ -41,7 +41,7 @@ class Instagram(http.Controller):
 
                     long_access_token = requests.get(f'https://graph.instagram.com/access_token?grant_type=ig_exchange_token&client_secret={instagram_client_secret}&access_token={oauth["access_token"]}')
 
-                    exist_instagram_user = request.env['instagram.user'].sudo().search([('instagram_id', '=', instagram_user['id'])], limit=1)
+                    exist_instagram_user = request.env['instagram.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
                     exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
 
                     if long_access_token.ok:
@@ -110,7 +110,8 @@ class Instagram(http.Controller):
                 'shop_id': current_shop.id,
                 "feed_layout": kw['feed_layout'],
                 "selected_posts": json.dumps(kw['selected_posts']),
-                "enable_status": True
+                "enable_status": True,
+                'post_spacing': kw['post_spacing']
             })
             return {"success": 'created'}
         except Exception as e:
@@ -136,7 +137,8 @@ class Instagram(http.Controller):
                                     'enable_status': feed.enable_status,
                                     "feed_layout": feed.feed_layout,
                                     "selected_posts": json.loads(feed.selected_posts),
-                                    'id': feed.id
+                                    'id': feed.id,
+                                    "post_spacing": feed.post_spacing
                                 })
                             else:
                                 list_feed.append({
@@ -147,7 +149,8 @@ class Instagram(http.Controller):
                                     'number_column': feed.number_column,
                                     "on_post_click": feed.on_post_click,
                                     "feed_layout": feed.feed_layout,
-                                    "selected_posts": []
+                                    "selected_posts": [],
+                                    "post_spacing": feed.post_spacing
                                 })
                     return {
                         'list_feed': list_feed,
@@ -171,7 +174,8 @@ class Instagram(http.Controller):
                                 'enable_status': feed.enable_status,
                                 "feed_layout": feed.feed_layout,
                                 "selected_posts": json.loads(feed.selected_posts),
-                                'id': feed.id
+                                'id': feed.id,
+                                "post_spacing": feed.post_spacing
                             })
                         else:
                             list_feed.append({
@@ -182,7 +186,8 @@ class Instagram(http.Controller):
                                 'number_column': feed.number_column,
                                 "on_post_click": feed.on_post_click,
                                 "feed_layout": feed.feed_layout,
-                                "selected_posts": []
+                                "selected_posts": [],
+                                "post_spacing": feed.post_spacing
                             })
                 return {
                     'list_feed': list_feed,

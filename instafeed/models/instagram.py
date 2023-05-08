@@ -8,6 +8,7 @@ class InstaFeed(models.Model):
     list_tag = fields.Char()
     feed_title = fields.Char()
     number_column = fields.Integer()
+    post_spacing = fields.Char()
     on_post_click = fields.Char()
     feed_layout = fields.Char()
     enable_status = fields.Boolean()

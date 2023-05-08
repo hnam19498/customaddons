@@ -92,7 +92,7 @@ export default {
             await window.open('https://odoo.website/facebook/auth', "_blank")
             FB.getLoginStatus(() => {
                 FB.login(() => {
-                }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement'})
+                }, {scope: 'pages_show_list, instagram_basic, pages_manage_engagement, business_management'})
             })
         },
         changeInstagram() {
@@ -191,7 +191,7 @@ export default {
 }
 
 #fetch_post_instagram {
-    background: violet;
+    background: #ea2cea;
     border: .1rem solid transparent;
     box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;
     border-radius: 5px;
@@ -237,11 +237,11 @@ export default {
 }
 
 #auth {
-    margin: 10px
+    margin: 10px;
 }
 
 #dashboard {
-    background: #E2E2E2;
+    background: #e2e2e2;
     margin-left: auto;
     border: .1rem solid transparent;
     box-shadow: inset 0 1px 0 0 transparent, 0 1px 0 0 rgb(22 29 37/5%), 0 0 0 0 transparent;

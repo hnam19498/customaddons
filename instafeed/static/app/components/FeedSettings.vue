@@ -1,7 +1,7 @@
 <template>
     <div style="display: flex; margin-bottom: 10px">
         <div id="setting_feed">
-            <div style="background: white">
+            <div style="background: white; border-radius: 5px">
                 <div style="margin-top: 5px; display: flex; flex-direction: column; margin-left: 5px; margin-right: 5px">
                     <span class="label">FEED TITLE</span>
                     <input v-model="feed_title" type="text"
@@ -9,11 +9,11 @@
                     <div style="display: flex; justify-content: space-between; margin-top: 15px">
                         <div class="feed_setting" style="width: 40%; margin-right: 10px">
                             <span class="label">POST SPACING</span>
-                            <select>
-                                <option value="no spacing">No spacing</option>
-                                <option value="small">Small</option>
-                                <option value="medium">Medium</option>
-                                <option value="large">Large</option>
+                            <select v-model="post_spacing">
+                                <option value="0">No spacing</option>
+                                <option value="5px">Small</option>
+                                <option value="10px">Medium</option>
+                                <option value="15px">Large</option>
                             </select>
                         </div>
                         <div class="feed_setting" style="width: 60%">
@@ -74,60 +74,27 @@
             <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed_title }}</h2>
             <Carousel style="margin-left: 10px; margin-right: 10px"
                       :items-to-show="number_column"
-                      :wrap-around="true"
-                      v-if="feed_layout.includes('slider')">
-                <Slide v-for="post in selected_posts" :key="post.id">
-                    <div class="carousel__item" @click='openPost(post)'>
-                        <img v-if="post.media_type == 'IMAGE' && feed_layout == 'slider_squares'"
+                      :items-to-slide="number_column"
+                      v-if="feed_layout == 'slider_squares'">
+                <Slide v-for="post in selected_posts"
+                       :key="post.id"
+                       @mouseenter="post.hover_status = true"
+                       @mouseleave="post.hover_status = false">
+                    <div class="carousel__item"
+                         :style="{padding: post_spacing}"
+                         style="width: 100%">
+                        <img v-if="post.media_type == 'IMAGE'"
                              :alt="post.caption"
-                             style="height: 150px; width: 150px; object-fit: cover"
+                             style="width: 100%; object-fit: cover"
                              :src="post.media_url">
-                        <img v-if="post.media_type == 'VIDEO' && feed_layout == 'slider_squares'"
+                        <img v-if="post.media_type == 'VIDEO'"
                              :alt="post.caption"
-                             style="height: 150px; width: 150px; object-fit: cover"
-                             :src="post.thumbnail_url">
-                        <img v-if="post.media_type == 'IMAGE' && feed_layout == 'slider_tiles'"
-                             :alt="post.caption"
-                             style="height: 250px; width: 150px; object-fit: cover"
-                             :src="post.media_url">
-                        <img v-if="post.media_type == 'VIDEO' && feed_layout == 'slider_tiles'"
-                             :alt="post.caption"
-                             style="height: 250px; width: 150px; object-fit: cover"
+                             style="width: 100%; object-fit: cover"
                              :src="post.thumbnail_url">
                     </div>
-                </Slide>
-                <template #addons>
-                    <Navigation/>
-                </template>
-            </Carousel>
-            <div style="display: grid; text-align: center"
-                 v-if="feed_layout.includes('grid')"
-                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`}">
-                <div :key="post.id"
-                     @mouseenter="post.hover_status = true"
-                     @mouseleave="post.hover_status = false"
-                     v-for="post in selected_posts"
-                     style="position: relative; margin-bottom: 15px"
-                     class="post">
-                    <img v-if="post.media_type == 'IMAGE' && feed_layout == 'grid_squares'"
-                         :alt="post.caption"
-                         style="height: 150px; width: 150px; object-fit: cover"
-                         :src="post.media_url">
-                    <img v-if="post.media_type == 'VIDEO' && feed_layout == 'grid_squares'"
-                         :alt="post.caption"
-                         style="height: 150px; width: 150px; object-fit: cover"
-                         :src="post.thumbnail_url">
-                    <img v-if="post.media_type == 'IMAGE' && feed_layout == 'grid_tiles'"
-                         :alt="post.caption"
-                         style="height: 250px; width: 150px; object-fit: cover"
-                         :src="post.media_url">
-                    <img v-if="post.media_type == 'VIDEO' && feed_layout == 'grid_tiles'"
-                         :alt="post.caption"
-                         style="height: 250px; width: 150px; object-fit: cover"
-                         :src="post.thumbnail_url">
-                    <div v-if="post.hover_status && feed_layout == 'grid_squares'"
+                    <div v-if="post.hover_status"
                          class="post_hover"
-                         style="height: 150px; width: 150px"
+                         style="height: 100%; width: 100%"
                          @click='openPost(post)'>
                         <font-awesome-icon icon="fa-brands fa-instagram"
                                            style="color: white; height: 30px; width: 30px"
@@ -136,9 +103,97 @@
                                            style="color: white; height: 30px; width: 30px"
                                            v-if="post.media_type == 'VIDEO'"/>
                     </div>
-                    <div v-if="post.hover_status && feed_layout == 'grid_tiles'"
+                </Slide>
+                <template #addons>
+                    <Navigation/>
+                </template>
+            </Carousel>
+            <Carousel style="margin-left: 10px; margin-right: 10px"
+                      :items-to-show="number_column"
+                      :items-to-slide="number_column"
+                      v-if="feed_layout == 'slider_tiles'">
+                <Slide v-for="post in selected_posts"
+                       :key="post.id"
+                       @mouseenter="post.hover_status = true"
+                       @mouseleave="post.hover_status = false">
+                    <div class="carousel__item"
+                         style="width: 100%"
+                         :style="{padding: post_spacing}">
+                        <img v-if="post.media_type == 'IMAGE'"
+                             :alt="post.caption"
+                             style="width: 100%; object-fit: cover; height: 300px;"
+                             :src="post.media_url">
+                        <img v-if="post.media_type == 'VIDEO'"
+                             :alt="post.caption"
+                             style="width: 100%; object-fit: cover; height: 300px;"
+                             :src="post.thumbnail_url">
+                    </div>
+                    <div v-if="post.hover_status"
                          class="post_hover"
-                         style="height: 250px; width: 150px"
+                         style="height: 100%; width: 100%"
+                         @click='openPost(post)'>
+                        <font-awesome-icon icon="fa-brands fa-instagram"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'IMAGE'"/>
+                        <font-awesome-icon icon="fa-solid fa-play"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'VIDEO'"/>
+                    </div>
+                </Slide>
+                <template #addons>
+                    <Navigation/>
+                </template>
+            </Carousel>
+            <div style="display: grid; text-align: center; width: 100%; margin-left: 10px; margin-right: 10px"
+                 v-if="feed_layout == 'grid_squares'"
+                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`, gap: post_spacing}">
+                <div :key="post.id"
+                     @mouseenter="post.hover_status = true"
+                     @mouseleave="post.hover_status = false"
+                     v-for="post in selected_posts"
+                     style="position: relative; width: 100%"
+                     class="post">
+                    <img v-if="post.media_type == 'IMAGE'"
+                         :alt="post.caption"
+                         style="width: 100%; object-fit: cover"
+                         :src="post.media_url">
+                    <img v-if="post.media_type == 'VIDEO'"
+                         :alt="post.caption"
+                         style="width: 100%; object-fit: cover"
+                         :src="post.thumbnail_url">
+                    <div v-if="post.hover_status && feed_layout.includes('squares')"
+                         class="post_hover"
+                         style="width: 100%; height: 100%"
+                         @click='openPost(post)'>
+                        <font-awesome-icon icon="fa-brands fa-instagram"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'IMAGE'"/>
+                        <font-awesome-icon icon="fa-solid fa-play"
+                                           style="color: white; height: 30px; width: 30px"
+                                           v-if="post.media_type == 'VIDEO'"/>
+                    </div>
+                </div>
+            </div>
+            <div style="display: grid; text-align: center; width: 100%; margin-left: 10px; margin-right: 10px"
+                 v-if="feed_layout == 'grid_tiles'"
+                 :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`, gap: post_spacing}">
+                <div :key="post.id"
+                     @mouseenter="post.hover_status = true"
+                     @mouseleave="post.hover_status = false"
+                     v-for="post in selected_posts"
+                     style="position: relative; width: 100%; height: 400px"
+                     class="post">
+                    <img v-if="post.media_type == 'IMAGE'"
+                         :alt="post.caption"
+                         style="width: 100%; height: 100%; object-fit: cover"
+                         :src="post.media_url">
+                    <img v-if="post.media_type == 'VIDEO'"
+                         :alt="post.caption"
+                         style="width: 100%; height: 100%; object-fit: cover"
+                         :src="post.thumbnail_url">
+                    <div v-if="post.hover_status"
+                         class="post_hover"
+                         style="height: 100%; width: 100%"
                          @click='openPost(post)'>
                         <font-awesome-icon icon="fa-brands fa-instagram"
                                            style="color: white; height: 30px; width: 30px"
@@ -268,7 +323,8 @@ export default {
             list_product: [],
             number_column: 3,
             current_list_tag: [],
-            configuration_select: 'auto'
+            configuration_select: 'auto',
+            post_spacing: 0
         }
     },
     methods: {
@@ -303,7 +359,8 @@ export default {
                             number_column: self.number_column,
                             on_post_click: self.on_post_click,
                             feed_layout: self.feed_layout,
-                            selected_posts: self.selected_posts
+                            selected_posts: self.selected_posts,
+                            post_spacing: self.post_spacing
                         }
                     }).then(res => {
                         if (res.data.result.success) {
@@ -426,6 +483,7 @@ export default {
     margin-top: 10px;
     border-radius: 5px;
     border: 1px solid #E2E2E2;
+    height: fit-content;
 }
 
 .label {
@@ -447,7 +505,7 @@ export default {
 
 .feed_setting input {
     border-radius: 5px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #e2e2e2;
     height: 30px;
 }
 
@@ -488,10 +546,6 @@ export default {
     margin-bottom: 10px;
 }
 
-.post {
-    position: relative;
-}
-
 .post img:hover {
     opacity: 0.5;
     cursor: pointer;
@@ -509,7 +563,7 @@ export default {
     z-index: 20;
     position: absolute;
     opacity: 0.5;
-    background: #151515
+    background: #151515;
 }
 
 .tag_product {

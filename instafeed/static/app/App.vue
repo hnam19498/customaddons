@@ -16,12 +16,12 @@
                            :selected_posts="selected_posts"
                            v-if="currentTab == 'FeedSettings'"/>
             <dashboard v-if="currentTab == 'Dashboard'"/>
-            <Modal style="width: 70%"
-                   title="CHANGE THE INSTAGRAM ACCOUNT CONNECTED"
-                   :footer="null"
+            <Modal title="CHANGE THE INSTAGRAM ACCOUNT CONNECTED"
                    @cancel="this.changeInstagram=false"
                    v-model:visible="changeInstagram"
-                   :maskClosable="false">
+                   :maskClosable="false"
+                   style="width: 70%"
+                   :footer="null">
                 <div>Follow the steps below on your computer and not mobile.</div>
                 <div>1 - Go to www.instagram.com in your desktop browser and log out.</div>
                 <div>2 - Important: Login to www.instagram.com with the Instagram username you want to show in your

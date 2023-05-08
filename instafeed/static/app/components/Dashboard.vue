@@ -141,6 +141,6 @@ table {
 }
 
 .ant-switch {
-    width: 56px
+    width: 56px;
 }
 </style>
