@@ -49,9 +49,7 @@
                                min="1" max="6"
                                v-if="configuration_select == 'manual'"
                                type="number">
-                        <input value="AUTO"
-                               v-if="configuration_select == 'auto'"
-                               disabled>
+                        <input value="AUTO" v-if="configuration_select == 'auto'" disabled>
                     </div>
                     <button @click="save_feed" id="btn_save">Save feed</button>
                     <div style="display: flex">
@@ -80,9 +78,7 @@
                        :key="post.id"
                        @mouseenter="post.hover_status = true"
                        @mouseleave="post.hover_status = false">
-                    <div class="carousel__item"
-                         :style="{padding: post_spacing}"
-                         style="width: 100%">
+                    <div class="carousel__item" :style="{padding: post_spacing}">
                         <img v-if="post.media_type == 'IMAGE'"
                              :alt="post.caption"
                              style="width: 100%; object-fit: cover"
@@ -116,22 +112,20 @@
                        :key="post.id"
                        @mouseenter="post.hover_status = true"
                        @mouseleave="post.hover_status = false">
-                    <div class="carousel__item"
-                         style="width: 100%"
-                         :style="{padding: post_spacing}">
+                    <div class="carousel__item" :style="{padding: post_spacing}">
                         <img v-if="post.media_type == 'IMAGE'"
                              :alt="post.caption"
-                             style="width: 100%; object-fit: cover; height: 300px;"
+                             style="width: 100%; object-fit: cover; height: 450px"
                              :src="post.media_url">
                         <img v-if="post.media_type == 'VIDEO'"
                              :alt="post.caption"
-                             style="width: 100%; object-fit: cover; height: 300px;"
+                             style="width: 100%; object-fit: cover; height: 450px"
                              :src="post.thumbnail_url">
                     </div>
                     <div v-if="post.hover_status"
                          class="post_hover"
                          style="height: 100%; width: 100%"
-                         @click='openPost(post)'>
+                         @click="openPost(post)">
                         <font-awesome-icon icon="fa-brands fa-instagram"
                                            style="color: white; height: 30px; width: 30px"
                                            v-if="post.media_type == 'IMAGE'"/>
@@ -144,14 +138,14 @@
                     <Navigation/>
                 </template>
             </Carousel>
-            <div style="display: grid; text-align: center; width: 100%; margin-left: 10px; margin-right: 10px"
+            <div style="display: grid; text-align: center; width: 100%"
                  v-if="feed_layout == 'grid_squares'"
                  :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`, gap: post_spacing}">
-                <div :key="post.id"
+                <div v-for="post in selected_posts"
+                     style="position: relative; width: 100%"
+                     :key="post.id"
                      @mouseenter="post.hover_status = true"
                      @mouseleave="post.hover_status = false"
-                     v-for="post in selected_posts"
-                     style="position: relative; width: 100%"
                      class="post">
                     <img v-if="post.media_type == 'IMAGE'"
                          :alt="post.caption"
@@ -174,13 +168,13 @@
                     </div>
                 </div>
             </div>
-            <div style="display: grid; text-align: center; width: 100%; margin-left: 10px; margin-right: 10px"
+            <div style="display: grid; text-align: center; width: 100%"
                  v-if="feed_layout == 'grid_tiles'"
                  :style="{gridTemplateColumns: `repeat(${number_column}, 1fr)`, gap: post_spacing}">
-                <div :key="post.id"
+                <div v-for="post in selected_posts"
+                     :key="post.id"
                      @mouseenter="post.hover_status = true"
                      @mouseleave="post.hover_status = false"
-                     v-for="post in selected_posts"
                      style="position: relative; width: 100%; height: 400px"
                      class="post">
                     <img v-if="post.media_type == 'IMAGE'"

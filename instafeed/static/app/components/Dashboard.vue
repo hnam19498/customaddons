@@ -13,7 +13,7 @@
                 <td>{{ feed.feed_title }}</td>
                 <td>
                     <div style="display: flex">
-                        <div :key="post.id" style="margin-left: 5px" v-for="post in feed.selected_posts">
+                        <div style="margin-right: 5px" v-for="post in feed.selected_posts" :key="post.id">
                             <img v-if="post.media_type == 'IMAGE'"
                                  :src="post.media_url"
                                  style="height: 50px; width: 50px; object-fit: cover"

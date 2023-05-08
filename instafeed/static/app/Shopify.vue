@@ -11,8 +11,7 @@
                    @mouseleave="post.hover_status = false">
                 <div class="carousel__item"
                      style="width: 100%"
-                     :style="{padding: feed.post_spacing}"
-                     @click='openPost(feed, post)'>
+                     :style="{padding: feed.post_spacing}">
                     <img v-if="post.media_type == 'IMAGE'"
                          :alt="post.caption"
                          style="width: 100%; object-fit: cover"
@@ -25,7 +24,7 @@
                 <div v-if="post.hover_status"
                      class="post_hover"
                      style="height: 100%; width: 100%"
-                     @click='openPost(post)'>
+                     @click='openPost(feed, post)'>
                     <font-awesome-icon icon="fa-brands fa-instagram"
                                        style="color: white; height: 30px; width: 30px"
                                        v-if="post.media_type == 'IMAGE'"/>
@@ -46,9 +45,7 @@
                    :key="post.id"
                    @mouseenter="post.hover_status = true"
                    @mouseleave="post.hover_status = false">
-                <div class="carousel__item"
-                     style="width: 100%"
-                     :style="{padding: feed.post_spacing}">
+                <div class="carousel__item" style="width: 100%" :style="{padding: feed.post_spacing}">
                     <img v-if="post.media_type == 'IMAGE'"
                          :alt="post.caption"
                          style="width: 100%; object-fit: cover; height: 500px"
@@ -123,8 +120,8 @@
             </template>
         </Carousel>
         <div style="display: grid; text-align: center; width: 100%; margin-bottom: 10px"
-             v-if="feed.feed_layout == 'grid_squares'"
-             :style="{gridTemplateColumns: `repeat(${feed.number_column}, 1fr)`, gap: feed.post_spacing}">
+             :style="{gridTemplateColumns: `repeat(${feed.number_column}, 1fr)`, gap: feed.post_spacing}"
+             v-if="feed.feed_layout == 'grid_squares'">
             <div v-for="post in feed.selected_posts"
                  :key="post.id"
                  style="position: relative; margin-bottom: 15px"
