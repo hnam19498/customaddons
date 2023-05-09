@@ -8,6 +8,7 @@ class Instagram(http.Controller):
     def instafeed_auth(self, **kw):
         instagram_app_id = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_app_id')
         instagram_redirect_uri = request.env['ir.config_parameter'].sudo().get_param('instafeed.instagram_redirect_uri')
+
         return werkzeug.utils.redirect(f'https://api.instagram.com/oauth/authorize?client_id={instagram_app_id}&redirect_uri={instagram_redirect_uri}&scope=user_profile,user_media&response_type=code')
 
     @http.route('/instafeed/oauth', auth='user')
@@ -100,6 +101,7 @@ class Instagram(http.Controller):
     @http.route("/instafeed/save_feed", auth='user', type="json")
     def instafeed_save_feed(self, **kw):
         try:
+            print(kw)
             current_user = request.env.user
             current_shop = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)], limit=1)
             request.env['instagram.feed'].sudo().create({

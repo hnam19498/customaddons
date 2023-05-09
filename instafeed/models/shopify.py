@@ -87,14 +87,14 @@ class Shop(models.Model):
 
                 webhook_products_create = shopify.Webhook()
                 webhook_products_create.topic = "products/create"
-                webhook_products_create.address = self.ngrok_url + "/webhook/products_create/" + shop.shopify_id
+                webhook_products_create.address = f'{self.ngrok_url}/webhook/products_create/{shop.shopify_id}'
                 webhook_products_create.format = "json"
                 webhook_products_create.save()
                 print(f"{webhook_products_create.id}: {webhook_products_create.topic}")
 
                 webhook_products_update = shopify.Webhook()
                 webhook_products_update.topic = "products/update"
-                webhook_products_update.address = self.ngrok_url + "/webhook/products_update/" + shop.shopify_id
+                webhook_products_update.address = f'{self.ngrok_url}/webhook/products_update/{shop.shopify_id}'
                 webhook_products_update.format = "json"
                 webhook_products_update.save()
                 print(f"{webhook_products_update.id}: {webhook_products_update.topic}")
@@ -106,8 +106,7 @@ class Shop(models.Model):
 
     def fetch_product(self):
         try:
-            new_session = shopify.Session(self.url, self.env['ir.config_parameter'].sudo().get_param(
-                'instafeed.shopify_api_version'), token=self.access_token)
+            new_session = shopify.Session(self.url, self.env['ir.config_parameter'].sudo().get_param('instafeed.shopify_api_version'), token=self.access_token)
             shopify.ShopifyResource.activate_session(new_session)
             products = shopify.Product.find()
 
@@ -126,7 +125,7 @@ class Shop(models.Model):
                             self.env['shopify.product'].sudo().create({
                                 'shopify_product_id': product.id,
                                 'name': product.title,
-                                'url': self.url + "/products/" + product.handle,
+                                'url': f'{self.url}/products/{product.handle}',
                                 'shop_id': self.id,
                                 'price': float(product.variants[0].price),
                                 "compare_at_price": product.variants[0].compare_at_price,
@@ -135,7 +134,7 @@ class Shop(models.Model):
                                 'url_img': product.image.src
                             })
                         except Exception as error_create_product:
-                            print("error_create_product: " + str(error_create_product))
+                            print(f"error_create_product: {str(error_create_product)}")
                             continue
                     else:
                         print(f'Product id "{product.id}" đã trong database!')

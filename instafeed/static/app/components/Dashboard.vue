@@ -123,14 +123,14 @@ table {
 
 .table-row {
     height: 3rem;
-    border-bottom: 1px groove #EFEFEF;
+    border-bottom: 1px groove #efefef;
     font-size: 14px;
 }
 
 .table-col-name {
     height: 3rem;
-    border-bottom: 1px groove #EFEFEF;
-    border-top: 1px groove #EFEFEF;
+    border-bottom: 1px groove #efefef;
+    border-top: 1px groove #efefef;
     color: black;
     font-weight: 700;
     font-size: 14px;

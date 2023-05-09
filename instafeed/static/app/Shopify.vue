@@ -226,8 +226,8 @@
             <div style="width: 100%; display: flex; flex-direction: column">
                 <div style="margin-left: 20px; display: flex; background-color: white; align-items: center">
                     <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
-                        <font-awesome-icon icon="fa-brands fa-instagram"
-                                           style="height: 30px; width: 30px; color: black"/>
+                        <font-awesome-icon style="height: 30px; width: 30px; color: black"
+                                           icon="fa-brands fa-instagram"/>
                     </div>
                     <div @click="redirectToInstagramUser"
                          style="cursor: pointer; color: black; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px">
@@ -391,7 +391,7 @@ export default {
     margin-left: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #e2e2e2;
     width: 100%;
     margin-right: 10px;
 }
@@ -442,10 +442,10 @@ export default {
 </style>
 <style>
 .carousel__prev, .carousel__next {
-    border: 1px solid #EFEFEF;
+    border: 1px solid #efefef;
     height: 25px;
     width: 25px;
-    background: #EFEFEF;
+    background: #efefef;
     border-radius: 50%;
 }
 </style>

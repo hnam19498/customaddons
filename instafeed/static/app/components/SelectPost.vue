@@ -189,7 +189,7 @@ export default {
     cursor: pointer;
     font-size: 14px;
     line-height: 24px;
-    background: #1D1E21;
+    background: #1d1e21;
     border-radius: 5px;
 }
 
@@ -199,9 +199,9 @@ export default {
     font-style: normal;
     font-weight: 500;
     font-size: 14px;
-    border: #E2E2E2;
+    border: #e2e2e2;
     line-height: 24px;
-    color: #000000;
+    color: black;
     flex: none;
     order: 1;
     flex-grow: 0;
@@ -209,7 +209,7 @@ export default {
     gap: 4px;
     width: 71px;
     height: 32px;
-    background: #E2E2E2;
+    background: #e2e2e2;
     border-radius: 5px;
     margin-right: 25px;
 }
@@ -290,14 +290,14 @@ table {
 
 .table-row {
     height: 3rem;
-    border-bottom: 1px groove #EFEFEF;
+    border-bottom: 1px groove #efefef;
     font-size: 14px;
 }
 
 .table-col-name {
     height: 3rem;
-    border-bottom: 1px groove #EFEFEF;
-    border-top: 1px groove #EFEFEF;
+    border-bottom: 1px groove #efefef;
+    border-top: 1px groove #efefef;
     color: rgba(0, 0, 0);
     font-weight: 700;
     font-size: 14px;
@@ -314,7 +314,7 @@ table {
     height: 24px;
     font-style: normal;
     font-weight: 400;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #efefef;
     border-radius: 5px;
     font-size: 14px;
     background: white;

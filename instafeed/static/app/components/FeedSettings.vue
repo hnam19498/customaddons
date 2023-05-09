@@ -333,6 +333,7 @@ export default {
             })
         },
         save_feed() {
+            console.log("click save")
             let self = this
             if (self.selected_posts.length == 0) {
                 this.show_toast('open', 'Please select at least 1 post at SelectPost before continue.', 3)
@@ -345,27 +346,27 @@ export default {
                     if (self.configuration_select == 'auto') {
                         self.number_column = 3
                     }
-                    axios.post('https://odoo.website/instafeed/save_feed', {
-                        jsonrpc: "2.0",
-                        params: {
-                            list_tag: self.list_tag,
-                            feed_title: self.feed_title,
-                            number_column: self.number_column,
-                            on_post_click: self.on_post_click,
-                            feed_layout: self.feed_layout,
-                            selected_posts: self.selected_posts,
-                            post_spacing: self.post_spacing
-                        }
-                    }).then(res => {
-                        if (res.data.result.success) {
-                            alert("Saved!")
-                        } else {
-                            alert(res.data.result.error)
-                        }
-                    }).catch(error => {
-                        console.log(error)
-                    })
                 }
+                axios.post('https://odoo.website/instafeed/save_feed', {
+                    jsonrpc: "2.0",
+                    params: {
+                        list_tag: self.list_tag,
+                        feed_title: self.feed_title,
+                        number_column: self.number_column,
+                        on_post_click: self.on_post_click,
+                        feed_layout: self.feed_layout,
+                        selected_posts: self.selected_posts,
+                        post_spacing: self.post_spacing
+                    }
+                }).then(res => {
+                    if (res.data.result.success) {
+                        alert("Saved!")
+                    } else {
+                        alert(res.data.result.error)
+                    }
+                }).catch(error => {
+                    console.log(error)
+                })
             }
         },
         cancelFeed() {
@@ -466,7 +467,7 @@ export default {
     margin-left: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #e2e2e2;
     width: 73%;
     margin-right: 10px;
 }
@@ -476,7 +477,7 @@ export default {
     margin-left: 10px;
     margin-top: 10px;
     border-radius: 5px;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #e2e2e2;
     height: fit-content;
 }
 
@@ -494,7 +495,7 @@ export default {
     height: 30px;
     border-radius: 5px;
     background: white;
-    border: 1px solid #E2E2E2;
+    border: 1px solid #e2e2e2;
 }
 
 .feed_setting input {
@@ -578,7 +579,7 @@ export default {
 
 .table-row {
     height: 3rem;
-    border-bottom: 1px groove #EFEFEF;
+    border-bottom: 1px groove #efefef;
     font-size: 14px;
 }
 
