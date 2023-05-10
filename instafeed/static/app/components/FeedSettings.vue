@@ -71,8 +71,8 @@
             </div>
             <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed_title }}</h2>
             <Carousel style="margin-left: 10px; margin-right: 10px"
-                      :items-to-show="number_column"
-                      :items-to-slide="number_column"
+                      :wrap-around="true"
+                      v-bind="{itemsToShow: number_column, snapAlign: 'start'}"
                       v-if="feed_layout == 'slider_squares'">
                 <Slide v-for="post in selected_posts"
                        :key="post.id"
@@ -105,8 +105,8 @@
                 </template>
             </Carousel>
             <Carousel style="margin-left: 10px; margin-right: 10px"
-                      :items-to-show="number_column"
-                      :items-to-slide="number_column"
+                      :wrap-around="true"
+                      v-bind="{itemsToShow: number_column, snapAlign: 'start'}"
                       v-if="feed_layout == 'slider_tiles'">
                 <Slide v-for="post in selected_posts"
                        :key="post.id"
@@ -226,7 +226,18 @@
                             {{ instagram_user }}
                         </div>
                     </div>
-                    <div style="display: flex; justify-content: center; text-align: center">
+                    <div style="display: flex">
+                        <button class="btn_post" @click="previous_post(selected_post.id)" style="margin-left: 20px">
+                            <font-awesome-icon icon="fa-solid fa-caret-left"
+                                               style="color: black; font-size: 30px"/>
+                        </button>
+                        <button class="btn_post" @click="next_post(selected_post.id)"
+                                style="right: 0; margin-left: auto">
+                            <font-awesome-icon icon="fa-solid fa-caret-right"
+                                               style="color: black; font-size: 30px"/>
+                        </button>
+                    </div>
+                    <div style="display: flex; justify-content: center; text-align: center; margin-bottom: 10px">
                         <button @click="tag_modal = true" class="tag_product">Tag product</button>
                     </div>
                     <div style="margin-left: 10px">
@@ -318,10 +329,48 @@ export default {
             number_column: 3,
             current_list_tag: [],
             configuration_select: 'auto',
-            post_spacing: 0
+            post_spacing: 0,
+            settings: {
+                itemsToShow: 1,
+                snapAlign: 'center',
+            }
         }
     },
     methods: {
+        previous_post(current_post_id) {
+            let self = this
+            for (let i = 0; i < self.selected_posts.length; i++) {
+                if (current_post_id == selected_posts[i].id) {
+                    if (i == 0) {
+                        self.selected_post = self.selected_posts[self.selected_posts.length - 1]
+                    } else {
+                        self.selected_post = self.selected_posts[i - 1]
+                    }
+                    if (self.selected_post.comments) {
+                        self.comments = JSON.parse(self.selected_post.comments)
+                    } else {
+                        self.comments = []
+                    }
+                }
+            }
+        },
+        next_post(current_post_id) {
+            let self = this
+            for (let i = 0; i < self.selected_posts.length; i++) {
+                if (current_post_id == selected_posts[i].id) {
+                    if (i == selected_posts.length - 1) {
+                        self.selected_post = self.selected_posts[0]
+                    } else {
+                        self.selected_post = self.selected_posts[i + 1]
+                    }
+                    if (self.selected_post.comments) {
+                        self.comments = JSON.parse(self.selected_post.comments)
+                    } else {
+                        self.comments = []
+                    }
+                }
+            }
+        },
         show_toast: (type, message, duration) => {
             notification[type]({
                 message: message,
@@ -333,7 +382,6 @@ export default {
             })
         },
         save_feed() {
-            console.log("click save")
             let self = this
             if (self.selected_posts.length == 0) {
                 this.show_toast('open', 'Please select at least 1 post at SelectPost before continue.', 3)
@@ -595,5 +643,11 @@ tr {
     cursor: pointer;
     justify-content: center;
     align-items: center;
+}
+
+.btn_post {
+    cursor: pointer;
+    border: 0;
+    background: white;
 }
 </style>
