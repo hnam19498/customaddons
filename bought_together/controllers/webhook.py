@@ -8,9 +8,10 @@ class WebhookController(http.Controller):
     def webhook_shopify(self, topic, shopify_id):
         try:
             client_secret = request.env['ir.config_parameter'].sudo().get_param('bought_together.client_secret')
+            request_hmac = request.httprequest.headers.get('X-Shopify-Hmac-Sha256', "")
             digest = hmac.new(client_secret.encode('utf-8'), request.httprequest.data, hashlib.sha256).digest()
             computed_hmac = base64.b64encode(digest)
-            if not hmac.compare_digest(computed_hmac, request.httprequest.headers.get('X-Shopify-Hmac-Sha256').encode('utf-8')):
+            if not hmac.compare_digest(computed_hmac, request_hmac.encode('utf-8')):
                 return Response('Secret key is not verified', status=500)
             else:
                 current_shop = request.env['shop.shopify'].sudo().search([("shopify_id", '=', shopify_id)], limit=1)
