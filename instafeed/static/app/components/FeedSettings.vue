@@ -71,8 +71,8 @@
                 PREVIEW
             </div>
             <h2 style="text-align: center; margin-top: 20px; margin-bottom: 15px">{{ feed_title }}</h2>
-            v-bind="{itemsToShow: number_column, snapAlign: 'start', itemsToScroll: number_column}"
-            <Carousel style="margin-left: 10px; margin-right: 10px"
+            <Carousel v-bind="{itemsToShow: number_column, snapAlign: 'start', itemsToScroll: number_column}"
+                      style="margin-left: 10px; margin-right: 10px"
                       v-if="feed_layout == 'slider_squares'"
                       :wrap-around="true"
                       :transition="1000">
@@ -345,11 +345,7 @@ export default {
             number_column: 3,
             current_list_tag: [],
             configuration_select: 'auto',
-            post_spacing: 0,
-            settings: {
-                itemsToShow: 1,
-                snapAlign: 'center',
-            }
+            post_spacing: 0
         }
     },
     methods: {

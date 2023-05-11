@@ -23,7 +23,7 @@
                          :alt="post.caption">
                 </div>
                 <div style="height: 100%; width: 100%"
-                     @click='openPost(feed, post)'
+                     @click="openPost(feed, post)"
                      v-if="post.hover_status"
                      class="post_hover">
                     <font-awesome-icon style="color: white; height: 30px; width: 30px"
@@ -101,6 +101,7 @@
         <Carousel v-bind="{itemsToShow: feed.number_column, snapAlign: 'start', itemsToScroll: feed.number_column}"
                   v-if="feed.feed_layout == 'slider_squares' && screen_width <= 600"
                   style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
+                  :wrap-around="true"
                   :transition="1000">
             <Slide v-for="post in feed.selected_posts"
                    @click='openPost(feed, post)'
@@ -216,6 +217,7 @@
                v-model:visible="post_modal"
                v-if="screen_width > 600"
                :maskClosable="false"
+               style="width: 750px"
                :footer="null">
             <div style="display: flex">
                 <img v-if="selected_post.media_type == 'IMAGE'"
