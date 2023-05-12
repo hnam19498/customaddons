@@ -64,6 +64,13 @@ class Instagram(http.Controller):
                                 new_instagram_user = request.env['instagram.user'].sudo().create(user_data)
                                 new_instagram_user.facebook_user_id = exist_facebook_user.id
                                 exist_facebook_user.instagram_user_id = new_instagram_user.id
+                                page = requests.get(f"https://graph.facebook.com/me/accounts?access_token={exist_facebook_user.access_token}")
+                                if page.ok:
+                                    instagram_business_account = requests.get(f"https://graph.facebook.com/{page.json()['data'][0]['id']}?fields=instagram_business_account&access_token={exist_facebook_user.access_token}")
+                                    if instagram_business_account.ok:
+                                        instagram_user_avatar = requests.get(f"https://graph.facebook.com/{instagram_business_account.json()['instagram_business_account']['id']}?fields=profile_picture_url&access_token={exist_facebook_user.access_token}")
+                                        if instagram_user_avatar.ok:
+                                            new_instagram_user.avatar_url = instagram_user_avatar.json()['profile_picture_url']
                         else:
                             if not exist_facebook_user:
                                 exist_instagram_user.sudo().write(user_data)
@@ -71,6 +78,13 @@ class Instagram(http.Controller):
                                 exist_instagram_user.sudo().write(user_data)
                                 exist_instagram_user.facebook_user_id = exist_facebook_user.id
                                 exist_facebook_user.instagram_user_id = exist_instagram_user.id
+                                page = requests.get(f"https://graph.facebook.com/me/accounts?access_token={exist_facebook_user.access_token}")
+                                if page.ok:
+                                    instagram_business_account = requests.get(f"https://graph.facebook.com/{page.json()['data'][0]['id']}?fields=instagram_business_account&access_token={exist_facebook_user.access_token}")
+                                    if instagram_business_account.ok:
+                                        instagram_user_avatar = requests.get(f"https://graph.facebook.com/{instagram_business_account.json()['instagram_business_account']['id']}?fields=profile_picture_url&access_token={exist_facebook_user.access_token}")
+                                        if instagram_user_avatar.ok:
+                                            exist_instagram_user.avatar_url = instagram_user_avatar.json()['profile_picture_url']
 
                     return werkzeug.utils.redirect('https://odoo.website/instafeed')
 
@@ -194,7 +208,8 @@ class Instagram(http.Controller):
                 return {
                     'list_feed': list_feed,
                     'shop_owner': current_shop.shopify_owner,
-                    "instagram_user": current_instagram_user.username
+                    "instagram_user": current_instagram_user.username,
+                    "instagram_avatar": current_instagram_user.avatar_url
                 }
         except Exception as e:
             return {"error": e}

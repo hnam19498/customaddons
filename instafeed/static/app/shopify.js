@@ -14,7 +14,13 @@ for (let test_app of test_apps) {
     let feed_id = test_app.getAttribute('data-feed-id')
     let feed_app = createApp({
         name: 'Feed_' + feed_id,
-        render: () => h(Shopify, {data: {feed_id: feed_id}})
+        render: function () {
+            return h(Shopify, {
+                data: {
+                    feed_id: feed_id
+                }
+            })
+        }
     })
     feed_app.component("font-awesome-icon", FontAwesomeIcon).use(Antd).mount(test_app)
 }

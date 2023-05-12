@@ -32,6 +32,9 @@ class Facebook(http.Controller):
                         'shop_shopify': current_shopify.id
                     }
 
+                    page = requests.get(f"https://graph.facebook.com/me/accounts?access_token={facebook_token.json()['access_token']}")
+                    instagram_business_account = requests.get(f"https://graph.facebook.com/{page.json()['data'][0]['id']}?fields=instagram_business_account&access_token={facebook_token.json()['access_token']}")
+                    instagram_user_avatar = requests.get(f"https://graph.facebook.com/{instagram_business_account.json()['instagram_business_account']['id']}?fields=profile_picture_url&access_token={facebook_token.json()['access_token']}")
                     exist_instagram_user = request.env['instagram.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
                     exist_facebook_user = request.env['facebook.user'].sudo().search([('shop_shopify', '=', current_shopify.id)], limit=1)
 
@@ -45,9 +48,11 @@ class Facebook(http.Controller):
                             new_facebook_user = request.env['facebook.user'].sudo().create(facebook_user_data)
                             new_facebook_user.instagram_user_id = exist_instagram_user.id
                             exist_instagram_user.facebook_user_id = new_facebook_user.id
+                            exist_instagram_user.avatar_url = instagram_user_avatar.json()['profile_picture_url']
                         else:
                             exist_facebook_user.sudo().write(facebook_user_data)
                             exist_facebook_user.instagram_user_id = exist_instagram_user.id
                             exist_instagram_user.facebook_user_id = exist_facebook_user.id
+                            exist_instagram_user.avatar_url = instagram_user_avatar.json()['profile_picture_url']
 
                     return werkzeug.utils.redirect('https://odoo.website/instafeed')

@@ -223,8 +223,7 @@
                 <div style="width: 100%; display: flex; flex-direction: column">
                     <div style="margin-left:20px; display: flex; background-color: white; align-items: center">
                         <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
-                            <font-awesome-icon style="height:30px; width: 30px; color: black"
-                                               icon="fa-brands fa-instagram"/>
+                            <img :src="instagram_avatar" alt="" style="height: 40px; width: 40px; object-fit: cover">
                         </div>
                         <div style="cursor: pointer; color: #000; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px"
                              @click="redirectToInstagramUser">
@@ -252,7 +251,8 @@
                         <div>{{ selected_post.caption }}</div>
                         <div style="border-bottom: 1px solid #dcdcdc">
                             {{ selected_post.like_count }}
-                            <font-awesome-icon icon="fa-regular fa-heart" beat style="color: black"/>
+                            <font-awesome-icon icon="fa-regular fa-heart"
+                                               style="color: black"/>
                         </div>
                         <div v-if="comments">
                             <div :key="comment.id" v-for="comment in comments">
@@ -296,12 +296,12 @@
     </div>
 </template>
 <script>
-import {Modal, notification} from 'ant-design-vue'
+import {LeftCircleOutlined, RightCircleOutlined, CloseCircleFilled, SearchOutlined} from '@ant-design/icons-vue'
 import {Carousel, Navigation, Slide} from 'vue3-carousel'
+import {Modal, notification} from 'ant-design-vue'
 import 'vue3-carousel/dist/carousel.css'
 import axios from "axios"
 import {h} from 'vue'
-import {LeftCircleOutlined, RightCircleOutlined, CloseCircleFilled, SearchOutlined} from '@ant-design/icons-vue'
 
 export default {
     watch: {
@@ -345,7 +345,8 @@ export default {
             number_column: 3,
             current_list_tag: [],
             configuration_select: 'auto',
-            post_spacing: 0
+            post_spacing: 0,
+            instagram_avatar : ''
         }
     },
     methods: {
@@ -500,6 +501,7 @@ export default {
     mounted() {
         let self = this
         self.instagram_user = window.instafeed.users.instagram_username
+        self.instagram_avatar = window.instafeed.users.instagram_avatar
         axios.post('https://odoo.website/shopify/get_product', {
             jsonrpc: "2.0",
             params: {}

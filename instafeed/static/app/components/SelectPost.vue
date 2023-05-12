@@ -1,55 +1,76 @@
 <template>
-    <div v-if="posts" style="background: white; margin-top: 15px; margin-bottom: 15px">
+    <div style="background: white; margin-top: 15px; margin-bottom: 15px"
+         v-if="posts">
         <div>
             <div class="setting-btn">
-                <button id="btn-cancel" @click="cancelSelectPost">Cancel</button>
-                <button id="btn-next" @click="nextToFeedSettings">NEXT</button>
+                <button @click="cancelSelectPost"
+                        id="btn-cancel">Cancel
+                </button>
+                <button @click="nextToFeedSettings"
+                        id="btn-next">NEXT
+                </button>
             </div>
             <div id="setting_widget">
                 <label id="enable_widget">Enable Widget</label>
-                <a-switch v-model:checked="enable_widget" checked-children="ON" un-checked-children="OFF"/>
+                <a-switch v-model:checked="enable_widget"
+                          un-checked-children="OFF"
+                          checked-children="ON"/>
             </div>
         </div>
         <div style="position: relative; width: 100%">
             <div>
                 <div id="choose-post">
-                    <font-awesome-icon icon="fa-solid fa-circle-question" style="color: #5C5F62"/>
+                    <font-awesome-icon icon="fa-solid fa-circle-question"
+                                       style="color: #5C5F62"/>
                     <span>Choose post(s)</span>
                 </div>
-                <div class="selected_posts" v-if="this.selected_posts.length > 0">
-                    <div :key="post.id"
-                         v-for="post in this.selected_posts"
-                         class="selected_post">
+                <div v-if="this.selected_posts.length > 0"
+                     class="selected_posts">
+                    <div v-for="post in this.selected_posts"
+                         class="selected_post"
+                         :key="post.id">
                         <div style="height: 17px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px">
                             {{ post.caption }}
                         </div>
-                        <font-awesome-icon icon="fa-solid fa-circle-xmark"
-                                           @click="deleteChoosePost(post.id)"
-                                           style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"
-                                           size="sm"/>
+                        <font-awesome-icon
+                                style="height: 15px; margin-right: 10px; color: red; margin-top: 5px; width: 15px; margin-bottom: 5px"
+                                @click="deleteChoosePost(post.id)"
+                                icon="fa-solid fa-circle-xmark"
+                                size="sm"/>
                     </div>
                 </div>
                 <div class="table">
                     <table>
                         <tr class="table-col-name">
-                            <td><input type="checkbox" @change="SelectAllPosts" v-model="tickAllPosts"></td>
+                            <td>
+                                <input @change="SelectAllPosts"
+                                       v-model="tickAllPosts"
+                                       type="checkbox">
+                            </td>
                             <td>Media</td>
                             <td>Like</td>
                             <td>Caption</td>
                         </tr>
-                        <tr class="table-row" v-for="post in posts" :key="post.id" @click="select_post(post)">
+                        <tr @click="select_post(post)"
+                            v-for="post in posts"
+                            class="table-row"
+                            :key="post.id">
                             <td>
                                 <input :checked="selected_posts.filter(e => e.id == post.id).length > 0"
                                        type="checkbox">
                             </td>
                             <td v-if="post.media_type == 'VIDEO'">
-                                <video controls width="200" height="200" style="object-fit: cover">
+                                <video style="object-fit: cover"
+                                       height="200"
+                                       width="200"
+                                       controls>
                                     <source :src="post.media_url">
                                 </video>
                             </td>
                             <td v-if="post.media_type == 'IMAGE'">
-                                <img :alt="post.caption" :src="post.media_url"
-                                     style="width: 200px; height: 200px; object-fit: cover">
+                                <img style="width: 200px; height: 200px; object-fit: cover"
+                                     :src="post.media_url"
+                                     :alt="post.caption">
                             </td>
                             <td>{{ post.like_count }}</td>
                             <td>{{ post.caption }}</td>
@@ -57,14 +78,15 @@
                     </table>
                 </div>
             </div>
-            <div v-if="!enable_widget" class="blur"/>
+            <div v-if="!enable_widget"
+                 class="blur"/>
         </div>
     </div>
 </template>
 <script>
-import {h} from 'vue'
-import {notification} from 'ant-design-vue'
 import {CloseCircleFilled} from "@ant-design/icons-vue"
+import {notification} from 'ant-design-vue'
+import {h} from 'vue'
 
 export default {
     data() {

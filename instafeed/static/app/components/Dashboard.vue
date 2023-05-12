@@ -8,19 +8,23 @@
                 <td>List post</td>
                 <td class="status">Status</td>
             </tr>
-            <tr class="table-row" v-if="list_feed" v-for="feed in list_feed">
+            <tr v-for="feed in list_feed"
+                class="table-row"
+                v-if="list_feed">
                 <td>{{ feed.id }}</td>
                 <td>{{ feed.feed_title }}</td>
                 <td>
                     <div style="display: flex">
-                        <div style="margin-right: 5px" v-for="post in feed.selected_posts" :key="post.id">
-                            <img v-if="post.media_type == 'IMAGE'"
+                        <div v-for="post in feed.selected_posts"
+                             style="margin-right: 5px"
+                             :key="post.id">
+                            <img style="height: 50px; width: 50px; object-fit: cover"
+                                 v-if="post.media_type == 'IMAGE'"
                                  :src="post.media_url"
-                                 style="height: 50px; width: 50px; object-fit: cover"
                                  :alt="post.caption">
-                            <img v-if="post.media_type == 'VIDEO'"
+                            <img style="height: 50px; width: 50px; object-fit: cover"
+                                 v-if="post.media_type == 'VIDEO'"
                                  :src="post.thumbnail_url"
-                                 style="height: 50px; width: 50px; object-fit: cover"
                                  :alt="post.caption">
                         </div>
                     </div>
@@ -28,18 +32,18 @@
                 <td class="status">
                     <a-switch @change="changeFeedStatus(feed.id, feed.enable_status)"
                               v-model:checked="feed.enable_status"
-                              checked-children="ON"
-                              un-checked-children="OFF"/>
+                              un-checked-children="OFF"
+                              checked-children="ON"/>
                 </td>
             </tr>
         </table>
     </div>
 </template>
 <script>
+import {CloseCircleFilled} from "@ant-design/icons-vue"
+import {notification} from 'ant-design-vue'
 import axios from "axios"
 import {h} from 'vue'
-import {notification} from 'ant-design-vue'
-import {CloseCircleFilled} from "@ant-design/icons-vue"
 
 export default {
     name: "Dashboard",

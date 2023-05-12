@@ -5,16 +5,16 @@
         </div>
         <layout-header>
             <feed-header @changeInstagramAccount="changeInstagramAccount"
-                         @changeTab="changeTab"
-                         @fetch_post_loading="fetch_post_loading"/>
+                         @fetch_post_loading="fetch_post_loading"
+                         @changeTab="changeTab"/>
         </layout-header>
         <layout-content>
             <select-post @SelectPostToFeedSettings="SelectPostToFeedSettings"
-                         :posts="posts"
-                         v-if="currentTab == 'SelectPost'"/>
-            <feed-settings @changeTab="changeTab"
+                         v-if="currentTab == 'SelectPost'"
+                         :posts="posts"/>
+            <feed-settings v-if="currentTab == 'FeedSettings'"
                            :selected_posts="selected_posts"
-                           v-if="currentTab == 'FeedSettings'"/>
+                           @changeTab="changeTab"/>
             <dashboard v-if="currentTab == 'Dashboard'"/>
             <Modal title="CHANGE THE INSTAGRAM ACCOUNT CONNECTED"
                    @cancel="this.changeInstagram=false"
@@ -35,12 +35,12 @@
     </layout>
 </template>
 <script>
-import axios from 'axios'
 import {Layout, LayoutHeader, LayoutContent, Modal} from "ant-design-vue"
 import FeedSettings from "./components/FeedSettings.vue"
 import FeedHeader from "./components/FeedHeader.vue"
-import Dashboard from "./components/Dashboard.vue"
 import SelectPost from "./components/SelectPost.vue"
+import Dashboard from "./components/Dashboard.vue"
+import axios from 'axios'
 
 export default {
     name: "App",
@@ -135,5 +135,15 @@ body {
     width: 15px;
     margin-right: -14px;
     margin-top: -9px;
+}
+
+.ant-modal-close-x {
+    height: 16px !important;
+    width: 16px !important;
+}
+
+.ant-modal-close {
+    margin-right: 5px;
+    margin-top: 5px;
 }
 </style>

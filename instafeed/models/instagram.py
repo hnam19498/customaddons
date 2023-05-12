@@ -44,6 +44,7 @@ class InstagramUser(models.Model):
 
     username = fields.Char()
     instagram_id = fields.Char()
+    avatar_url = fields.Char(default='')
     code = fields.Char()
     instagram_access_token = fields.Char()
     instagram_long_access_token = fields.Char()

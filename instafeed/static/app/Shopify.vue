@@ -5,7 +5,8 @@
                   style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
                   v-if="feed.feed_layout == 'slider_squares' && screen_width > 600"
                   :wrap-around="true"
-                  :transition="1000">
+                  :transition="1000"
+                  :autoplay="5000">
             <Slide @mouseleave="post.hover_status = false"
                    @mouseenter="post.hover_status = true"
                    v-for="post in feed.selected_posts"
@@ -42,7 +43,8 @@
                   style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
                   v-if="feed.feed_layout == 'slider_tiles' && screen_width > 600"
                   :wrap-around="true"
-                  :transition="1000">
+                  :transition="1000"
+                  :autoplay="5000">
             <Slide @mouseleave="post.hover_status = false"
                    @mouseenter="post.hover_status = true"
                    v-for="post in feed.selected_posts"
@@ -77,9 +79,10 @@
                   style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
                   v-if="feed.feed_layout == 'slider_tiles' && screen_width <= 600"
                   :wrap-around="true"
-                  :transition="1000">
+                  :transition="1000"
+                  :autoplay="5000">
             <Slide v-for="post in feed.selected_posts"
-                   @click='openPost(feed, post)'
+                   @click="openPost(feed, post)"
                    :key="post.id">
                 <div :style="{padding: feed.post_spacing}"
                      class="carousel__item"
@@ -102,7 +105,8 @@
                   v-if="feed.feed_layout == 'slider_squares' && screen_width <= 600"
                   style="margin-left: 10px; margin-right: 10px; margin-bottom: 10px"
                   :wrap-around="true"
-                  :transition="1000">
+                  :transition="1000"
+                  :autoplay="5000">
             <Slide v-for="post in feed.selected_posts"
                    @click='openPost(feed, post)'
                    :key="post.id">
@@ -232,8 +236,9 @@
                 <div style="width: 100%; display: flex; flex-direction: column">
                     <div style="margin-left: 20px; display: flex; background-color: white; align-items: center">
                         <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
-                            <font-awesome-icon style="height: 30px; width: 30px; color: black"
-                                               icon="fa-brands fa-instagram"/>
+                            <img style="height: 40px; width: 40px; object-fit: cover"
+                                 :src="instagram_avatar"
+                                 :alt="instagram_user">
                         </div>
                         <div style="cursor: pointer; color: black; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px"
                              @click="redirectToInstagramUser">
@@ -258,8 +263,7 @@
                         <div>{{ selected_post.caption }}</div>
                         <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }}
                             <font-awesome-icon icon="fa-regular fa-heart"
-                                               style="color: black"
-                                               beat/>
+                                               style="color: black"/>
                         </div>
                         <div v-if="selected_feed.on_post_click == 'open'">
                             <div v-for="line in JSON.parse(selected_feed.list_tag)"
@@ -290,7 +294,7 @@
                 <img v-if="selected_post.media_type == 'IMAGE'"
                      :src="selected_post.media_url"
                      :alt="selected_post.caption"
-                     style="width: 90%">
+                     style="width: 100%">
                 <video v-if="selected_post.media_type == 'VIDEO'"
                        height="400"
                        autoplay>
@@ -299,8 +303,9 @@
                 <div style="width: 100%; display: flex; flex-direction: column">
                     <div style="margin-left: 20px; display: flex; background-color: white; align-items: center">
                         <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
-                            <font-awesome-icon style="height: 30px; width: 30px; color: black"
-                                               icon="fa-brands fa-instagram"/>
+                            <img style="height: 40px; width: 40px; object-fit: cover"
+                                 :src="instagram_avatar"
+                                 :alt="instagram_user">
                         </div>
                         <div style="cursor: pointer; color: black; font-weight: 600; line-height: 23px; font-size: 17px; margin-left: 15px"
                              @click="redirectToInstagramUser">
@@ -311,8 +316,7 @@
                         <div>{{ selected_post.caption }}</div>
                         <div style="border-bottom: 1px solid #dcdcdc">{{ selected_post.like_count }}
                             <font-awesome-icon icon="fa-regular fa-heart"
-                                               style="color: black"
-                                               beat/>
+                                               style="color: black"/>
                         </div>
                         <div v-if="selected_feed.on_post_click == 'open'">
                             <div v-for="line in JSON.parse(selected_feed.list_tag)"
@@ -336,10 +340,10 @@
     </div>
 </template>
 <script>
-import axios from 'axios'
 import {Carousel, Navigation, Slide} from "vue3-carousel"
-import {Modal} from "ant-design-vue"
 import 'vue3-carousel/dist/carousel.css'
+import {Modal} from "ant-design-vue"
+import axios from 'axios'
 
 export default {
     name: "Shopify",
@@ -352,7 +356,8 @@ export default {
             comments: [],
             instagram_user: '',
             selected_feed: {},
-            screen_width: 0
+            screen_width: 0,
+            instagram_avatar: ''
         }
     },
     methods: {
@@ -432,11 +437,13 @@ export default {
                 shop_url: window.location.origin
             }
         }).then(res => {
+            console.log(res)
             if (res.data.result.list_feed) {
                 self.feed = res.data.result.list_feed[0]
             }
             if (res.data.result.instagram_user) {
                 self.instagram_user = res.data.result.instagram_user
+                self.instagram_avatar = res.data.result.instagram_avatar
             }
         }).catch(error => {
             console.log(error)
@@ -512,5 +519,16 @@ export default {
     cursor: pointer;
     border: 0;
     background: white;
+}
+
+.ant-modal-close-x {
+    height: 16px !important;
+    width: 16px !important;
+    line-height: 16px !important;
+}
+
+.ant-modal-close {
+    margin-top: 5px;
+    margin-right: 5px;
 }
 </style>
