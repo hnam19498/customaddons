@@ -346,7 +346,7 @@ export default {
             current_list_tag: [],
             configuration_select: 'auto',
             post_spacing: 0,
-            instagram_avatar : ''
+            instagram_avatar: ''
         }
     },
     methods: {
