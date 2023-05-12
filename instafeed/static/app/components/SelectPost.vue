@@ -10,12 +10,6 @@
                         id="btn-next">NEXT
                 </button>
             </div>
-            <div id="setting_widget">
-                <label id="enable_widget">Enable Widget</label>
-                <a-switch v-model:checked="enable_widget"
-                          un-checked-children="OFF"
-                          checked-children="ON"/>
-            </div>
         </div>
         <div style="position: relative; width: 100%">
             <div>
@@ -78,8 +72,6 @@
                     </table>
                 </div>
             </div>
-            <div v-if="!enable_widget"
-                 class="blur"/>
         </div>
     </div>
 </template>
@@ -91,19 +83,21 @@ import {h} from 'vue'
 export default {
     data() {
         return {
-            enable_widget: false,
             selected_posts: [],
             tickAllPosts: false
         }
     },
     mounted() {
         if (window.selected_posts) {
-            this.enable_widget = true
             this.selected_posts = window.selected_posts
+        }
+        if (this.edit_feed_posts){
+            this.selected_posts = this.edit_feed_posts
         }
     },
     props: {
-        posts: {type: Array, default: []}
+        posts: {type: Array, default: []},
+        edit_feed_posts: {type: Array, default: []}
     },
     emits: ['SelectPostToFeedSettings'],
     methods: {
@@ -243,31 +237,9 @@ export default {
     align-items: center;
 }
 
-#enable_widget {
-    width: 127px !important;
-    height: 22px !important;
-    font-style: normal;
-    font-weight: 600;
-    font-size: 18px;
-    line-height: 22px;
-    color: black;
-}
-
 .ant-switch {
     margin-left: 28px;
     width: 56px;
-}
-
-.blur {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: 99;
-    opacity: 0.5;
-    background-color: white;
-    justify-content: center;
 }
 
 #choose-post {

@@ -115,10 +115,9 @@ class Instagram(http.Controller):
     @http.route("/instafeed/save_feed", auth='user', type="json")
     def instafeed_save_feed(self, **kw):
         try:
-            print(kw)
             current_user = request.env.user
             current_shop = request.env['shop.shopify'].sudo().search([('admin', '=', current_user.id)], limit=1)
-            request.env['instagram.feed'].sudo().create({
+            feed_data = {
                 'list_tag': json.dumps(kw['list_tag']),
                 "feed_title": kw['feed_title'],
                 "number_column": kw['number_column'],
@@ -128,8 +127,15 @@ class Instagram(http.Controller):
                 "selected_posts": json.dumps(kw['selected_posts']),
                 "enable_status": True,
                 'post_spacing': kw['post_spacing']
-            })
-            return {"success": 'created'}
+            }
+            if 'feed_id' in kw:
+                edit_feed = request.env['instagram.feed'].sudo().search([('shop_id', '=', current_shop.id), ('id', "=", kw['feed_id'])], limit=1)
+                edit_feed.sudo().write(feed_data)
+                edit_feed['enable_status'] = kw['enable_status']
+                return {"success": f'Feed id = {kw["feed_id"]} has been edited!'}
+            else:
+                request.env['instagram.feed'].sudo().create(feed_data)
+                return {"success": 'Created new feed!'}
         except Exception as e:
             return {"error": e}
 
@@ -238,3 +244,35 @@ class Instagram(http.Controller):
                 return {'change_status_feed': f"Feed id = {current_feed.id} was disabled!"}
         except Exception as e:
             return {"error_enable_feed": e}
+
+    @http.route("/instafeed/edit", auth='user', type="json")
+    def instafeed_edit(self, **kw):
+        try:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([("admin", '=', current_user.id)], limit=1)
+            edit_feed = request.env['instagram.feed'].sudo().search([("shop_id", '=', current_shop.id), ('id', '=', kw['feed_id'])], limit=1)
+            return {'edit_feed': {
+                "id": edit_feed.id,
+                "list_tag": edit_feed.list_tag,
+                "feed_title": edit_feed.feed_title,
+                'number_column': edit_feed.number_column,
+                "post_spacing": edit_feed.post_spacing,
+                'on_post_click': edit_feed.on_post_click,
+                "feed_layout": edit_feed.feed_layout,
+                "enable_status": edit_feed.enable_status,
+                'selected_posts': edit_feed.selected_posts
+            }}
+        except Exception as e:
+            return {'error': e}
+
+    @http.route("/instafeed/delete", auth='user', type="json")
+    def instafeed_delete(self, **kw):
+        try:
+            current_user = request.env.user
+            current_shop = request.env['shop.shopify'].sudo().search([("admin", '=', current_user.id)], limit=1)
+            edit_feed = request.env['instagram.feed'].sudo().search([("shop_id", '=', current_shop.id), ('id', '=', kw['feed_id'])], limit=1)
+            feed_id = edit_feed.id
+            edit_feed.sudo().unlink()
+            return {'success': f"Deleted feed id {feed_id}!"}
+        except Exception as e:
+            return {'error': e}

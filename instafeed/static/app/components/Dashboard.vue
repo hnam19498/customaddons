@@ -7,6 +7,7 @@
                 <td>Feed title</td>
                 <td>List post</td>
                 <td class="status">Status</td>
+                <td>Tools</td>
             </tr>
             <tr v-for="feed in list_feed"
                 class="table-row"
@@ -35,6 +36,17 @@
                               un-checked-children="OFF"
                               checked-children="ON"/>
                 </td>
+                <td>
+                    <div>
+                        <font-awesome-icon icon="fa-solid fa-pencil"
+                                           style="color: black; cursor: pointer"
+                                           @click="editFeed(feed.id)"/>
+                        |
+                        <font-awesome-icon @click="deleteFeed(feed.id)"
+                                           icon="fa-solid fa-trash"
+                                           style="color: black; cursor: pointer"/>
+                    </div>
+                </td>
             </tr>
         </table>
     </div>
@@ -47,6 +59,7 @@ import {h} from 'vue'
 
 export default {
     name: "Dashboard",
+    emits: ['editFeed'],
     components: {CloseCircleFilled, notification},
     data() {
         return {
@@ -55,6 +68,41 @@ export default {
         }
     },
     methods: {
+        editFeed(feed_id) {
+            let self = this
+            axios.post("https://odoo.website/instafeed/edit", {
+                jsonrpc: '2.0',
+                params: {
+                    feed_id: feed_id
+                }
+            }).then(res => {
+                self.$emit('editFeed', res.data.result.edit_feed)
+            }).catch(error => {
+                console.log(error)
+            })
+        },
+        deleteFeed(feed_id) {
+            let self = this
+            axios.post("https://odoo.website/instafeed/delete", {
+                jsonrpc: '2.0',
+                params: {
+                    feed_id: feed_id
+                }
+            }).then(res => {
+                if (res.data.result.success) {
+                    for (let i = 0; i < self.list_feed.length; i++) {
+                        if (self.list_feed[i].id == feed_id) {
+                            self.list_feed.splice(i, 1)
+                        }
+                    }
+                    self.show_toast('open', res.data.result.success, 3)
+                } else {
+                    self.show_toast('open', res.data.result.error, 3)
+                }
+            }).catch(error => {
+                console.log(error)
+            })
+        },
         show_toast: (type, message, duration) => {
             notification[type]({
                 message: message,

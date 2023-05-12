@@ -281,8 +281,7 @@
                     :key="product.id"
                     class="table-row">
                     <td>
-                        <input :checked="list_tag.filter(e => e.product_id == product.id).length > 0 || current_list_tag.filter(e => e.product_id == product.id).length > 0"
-                               :disabled="list_tag.filter(e => e.product_id == product.id).length > 0"
+                        <input :checked="list_tag.filter(e => e.product_id == product.id && e.post_id == selected_post.id).length > 0 || current_list_tag.filter(e => e.product_id == product.id && e.post_id == selected_post.id).length > 0"
                                style="margin-left: 10px"
                                type="checkbox">
                     </td>
@@ -327,7 +326,8 @@ export default {
         selected_posts: {
             type: Array,
             default: []
-        }
+        },
+        edit_feed: {type: Object, default: {}}
     },
     data() {
         return {
@@ -404,26 +404,30 @@ export default {
                         this.show_toast('open', 'Please tag product before!', 3)
                     }
                 }
-                axios.post('https://odoo.website/instafeed/save_feed', {
-                    jsonrpc: "2.0",
-                    params: {
-                        list_tag: self.list_tag,
-                        feed_title: self.feed_title,
-                        number_column: self.number_column,
-                        on_post_click: self.on_post_click,
-                        feed_layout: self.feed_layout,
-                        selected_posts: self.selected_posts,
-                        post_spacing: self.post_spacing
-                    }
-                }).then(res => {
-                    if (res.data.result.success) {
-                        alert("Saved!")
-                    } else {
-                        alert(res.data.result.error)
-                    }
-                }).catch(error => {
-                    console.log(error)
-                })
+                if (self.edit_feed) {
+                    axios.post('https://odoo.website/instafeed/save_feed', {
+                        jsonrpc: "2.0",
+                        params: {
+                            feed_id: self.edit_feed.id,
+                            list_tag: self.list_tag,
+                            feed_title: self.feed_title,
+                            number_column: self.number_column,
+                            on_post_click: self.on_post_click,
+                            feed_layout: self.feed_layout,
+                            selected_posts: self.selected_posts,
+                            post_spacing: self.post_spacing,
+                            enable_status: self.edit_feed.enable_status
+                        }
+                    }).then(res => {
+                        if (res.data.result.success) {
+                            alert(res.data.result.success)
+                        } else {
+                            alert(res.data.result.error)
+                        }
+                    }).catch(error => {
+                        console.log(error)
+                    })
+                }
             }
         },
         cancelFeed() {
@@ -510,6 +514,14 @@ export default {
         }).catch(error => {
             console.log(error)
         })
+        if (self.edit_feed) {
+            self.feed_title = self.edit_feed.feed_title
+            self.number_column = self.edit_feed.number_column
+            self.post_spacing = self.edit_feed.post_spacing
+            self.on_post_click = self.edit_feed.on_post_click
+            self.feed_layout = self.edit_feed.feed_layout
+            self.list_tag = JSON.parse(self.edit_feed.list_tag)
+        }
     },
     computed: {
         list_product_filter() {

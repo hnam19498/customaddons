@@ -11,11 +11,14 @@
         <layout-content>
             <select-post @SelectPostToFeedSettings="SelectPostToFeedSettings"
                          v-if="currentTab == 'SelectPost'"
+                         :edit_feed_posts='edit_feed_posts'
                          :posts="posts"/>
             <feed-settings v-if="currentTab == 'FeedSettings'"
                            :selected_posts="selected_posts"
+                           :edit_feed="edit_feed"
                            @changeTab="changeTab"/>
-            <dashboard v-if="currentTab == 'Dashboard'"/>
+            <dashboard v-if="currentTab == 'Dashboard'"
+                       @editFeed="editFeed"/>
             <Modal title="CHANGE THE INSTAGRAM ACCOUNT CONNECTED"
                    @cancel="this.changeInstagram=false"
                    v-model:visible="changeInstagram"
@@ -50,7 +53,9 @@ export default {
             currentTab: "SelectPost",
             selected_posts: [],
             changeInstagram: false,
-            fetch_status: false
+            fetch_status: false,
+            edit_feed: {},
+            edit_feed_posts: []
         }
     },
     components: {
@@ -75,6 +80,12 @@ export default {
         })
     },
     methods: {
+        editFeed(feed) {
+            let self = this
+            self.edit_feed = feed
+            self.edit_feed_posts = JSON.parse(feed.selected_posts)
+            self.currentTab = "SelectPost"
+        },
         fetch_post_loading(status) {
             this.fetch_status = status
         },
