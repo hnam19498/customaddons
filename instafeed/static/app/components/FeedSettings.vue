@@ -211,15 +211,30 @@
                style="width: 70%"
                :footer="null">
             <div style="display: flex">
-                <img v-if="selected_post.media_type == 'IMAGE'"
-                     style="width: 50%; height: 50%"
-                     :src="selected_post.media_url"
-                     :alt="selected_post.caption">
-                <video v-if="selected_post.media_type == 'VIDEO'"
-                       height="400"
-                       autoplay>
-                    <source :src="selected_post.media_url">
-                </video>
+                <div style="display: flex; flex-direction: column">
+                    <img v-if="selected_post.media_type == 'IMAGE'"
+                         style="width: 100%; height: 100%"
+                         :src="selected_post.media_url"
+                         :alt="selected_post.caption">
+                    <video v-if="selected_post.media_type == 'VIDEO'"
+                           height="400"
+                           autoplay>
+                        <source :src="selected_post.media_url">
+                    </video>
+                    <div style="margin-left: 10px">
+                        <div>{{ selected_post.caption }}</div>
+                        <div>
+                            {{ selected_post.like_count }}
+                            <font-awesome-icon icon="fa-regular fa-heart"
+                                               style="color: black"/>
+                        </div>
+                        <div v-if="comments.length > 0" style="border-top: 1px solid #dcdcdc">
+                            <div :key="comment.id" v-for="comment in comments">
+                                <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
                 <div style="width: 100%; display: flex; flex-direction: column">
                     <div style="margin-left:20px; display: flex; background-color: white; align-items: center">
                         <div style="display: flex; justify-content: center; align-items: center; border: 1px solid #E2E2E2; border-radius: 50%; height: 40px; width: 40px">
@@ -245,25 +260,21 @@
                         </button>
                     </div>
                     <div style="display: flex; justify-content: center; text-align: center; margin-bottom: 10px">
-                        <button @click="tag_modal = true" class="tag_product">Tag product</button>
+                        <button @click="openTagProduct" class="tag_product">Tag product</button>
                     </div>
-                    <div style="margin-left: 10px">
-                        <div>{{ selected_post.caption }}</div>
-                        <div style="border-bottom: 1px solid #dcdcdc">
-                            {{ selected_post.like_count }}
-                            <font-awesome-icon icon="fa-regular fa-heart"
-                                               style="color: black"/>
-                        </div>
-                        <div v-if="comments">
-                            <div :key="comment.id" v-for="comment in comments">
-                                <div>{{ comment['username'] }}: {{ comment['text'] }}</div>
-                            </div>
+                    <div style="display: flex; flex-direction: column"
+                         v-if="current_product_tag.length > 0">
+                        <div style="height: 50px; margin-left: 10px; margin-bottom: 5px; margin-top: 5px"
+                             v-for="product in current_product_tag">
+                            <img :src="product.img" :alt="product.name"
+                                 style="width: 50px; height: 50px; object-fit: cover">
+                            {{ product.name }}
                         </div>
                     </div>
                 </div>
             </div>
         </Modal>
-        <Modal @ok="submitTag(this.current_list_tag)"
+        <Modal @ok="submitTag(this.current_list_tag, selected_post.id)"
                v-model:visible="tag_modal"
                :maskClosable="false"
                title="Thêm sản phẩm"
@@ -281,7 +292,7 @@
                     :key="product.id"
                     class="table-row">
                     <td>
-                        <input :checked="list_tag.filter(e => e.product_id == product.id && e.post_id == selected_post.id).length > 0 || current_list_tag.filter(e => e.product_id == product.id && e.post_id == selected_post.id).length > 0"
+                        <input :checked="current_list_tag.filter(e => e.product_id == product.id && e.post_id == selected_post.id).length > 0"
                                style="margin-left: 10px"
                                type="checkbox">
                     </td>
@@ -323,14 +334,12 @@ export default {
         RightCircleOutlined
     },
     props: {
-        selected_posts: {
-            type: Array,
-            default: []
-        },
+        selected_posts: {type: Array, default: []},
         edit_feed: {type: Object, default: {}}
     },
     data() {
         return {
+            current_product_tag: [],
             list_tag: [],
             on_post_click: "open",
             search: '',
@@ -352,6 +361,7 @@ export default {
     methods: {
         previous_post(current_post_id) {
             let self = this
+            self.current_product_tag = []
             for (let i = 0; i < self.selected_posts.length; i++) {
                 if (current_post_id == selected_posts[i].id) {
                     if (i == 0) {
@@ -366,9 +376,22 @@ export default {
                     }
                 }
             }
+            for (let item of self.list_tag) {
+                if (item.post_id == self.selected_post.id) {
+                    for (let product of self.list_product) {
+                        if (product.id == item.product_id) {
+                            self.current_product_tag.push({
+                                name: product.name,
+                                img: product.url_img
+                            })
+                        }
+                    }
+                }
+            }
         },
         next_post(current_post_id) {
             let self = this
+            self.current_product_tag = []
             for (let i = 0; i < self.selected_posts.length; i++) {
                 if (current_post_id == selected_posts[i].id) {
                     if (i == selected_posts.length - 1) {
@@ -380,6 +403,18 @@ export default {
                         self.comments = JSON.parse(self.selected_post.comments)
                     } else {
                         self.comments = []
+                    }
+                }
+            }
+            for (let item of self.list_tag) {
+                if (item.post_id == self.selected_post.id) {
+                    for (let product of self.list_product) {
+                        if (product.id == item.product_id) {
+                            self.current_product_tag.push({
+                                name: product.name,
+                                img: product.url_img
+                            })
+                        }
                     }
                 }
             }
@@ -444,28 +479,38 @@ export default {
         },
         cancelTag() {
             let self = this
-            self.current_list_tag = []
             self.tag_modal = false
             self.search = ''
         },
-        submitTag(current_list_tag) {
+        openTagProduct() {
+            this.tag_modal = true
+        },
+        submitTag(current_tag, post_id) {
             let self = this
-            self.list_tag.push(...current_list_tag)
-            self.current_list_tag = []
             self.tag_modal = false
             self.search = ""
             self.post_modal = false
+            let temp_list = self.list_tag.filter(item => item.post_id != post_id)
+            self.list_tag = [...temp_list, ...current_tag]
+            self.list_tag = self.list_tag.filter((obj, index, e) => index == e.findIndex(t => (t.post_id == obj.post_id && t.product_id == obj.product_id)))
+            self.current_list_tag = []
         },
         tagProduct(selected_post, product) {
             let self = this
             let count = 0
-            for (let line of self.current_list_tag) {
-                if (line.post_id == selected_post.id && line.product_id == product.id) {
+            let line_index = -1
+            for (let i = 0; i < self.current_list_tag.length; i++) {
+                if (self.current_list_tag[i].post_id == selected_post.id && self.current_list_tag[i].product_id == product.id) {
                     count += 1
+                    line_index = i
                 }
             }
             if (count == 0) {
                 self.current_list_tag.push({post_id: selected_post.id, product_id: product.id})
+            } else {
+                if (line_index >= 0) {
+                    self.current_list_tag.splice(line_index, 1)
+                }
             }
         },
         backToSelectPost() {
@@ -483,6 +528,7 @@ export default {
         },
         openPost(post) {
             let self = this
+            self.current_product_tag = []
             if (self.on_post_click == 'open') {
                 self.selected_post = post
                 self.search = ''
@@ -495,6 +541,29 @@ export default {
             }
             if (self.on_post_click == 'instagram') {
                 window.open(post.link_to_post, '_blank')
+            }
+            for (let item of self.list_tag) {
+                if (item.post_id == post.id) {
+                    for (let product of self.list_product) {
+                        if (product.id == item.product_id) {
+                            self.current_product_tag.push({
+                                name: product.name,
+                                img: product.url_img
+                            })
+                        }
+                    }
+                }
+            }
+            if (self.list_tag.length > 0) {
+                self.current_list_tag = []
+                for (let item of self.list_tag) {
+                    if (post.id == item.post_id) {
+                        self.current_list_tag.push({
+                            product_id: item.product_id,
+                            post_id: item.post_id
+                        })
+                    }
+                }
             }
         },
         redirectToInstagramUser() {
@@ -514,13 +583,17 @@ export default {
         }).catch(error => {
             console.log(error)
         })
-        if (self.edit_feed) {
+        if ("feed_title" in self.edit_feed) {
             self.feed_title = self.edit_feed.feed_title
             self.number_column = self.edit_feed.number_column
             self.post_spacing = self.edit_feed.post_spacing
             self.on_post_click = self.edit_feed.on_post_click
             self.feed_layout = self.edit_feed.feed_layout
             self.list_tag = JSON.parse(self.edit_feed.list_tag)
+        }
+        if (self.selected_posts.length < 3) {
+            self.configuration_select = 'manual'
+            self.number_column = self.selected_posts.length
         }
     },
     computed: {

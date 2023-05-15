@@ -267,7 +267,10 @@
                         </div>
                         <div v-if="selected_feed.on_post_click == 'open'">
                             <div v-for="line in JSON.parse(selected_feed.list_tag)"
-                                 style="display: flex; justify-content: center">
+                                 style="justify-content: center; display: flex; flex-direction: column">
+                                <div v-if="line.post_id == selected_post.id">
+
+                                </div>
                                 <button v-if="line.post_id == selected_post.id"
                                         @click="openProduct(line.product_id)"
                                         class="shop_now">
